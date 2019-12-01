@@ -56,4 +56,5 @@ if len(sys.argv) > 2 and 'test' in sys.argv:
     new_port = int(raw_input('Enter New Port: '))
     print 'Testing File Transfer...'
     file_data, c = query(ip, new_port,'?'+rmt_token+':test.txt')
+    open('test.txt', 'w').write(file_data)
     c.close()
