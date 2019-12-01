@@ -55,7 +55,7 @@ class Server:
                         self.actions[query](query, client, addr[0])
                     elif len(query.split('?'+self.token+':'))>1:
                         q = '?'+self.token+':'
-                        self.actions[q](query[1], client, addr[0])
+                        self.actions[q](query, client, addr[0])
                     else:
                         print '[!!] Received unrecognized query'
                         print query
@@ -113,18 +113,19 @@ class Server:
         return answer
 
     def file_transfer(self, query, client, addr):
-        try:
-            local_file = query.split('?'+self.token + ':')[1]
-        except IndexError:
-            print '[!!] Malformed File Transfer Query'
-        if os.path.isfile(local_file):
-            if local_file not in os.listdir('Shared'):
-                print '[!!] Serving file OUTSIDE of shared folder'
-            data = open(local_file, 'rb').read()
+        # TODO: If file is larger than 65kb I need to do some kind
+        #  of buffering here. Need to match client/server pipe sizes
+        if len(query.split(' ')) == 2:
+            query_str = query.split(':')[0]
+            file_name = query.split(' ')[1]
+            print '[*] %s is requesting %s' % (addr, file_name)
+            if file_name in os.listdir('Shared/') or os.path.isfile(file_name):
+                client.send(open(file_name,'rb').read())
+            else:
+                print '[!!] Cannot Find %s' % file_name
+            client.close()
         else:
-            data = 'File <%s> not Found!' % local_file
-        client.send(data)
-        client.close()
+            print query
 
 
 Server(port=12345, isSecure=True)

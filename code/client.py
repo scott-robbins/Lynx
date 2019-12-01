@@ -22,7 +22,7 @@ def query(ip_addr, rmt_port, question):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((ip_addr, rmt_port))
         s.send(question)
-        reply = s.recv(4096)
+        reply = s.recv(65000)
     except socket.error:
         print '[!!] Connection Error... Query Failed!'
         s.close()
@@ -55,6 +55,6 @@ if len(sys.argv) > 2 and 'test' in sys.argv:
     srvr.close()
     new_port = int(raw_input('Enter New Port: '))
     print 'Testing File Transfer...'
-    file_data, c = query(ip, new_port,'?'+rmt_token+':test.txt')
+    file_data, c = query(ip, new_port,'?'+rmt_token+': test.txt')
     open('test.txt', 'w').write(file_data)
     c.close()
