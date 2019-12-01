@@ -57,6 +57,7 @@ class Server:
                         self.actions[query](query, client, addr[0])
                     else:
                         print '[!!] Received unrecognized query'
+                        print query
                         client.close()
                 except socket.error:
                     print '[!!] Failed to Start Server'
