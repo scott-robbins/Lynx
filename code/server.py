@@ -16,10 +16,12 @@ class Server:
     clients = []
     inbound_port = 0
     outgoin_port = 0
+    passphrase = ''
     SECURE = False
 
     def __init__(self, port, isSecure):
-        self.SECURE = isSecure
+        self.SECURE = isSecure[0]
+        self.passphrase = isSecure[1]
         self.crypto_engine = self.initialize(port)
         self.actions = {'?': self.exchange_public_keys,
                         '?'+self.token: self.show_available_files,
@@ -119,13 +121,25 @@ class Server:
             query_str = query.split(':')[0]
             file_name = query.split(' ')[1]
             print '[*] %s is requesting %s' % (addr, file_name)
+
+        if not self.SECURE:
             if file_name in os.listdir('Shared/') or os.path.isfile(file_name):
-                client.send(open(file_name,'rb').read())
+                client.send(open(file_name, 'rb').read())
             else:
                 print '[!!] Cannot Find %s' % file_name
-            client.close()
+                client.close()
         else:
-            print query
+            if file_name in os.listdir('Shared/') or os.path.isfile(file_name):
+                plain_text = open(file_name, 'rb').read()
+                cipher_text = utils.EncodeAES(AES.new(self.passphrase), plain_text)
+                client.send(cipher_text)
+            else:
+                print '[!!] Cannot Find %s' % file_name
+                client.close()
 
 
-Server(port=12345, isSecure=True)
+if '-p' not in sys.argv:
+    Server(port=12345, isSecure=[False])
+elif len(sys.argv) >= 3:
+    Server(port=12345, isSecure=[True, sys.argv[2]])
+
