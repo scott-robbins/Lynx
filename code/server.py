@@ -1,6 +1,5 @@
-from Crypto.Random import get_random_bytes
-from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
+from Crypto.Cipher import AES
 import base64
 import random
 import socket
@@ -21,7 +20,8 @@ class Server:
     def __init__(self, port):
         self.crypto_engine = self.initialize(port)
         self.actions = {'?': self.exchange_public_keys,
-                        '?'+self.token: self.show_available_files}
+                        '?'+self.token: self.show_available_files,
+                        '?'+self.token+':': self.file_transfer}
         self.start_listener()
 
     def initialize(self, p):
@@ -50,7 +50,7 @@ class Server:
                     query = client.recv(1024)
                     self.clients.append(addr[0])
                     if query in self.actions.keys():
-                        self.actions[query](client, addr[0])
+                        self.actions[query](query, client, addr[0])
                     else:
                         print '[!!] Received unrecognized query'
                         client.close()
@@ -67,7 +67,7 @@ class Server:
                 str(self.calculate_uptime())
             self.delete_keys(True)
 
-    def exchange_public_keys(self, client, addr):
+    def exchange_public_keys(self, query, client, addr):
         try:
             pbk = open('KEYS/public.pem', 'rb').read()
             client.send(pbk)
@@ -94,7 +94,7 @@ class Server:
         if os.path.isdir('KEYS'):
             os.rmdir('KEYS')
 
-    def show_available_files(self, client, addr):
+    def show_available_files(self, query, client, addr):
         if os.path.isdir('Shared/'):
             # Count the number of objects and report back to client
             reply = '%d Files in Shared/' % len(os.listdir('Shared'))
@@ -105,4 +105,20 @@ class Server:
         client.send(reply)
         answer = client.recv(4096)
         return answer
+
+    def file_transfer(self, query, client):
+        try:
+            local_file = query.split(self.token + '_get:')[1]
+        except IndexError:
+            print '[!!] Malformed File Transfer Query'
+        if os.path.isfile(local_file):
+            if local_file not in os.listdir('Shared'):
+                print '[!!] Serving file OUTSIDE of shared folder'
+            data = open(local_file, 'rb').read()
+        else:
+            data = 'File not Found!'
+        client.send(data)
+        client.close()
+
+
 Server(12345)

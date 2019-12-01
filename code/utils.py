@@ -1,4 +1,5 @@
 from Crypto.PublicKey import RSA
+from Crypto.Cipher import AES
 import random
 import base64
 import socket
@@ -30,15 +31,32 @@ def swap(file_name, destroy):
     return data
 
 
+def create_timestamp():
+    date = time.localtime(time.time())
+    mo = str(date.tm_mon)
+    day = str(date.tm_mday)
+    yr = str(date.tm_year)
+
+    hr = str(date.tm_hour)
+    min = str(date.tm_min)
+    sec = str(date.tm_sec)
+
+    date = mo + '/' + day + '/' + yr
+    timestamp = hr + ':' + min + ':' + sec
+    return date, timestamp
+
+
 def get_local_ip():
     os.system('ifconfig | grep broadcast >> inet.txt')
     ip = open('inet.txt', 'r').read().split('netmask')[0].split('inet')[1].replace(' ', '')
     os.remove('inet.txt')
     return ip
 
+
 def get_ext_ip():
     cmd = 'echo $(GET https://api.ipify.org) >> ext.txt'
     return swap(cmd, True).pop()
+
 
 def get_ext_ip_info():
     cmd = 'echo $(GET https://ipinfo.io/$(GET https://api.ipify.org)) >> ext_ip.txt'
@@ -117,6 +135,31 @@ def arr2str(args):
     return string
 
 
+def create_whitelist():
+    content = ''
+    valid_pw = False
+    while not valid_pw:
+        pw = str(raw_input('Enter a Password for Whitelist:\n'))
+        if len(pw) % 16 != 0:
+            print 'Password must be either 16, 32 or 64 characters in length'
+        else:
+            valid_pw = True
+    done_adding = False
+    while not done_adding:
+        ip = raw_input('Enter an IP Address to add: ')
+        content += ip + '\n'
+        if raw_input('Continue? (y/n): ') != ('y' or 'Y'):
+            done_adding = True
+    data = EncodeAES(AES.new(pw), content)
+    open('whitelist.txt', 'w').write(data)
+
+
+def decrypt_whitelist(passkey):
+    cipher_text = open('whitelist.txt', 'rb').read()
+    clear_text = DecodeAES(AES.new(passkey), cipher_text)
+    return clear_text
+
+
 if __name__ == '__main__':
     if 'send' in sys.argv:
         addr = sys.argv[2]
@@ -126,5 +169,8 @@ if __name__ == '__main__':
 
     if 'keygen' in sys.argv:
         prk, pbk = create_ephemeral_key()
+
+    if 'make_whitelist' in sys.argv:
+        create_whitelist()
 
 # EOF
