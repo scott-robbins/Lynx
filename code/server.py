@@ -25,7 +25,8 @@ class Server:
         self.crypto_engine = self.initialize(port)
         self.actions = {'?': self.exchange_public_keys,
                         '?'+self.token: self.show_available_files,
-                        '?'+self.token+':': self.file_transfer}
+                        '?'+self.token+':': self.file_download,
+                        '!'+self.token+':': self.file_upload}
         self.start_listener()
 
     def initialize(self, p):
@@ -49,7 +50,7 @@ class Server:
         try:
             while listening:
                 try:
-                    listen, self.inbound_port = utils.create_listening_socket(self.inbound_port, True)
+                    listen, new_port = utils.create_listening_socket(self.inbound_port, True)
                     client, addr = listen.accept()
                     query = client.recv(1024)
                     self.clients.append(addr[0])
@@ -58,10 +59,14 @@ class Server:
                     elif len(query.split('?'+self.token+':'))>1:
                         q = '?'+self.token+':'
                         self.actions[q](query, client, addr[0])
+                    elif len(query.split('!'+self.token+':'))>1:
+                        q = '!'+self.token+':'
+                        self.actions[q](query, client, addr[0])
                     else:
                         print '[!!] Received unrecognized query'
                         print query
                         client.close()
+                    self.inbound_port = new_port
                 except socket.error:
                     print '[!!] Failed to Start Server'
                     listening = False
@@ -87,6 +92,8 @@ class Server:
             return False
         open(client_pbk_file, 'wb').write(reply)
         print '[*] Key Exchange completed with %s' % addr
+        self.inbound_port = random.randint(1025, 65000)
+        client.send(str(self.inbound_port))
         client.close()
         return True
 
@@ -112,16 +119,23 @@ class Server:
         print reply
         client.send(reply)
         answer = client.recv(4096)
+        self.inbound_port = random.randint(1025, 65000)
+        client.send(str(self.inbound_port))
+        client.close()
         return answer
 
-    def file_transfer(self, query, client, addr):
-        # TODO: If file is larger than 65kb I need to do some kind
-        #  of buffering here. Need to match client/server pipe sizes
+    def file_download(self, query, client, addr):
+        """
+        File_Download will download a file ONTO the machine running server.py
+        :param query:
+        :param client:
+        :param addr:
+        :return:
+        """
         if len(query.split(' ')) == 2:
             query_str = query.split(':')[0]
             file_name = query.split(' ')[1]
             print '[*] %s is requesting %s' % (addr, file_name)
-
         if not self.SECURE:
             if file_name in os.listdir('Shared/') or os.path.isfile(file_name):
                 client.send(open(file_name, 'rb').read())
@@ -136,10 +150,36 @@ class Server:
             else:
                 print '[!!] Cannot Find %s' % file_name
                 client.close()
+        # For debugging that the files are transferring correctly
+        os.system('sha256sum %s' % file_name)
+        self.inbound_port = random.randint(1025, 65000)
+        client.send(str(self.inbound_port))
+        client.close()
+        return client
+
+    def file_upload(self, query, client, addr):
+        if len(query.split(' ')) == 3:
+            remote_file_name = query.split(' ')[1]
+            remote_file_size = int(query.split(' ')[2])*2
+            # if remote_file_size > 100000000:
+            #     remote_file_size = 1000000
+            client.send(str(remote_file_size))
+            print '[*] %s is uploading %s' % (addr, remote_file_name)
+        print remote_file_size
+        file_data = client.recv(remote_file_size)
+        open(remote_file_name, 'w').write(file_data)
+        size_transferred = os.path.getsize(remote_file_name)
+        print '[*] %s Uploaded [%d bytes]' % \
+              (remote_file_name, size_transferred)
+        os.system('sha256sum %s' % remote_file_name)
+        self.inbound_port = random.randint(1025, 65000)
+        client.send(str(self.inbound_port))
+        client.close()
+        return size_transferred
 
 
 if '-p' not in sys.argv:
-    Server(port=12345, isSecure=[False])
-elif len(sys.argv) >= 3:
+    Server(port=12345, isSecure=[False, ''])
+elif len(sys.argv) == 3:
     Server(port=12345, isSecure=[True, sys.argv[2]])
 
