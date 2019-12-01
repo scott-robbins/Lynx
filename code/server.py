@@ -59,7 +59,7 @@ class Server:
                         print '[!!] Received unrecognized query'
                         client.close()
                 except socket.error:
-                    print '[!!] Could Start Server'
+                    print '[!!] Failed to Start Server'
                     listening = False
         except KeyboardInterrupt:
             try:    # Try to close any sockets that could be open?
