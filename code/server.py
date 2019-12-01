@@ -112,7 +112,7 @@ class Server:
         answer = client.recv(4096)
         return answer
 
-    def file_transfer(self, query, client):
+    def file_transfer(self, query, client, addr):
         try:
             local_file = query.split('?'+self.token + ':')[1]
         except IndexError:
