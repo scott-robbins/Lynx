@@ -53,7 +53,7 @@ class Server:
                     self.clients.append(addr[0])
                     if query in self.actions.keys():
                         self.actions[query](query, client, addr[0])
-                    elif '?'+query.split(':')[0] in self.actions.keys():
+                    elif len(query.split('?'+self.token+':'))>1:
                         self.actions[query](query, client, addr[0])
                     else:
                         print '[!!] Received unrecognized query'
