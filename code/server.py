@@ -122,7 +122,7 @@ class Server:
                 print '[!!] Serving file OUTSIDE of shared folder'
             data = open(local_file, 'rb').read()
         else:
-            data = 'File not Found!'
+            data = 'File <%s> not Found!' % local_file
         client.send(data)
         client.close()
 
