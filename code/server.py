@@ -16,8 +16,10 @@ class Server:
     clients = []
     inbound_port = 0
     outgoin_port = 0
+    SECURE = False
 
-    def __init__(self, port):
+    def __init__(self, port, isSecure):
+        self.SECURE = isSecure
         self.crypto_engine = self.initialize(port)
         self.actions = {'?': self.exchange_public_keys,
                         '?'+self.token: self.show_available_files,
@@ -121,4 +123,4 @@ class Server:
         client.close()
 
 
-Server(12345)
+Server(port=12345, isSecure=True)

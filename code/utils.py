@@ -157,7 +157,9 @@ def create_whitelist():
 def decrypt_whitelist(passkey):
     cipher_text = open('whitelist.txt', 'rb').read()
     clear_text = DecodeAES(AES.new(passkey), cipher_text)
-    return clear_text
+    ip_list = list(clear_text.split('\n'))
+    ip_list.remove('')
+    return set(ip_list)
 
 
 if __name__ == '__main__':
