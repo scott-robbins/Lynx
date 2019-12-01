@@ -21,11 +21,29 @@ DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
 # plain = DecodeAES(AES.new(key_init), cipher)
 
 
+def swap(file_name, destroy):
+    data = []
+    for line in open(file_name, 'r').readlines():
+        data.append(line.replace('\n', ''))
+    if destroy:
+        os.remove(file_name)
+    return data
+
+
 def get_local_ip():
     os.system('ifconfig | grep broadcast >> inet.txt')
     ip = open('inet.txt', 'r').read().split('netmask')[0].split('inet')[1].replace(' ', '')
     os.remove('inet.txt')
     return ip
+
+def get_ext_ip():
+    cmd = 'echo $(GET https://api.ipify.org) >> ext.txt'
+    return swap(cmd, True).pop()
+
+def get_ext_ip_info():
+    cmd = 'echo $(GET https://ipinfo.io/$(GET https://api.ipify.org)) >> ext_ip.txt'
+    os.system(cmd)
+    return swap('ext_ip.txt', True).pop()
 
 
 def create_listening_socket(p, verbose):
