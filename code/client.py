@@ -53,3 +53,7 @@ if len(sys.argv) > 2 and 'test' in sys.argv:
     files, srvr = query(ip, new_port, '?'+rmt_token)
     print '[*] %s' % files
     srvr.close()
+    new_port = int(raw_input('Enter New Port: '))
+    print 'Testing File Transfer...'
+    file_data, c = query(ip, new_port,'?'+rmt_token+':test.txt')
+    c.close()

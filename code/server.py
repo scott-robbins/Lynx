@@ -110,7 +110,7 @@ class Server:
 
     def file_transfer(self, query, client):
         try:
-            local_file = query.split(self.token + '_get:')[1]
+            local_file = query.split('?'+self.token + ':')[1]
         except IndexError:
             print '[!!] Malformed File Transfer Query'
         if os.path.isfile(local_file):
