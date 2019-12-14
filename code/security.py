@@ -1,8 +1,9 @@
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
-import security
 import base64
 import socket
+import random
+import utils
 import sys
 import os
 
@@ -10,8 +11,8 @@ import os
 #  ################# Crypto Constants ################ #
 BLOCK_SIZE = 16;            PADDING = '{'
 #   ################ Lambda Functions  ################   #
-Pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING        # pad the text to be encrypted
-EncodeAES = lambda c, s: base64.b64encode(c.encrypt(Pad(s)))            # encrypt with AES, encode with base64
+Pad = lambda sr: sr + (BLOCK_SIZE - len(sr) % BLOCK_SIZE) * PADDING        # pad the text to be encrypted
+EncodeAES = lambda c, st: base64.b64encode(c.encrypt(Pad(st)))            # encrypt with AES, encode with base64
 DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
 #  ###################################################### #
 
@@ -65,7 +66,7 @@ def authenticate(peer):
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((peer, 11235))
-        s.send(a+'  :  '+security.EncodeAES(AES.new(a), 'test_password'))
+        s.send(a+'  :  ' + EncodeAES(AES.new(a), 'test_password'))
         print s.recv(1024)
         s.close()
     except socket.error:
@@ -73,6 +74,28 @@ def authenticate(peer):
         exit()
 
 
-if 'auth_test' and len(sys.argv) >=3:
+def retrieve_credentials(node):
+    file_name = node.replace('.', '')
+    key = base64.b64decode(utils.swap(file_name+'.key', False).pop())
+    pwd = DecodeAES(AES.new(key), utils.swap(file_name+'.pwd', False).pop())
+    return pwd, key
+
+
+def log_credentials(client, credentials, key):
+    open('trusted_peers.txt', 'a').write(client)
+    # TODO: Get Remote clients keys and write those, then use trusted_peers
+    #  To be able to associate that with the remote peer for easier setup
+    fname = client.replace('.', '')
+    open(fname + '.key','w').write(base64.b64encode(key))
+    open(fname + '.pwd','w').write(EncodeAES(AES.new(key), credentials))
+
+
+def load_key():
+    return base64.b64decode(open('secret').read())
+
+
+if 'auth_test_0' and len(sys.argv) >=3:
     p = sys.argv[2]
     authenticate(p)
+
+
