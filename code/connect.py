@@ -83,6 +83,12 @@ def serve():
                 local_key = security.load_key()
                 print '[*] Sending %s Encryption Key: %s' % (client_addr[0], base64.b64encode(local_key))
                 client.send(base64.b64encode(local_key))
+
+                ''' Receive Encrypted Query '''
+                encrypted_query = client.recv(2048)
+                print '[*] Received. Encrypted Query...'
+                decrypted_query = security.DecodeAES(AES.new(local_key), encrypted_query)
+                print '[*] Decrypted Query: %s' % decrypted_query
                 client.close()
         except socket.error:
             print '[!!] Connection Error'

@@ -112,8 +112,8 @@ if 'query' in sys.argv and len(sys.argv)>=4:
     '''     Prepare the Query '''
     print '[*] Querying %s : %s' % (rhost, query)
     k = load_key()
-    cipher = AES.new(k)
-    msg = EncodeAES(cipher, query)
+    # cipher = AES.new(k)
+    # msg = EncodeAES(cipher, query)
     print 'Sending Encryption Key: %s' % base64.b64encode(k)
 
     '''     Make the Connection '''
@@ -129,4 +129,6 @@ if 'query' in sys.argv and len(sys.argv)>=4:
     if os.path.isfile('trusted_peers.txt'):
         if rhost not in utils.swap('trusted_peers.txt',False):
             open('trusted_peers.txt','a').write(rhost)
+    ciph = AES.new(rkey)
+    s.send(EncodeAES(ciph, 'Querying: %s' % query))
     s.close()
