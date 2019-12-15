@@ -123,7 +123,7 @@ if 'query' in sys.argv and len(sys.argv)>=4:
 
     ''' Now get the remote hosts key to complete handshake'''
     rkey = base64.b64decode(s.recv(1024))
-    print '[*] %s Has Sent Key: %s' % (rhost, rkey)
+    print '[*] %s Has Sent Key: %s' % (rhost, base64.b64encode(rkey))
     rfile = rhost.replace('.', '')
     open(rfile+'.key','wb').write(rkey)
     if os.path.isfile('trusted_peers.txt'):
