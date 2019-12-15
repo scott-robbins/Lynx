@@ -53,7 +53,19 @@ def client_authentication(c, c_addr, pword):
     return authentic
 
 
+
 def serve():
+
+    def show_commands():
+        syntax = ['sys_cmd', 'cmd_set', 'get_file', 'send_file']
+        reply = '\t==== COMMAND_SET ====\n'
+        for i in range(1,len(syntax)):
+            reply += '[%d] %s\n' % (i, syntax[i])
+        return reply
+
+    actions = {'sys_cmd': os.system,
+               'cmd_set': show_commands}
+
     inbound_port = 11235
     if not os.path.isfile('trusted_peers.txt'):
         os.system('touch trusted_peers.txt')
@@ -62,11 +74,14 @@ def serve():
     authenticated = False
     passwd = security.load_password()
     started = False
+    queried = False
+    query = ''
 
     while not started:
         started, s = create_listener(inbound_port)
         time.sleep(10)
     print '[*] Server Started'
+    args = []
     running = True
     while not authenticated and running:
         trusted = utils.swap('trusted_peers.txt', False)
@@ -88,12 +103,25 @@ def serve():
                 encrypted_query = client.recv(2048)
                 print '[*] Received. Encrypted Query...'
                 decrypted_query = security.DecodeAES(AES.new(local_key), encrypted_query)
-                print '[*] Decrypted Query: %s' % decrypted_query
+                query = decrypted_query.split('Querying: ')[1].split('"')[0]
+                try:
+                    args = decrypted_query.split('"')[1:].replace('"', '')
+                except IndexError:
+                    pass
+                print '[*] Decrypted Query: %s' % query
+                if args:
+                    print '[*] With Arguments: %s' % args
+                queried = True
                 client.close()
         except socket.error:
             print '[!!] Connection Error'
             s.close()
             running = False
+
+    ''' Now Authenticated, So all outgoing communication are encrypted with local_key '''
+    if queried:
+        actions[query]()
+
     s.close()
 
 
