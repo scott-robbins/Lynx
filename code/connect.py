@@ -78,7 +78,7 @@ def serve():
             else:       # KNOWN PEER
                 print '[*] Known Peer %s connecting' % client_addr[0]
                 client_key = client.recv(1024)
-                print '[*] Received Client Key: %s' % base64.b64encode(client_key)
+                print '[*] Received Client Key: %s' % client_key
                 cipher = AES.new(base64.b64decode(client_key))
                 local_key = security.load_key()
                 client.send(base64.b64encode(local_key))

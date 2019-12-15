@@ -122,7 +122,7 @@ if 'query' in sys.argv and len(sys.argv)>=4:
     s.send(base64.b64encode(k))
 
     ''' Now get the remote hosts key to complete handshake'''
-    rkey = base64.b64encode(s.recv(1024))
+    rkey = base64.b64decode(s.recv(1024))
     print '[*] %s Has Sent Key: %s' % (rhost, rkey)
     rfile = rhost.replace('.', '')
     open(rfile+'.key','wb').write(rkey)
