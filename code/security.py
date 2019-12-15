@@ -130,5 +130,5 @@ if 'query' in sys.argv and len(sys.argv)>=4:
         if rhost not in utils.swap('trusted_peers.txt',False):
             open('trusted_peers.txt','a').write(rhost)
     ciph = AES.new(rkey)
-    s.send(EncodeAES(ciph, 'Querying: %s' % query))
+    s.send(EncodeAES(ciph, 'Querying: ' + query))
     s.close()
