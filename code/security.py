@@ -101,8 +101,21 @@ def create_password():
 if 'create_password' in sys.argv:
     create_password()
 
-if 'auth_test_0' and len(sys.argv) >=3:
+if 'authenticate' and len(sys.argv) >=3:
     p = sys.argv[2]
     authenticate(p)
 
+if 'query' in sys.argv and len(sys.argv)>=4:
+    rhost = sys.argv[2]
+    query = sys.argv[3]
 
+    '''     Prepare the Query '''
+    print '[*] Querying %s : %s' % (rhost, query)
+    k = load_key()
+    cipher = AES.new(k)
+    msg = EncodeAES(cipher, query)
+
+    '''     Make the Connection '''
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((rhost, 11235))
+    s.send(msg)

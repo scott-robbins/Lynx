@@ -79,6 +79,7 @@ def serve():
                 peer_creds = security.retrieve_credentials(client_addr[0])
                 cipher = AES.new(peer_creds[1])
                 encrypted_query = client.recv(2048)
+                print '[*] Encrypted Query: %s' % encrypted_query
                 try:
                     query = security.DecodeAES(cipher, encrypted_query)
                 except ValueError:
