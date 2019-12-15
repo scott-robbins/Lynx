@@ -84,6 +84,23 @@ def load_key():
     return base64.b64decode(open('secret').read())
 
 
+def create_password():
+    if os.path.isfile('pass'):
+        opt = raw_input('It Looks like you already have a password. '
+                        'Do you want to reset it now? (y/n):')
+        if opt != ('y' or 'Y'):
+            k = get_keys()
+        else:
+            k = get_keys()
+    else:
+        k = get_keys()
+    pwd = EncodeAES(AES.new(k), raw_input('Enter Password: '))
+    open('pass', 'wb').write(pwd)
+
+
+if 'create_password' in sys.argv:
+    create_password()
+
 if 'auth_test_0' and len(sys.argv) >=3:
     p = sys.argv[2]
     authenticate(p)
