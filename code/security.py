@@ -31,16 +31,6 @@ def get_keys():
     return key
 
 
-def create_password():
-    if os.path.isfile('pass'):
-        opt = raw_input('It Looks like you already have a password. Do you want to reset it now? (y/n):')
-        if opt != ('y' or 'Y'):
-            return False
-    k = get_keys()
-    pwd = EncodeAES(AES.new(k), raw_input('Enter Password: '))
-    open('pass', 'wb').write(pwd)
-
-
 def load_password():
     if not os.path.isfile('pass'):
         print '[!!] No password file found'
