@@ -56,7 +56,7 @@ def authenticate(peer):
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((peer, 11235))
-        s.send(a+'  :  ' + EncodeAES(AES.new(a), 'test_password'))
+        s.send(a+'  :  ' + EncodeAES(AES.new(a), DecodeAES(AES.new(a),open('pass','rb').read())))
         print s.recv(1024)
         s.close()
     except socket.error:
