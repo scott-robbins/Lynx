@@ -74,20 +74,11 @@ def serve():
             client, client_addr = s.accept()
             if client_addr[0] not in trusted:  # Authenticate client, and add to trusted peers
                 authenticated = client_authentication(client, client_addr, passwd)
+                client.close()
             else:       # KNOWN PEER
                 print '[*] Known Peer %s connecting' % client_addr[0]
                 peer_creds = security.retrieve_credentials(client_addr[0])
-                cipher = AES.new(peer_creds[1])
-                encrypted_query = client.recv(2048)
-                print '[*] Encrypted Query: %s' % encrypted_query
-                try:
-                    query = security.DecodeAES(cipher, encrypted_query)
-                except ValueError:
-                    print encrypted_query
-                    print len(list(encrypted_query))
-                    print '[!!!] Could not Decode query'
-                    exit()
-                print '[*] %s is querying: %s' % (client_addr[0], query)
+                print '%s Key: %s' % (client_addr[0], base64.b64encode(peer_creds[1]))
                 client.close()
         except socket.error:
             print '[!!] Connection Error'

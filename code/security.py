@@ -114,7 +114,7 @@ if 'query' in sys.argv and len(sys.argv)>=4:
     k = load_key()
     cipher = AES.new(k)
     msg = EncodeAES(cipher, query)
-
+    print 'Encryption Key: %s' % base64.b64encode(k)
     '''     Make the Connection '''
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((rhost, 11235))
