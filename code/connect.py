@@ -106,13 +106,14 @@ def serve():
                 print '[*] Decrypted Query: %s' % query
                 try:
                     query = decrypted_query.split('Querying: ')[1]
+                    queried = True
                     if '~' in list(query):
                         args = query.split('~')[1:]
                 except IndexError:
                     pass
                 if args:
                     print '[*] With Arguments: %s' % args
-                queried = True
+
                 client.close()
         except socket.error:
             print '[!!] Connection Error'
@@ -120,9 +121,10 @@ def serve():
             running = False
 
     ''' Now Authenticated, So all outgoing communication are encrypted with local_key '''
-    if queried:
+    if queried and not args:
         actions[query]()
-
+    elif queried and args:
+        actions[query](args)
     s.close()
 
 
