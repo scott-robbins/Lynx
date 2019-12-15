@@ -115,7 +115,18 @@ if 'query' in sys.argv and len(sys.argv)>=4:
     cipher = AES.new(k)
     msg = EncodeAES(cipher, query)
     print 'Encryption Key: %s' % base64.b64encode(k)
+
     '''     Make the Connection '''
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((rhost, 11235))
-    s.send(msg)
+    s.send(base64.b64encode(k))
+
+    ''' Now get the remote hosts key to complete handshake'''
+    rkey = base64.b64encode(s.recv(1024))
+    print '[*] %s Has Sent Key: %s' % (rhost, rkey)
+    rfile = rhost.replace('.', '')
+    open(rfile+'.key','wb').write(rkey)
+    if os.path.isfile('trusted_peers.txt'):
+        if rhost not in utils.swap('trusted_peers.txt',False):
+            open('trusted_peers.txt','a').write(rhost)
+

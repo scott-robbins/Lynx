@@ -77,8 +77,9 @@ def serve():
                 client.close()
             else:       # KNOWN PEER
                 print '[*] Known Peer %s connecting' % client_addr[0]
-                peer_creds = security.retrieve_credentials(client_addr[0])
-                print '%s Key: %s' % (client_addr[0], base64.b64encode(peer_creds[1]))
+                client_key = base64.b64decode(client.recv(1024))
+                cipher = AES.new(client_key)
+
                 client.close()
         except socket.error:
             print '[!!] Connection Error'
