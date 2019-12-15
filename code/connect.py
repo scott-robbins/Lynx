@@ -103,11 +103,10 @@ def serve():
                 encrypted_query = client.recv(2048)
                 print '[*] Received. Encrypted Query...'
                 decrypted_query = security.DecodeAES(AES.new(local_key), encrypted_query)
-                query = decrypted_query.split('Querying: ')[1].split('<')[0]
-                try:
-                    args = decrypted_query.split('~')[1:].replace('~', '')
-                except IndexError:
-                    pass
+                query = decrypted_query.split('Querying: ')[1]
+                if '~' in list(query):
+                    args = query.split('~')[1:]
+
                 print '[*] Decrypted Query: %s' % query
                 if args:
                     print '[*] With Arguments: %s' % args
