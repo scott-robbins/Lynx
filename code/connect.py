@@ -90,28 +90,7 @@ def serve():
             if client_addr[0] not in trusted:  # Authenticate client, and add to trusted peers
                 authenticated = client_authentication(client, client_addr, passwd)
                 client.close()
-            else:       # KNOWN PEER
-                print '[*] Known Peer %s connecting' % client_addr[0]
-                client_key = client.recv(1024)
-                print '[*] Received Client Key: %s' % client_key
-                # cipher = AES.new(base64.b64decode(client_key))
-                local_key = security.load_key()
-                print '[*] Sending %s Encryption Key: %s' % (client_addr[0], base64.b64encode(local_key))
-                client.send(base64.b64encode(local_key))
 
-                ''' Receive Encrypted Query '''
-                encrypted_query = client.recv(2048)
-                print '[*] Received. Encrypted Query...'
-                decrypted_query = security.DecodeAES(AES.new(local_key), encrypted_query)
-                query = decrypted_query.split('Querying: ')[1].split('<')[0]
-                try:
-                    args = decrypted_query.split('~')[1:].replace('~', '')
-                except IndexError:
-                    pass
-                print '[*] Decrypted Query: %s' % query
-                if args:
-                    print '[*] With Arguments: %s' % args
-                queried = True
                 client.close()
         except socket.error:
             print '[!!] Connection Error'
@@ -119,8 +98,32 @@ def serve():
             running = False
 
     ''' Now Authenticated, So all outgoing communication are encrypted with local_key '''
-    if queried:
-        actions[query]()
+    try:
+        # KNOWN PEER
+        print '[*] Known Peer %s connecting' % client_addr[0]
+        client_key = client.recv(1024)
+        print '[*] Received Client Key: %s' % client_key
+        # cipher = AES.new(base64.b64decode(client_key))
+        local_key = security.load_key()
+        print '[*] Sending %s Encryption Key: %s' % (client_addr[0], base64.b64encode(local_key))
+        client.send(base64.b64encode(local_key))
+
+        ''' Receive Encrypted Query '''
+        encrypted_query = client.recv(2048)
+        print '[*] Received. Encrypted Query...'
+        decrypted_query = security.DecodeAES(AES.new(local_key), encrypted_query)
+        query = decrypted_query.split('Querying: ')[1].split('<')[0]
+        try:
+            args = decrypted_query.split('~')[1:].replace('~', '')
+        except IndexError:
+            pass
+        print '[*] Decrypted Query: %s' % query
+        if args:
+            print '[*] With Arguments: %s' % args
+
+    except socket.error:
+        print '!! Session Connection Broken'
+        pass
 
     s.close()
 
@@ -130,7 +133,7 @@ if __name__ == '__main__':
     localhost = utils.get_lan_ip()
 
     if 'serve' in sys.argv:
-        # try:
-        serve()
-        # except:
-        #     print '[!!] Server Crashed [%ss elapsed]' % str(time.time() - tic)
+        try:
+            serve()
+        except:
+            print '[!!] Server Crashed [%ss elapsed]' % str(time.time() - tic)
