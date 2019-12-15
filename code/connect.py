@@ -9,6 +9,7 @@ import sys
 import os
 
 tic = time.time()
+DEBUG = True
 
 
 def create_listener(port):
@@ -27,10 +28,15 @@ def client_authentication(c, c_addr, pword):
     print '[*] Authenticating %s...' % c_addr[0]
     authentic = False
     cred_query = c.recv(1024)
+    if DEBUG:
+        print 'Query: %s' % cred_query
+        print 'Login: %s' % pword
     try:
         key = cred_query.split('  :  ')[0]
         pss = cred_query.split('  :  ')[1].replace('\n', '')
         credentials = security.DecodeAES(AES.new(key), pss)
+        if DEBUG:
+            print 'Decrypted Query: %s' % credentials
         if credentials == pword:
             print '\033[1m\033[31m[*] %s \033[1mHas Successfully Authenticated\033[0m' % c_addr[0]
             c.send('[GOOD]')
