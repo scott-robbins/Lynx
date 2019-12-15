@@ -129,4 +129,4 @@ if 'query' in sys.argv and len(sys.argv)>=4:
     if os.path.isfile('trusted_peers.txt'):
         if rhost not in utils.swap('trusted_peers.txt',False):
             open('trusted_peers.txt','a').write(rhost)
-
+    s.close()
