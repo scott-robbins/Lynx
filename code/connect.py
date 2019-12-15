@@ -81,6 +81,7 @@ def serve():
                 print '[*] Received Client Key: %s' % client_key
                 # cipher = AES.new(base64.b64decode(client_key))
                 local_key = security.load_key()
+                print '[*] Sending %s Encryption Key: %s' % (client_addr[0], base64.b64encode(local_key))
                 client.send(base64.b64encode(local_key))
                 client.close()
         except socket.error:

@@ -1,6 +1,4 @@
 from Crypto.Cipher import AES
-import security
-import connect
 import sys
 import os
 
