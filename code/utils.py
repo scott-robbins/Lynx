@@ -32,6 +32,7 @@ def arr2lines(arr):
         content += line + '\n'
     return content
 
+
 def get_lan_ip():
     ip = ''
     cmd1 = 'ifconfig | grep BROADCAST | grep RUNNING'

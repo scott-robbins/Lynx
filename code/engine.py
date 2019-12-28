@@ -6,6 +6,7 @@ import random
 import utils
 import time
 import api
+import sys
 import os
 
 
@@ -18,42 +19,39 @@ DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
 
 class Server:
     INBOUND_PORT = 54123
-    IV_KEY = base64.b64encode(get_random_bytes(16))
+    #IV_KEY = base64.b64encode(get_random_bytes(16))
+    IV_KEY = ''
     enciphered = False
     client_keys = {}
 
-    def __init__(self):
+    def __init__(self, API, local):
+        self.api = API
+        self.IV_KEY = self.load_public_key(local)
         self.tic = time.time()
         self.client_ciphers = {}
-        self.client_keys['?'] = self.list_commands
-        self.client_keys['!'] = self.sys_cmd
 
-    def sys_cmd(self, client, cmd):
-        os.system('%s >> cmd.txt' % cmd)
-        output = utils.arr2lines(utils.swap('cmd.txt', True))
-        try:
-            client.send(output)
-            client.close()
-        except socket.error:
-            pass
-        return output
+    def load_public_key(self, ip):
+        if os.path.isfile('public.key'):
+            print '[*] Loading Public Server Key...'
+            public_key = utils.swap('public.key', False).pop()
+        else:
+            public_key = self.api.create_public_keyfile(ip_address=ip)
+        return public_key
 
     def add_client_key(self, client, key):
         self.client_keys[key] = client
         self.client_ciphers[client] = AES.new(base64.b64decode(key))
         self.enciphered = True
+        return True
 
-    def list_commands(self, client, query):
-        cmd_list = ''
-        for cmd in self.client_keys.keys():
-            cmd_list += cmd + '\n'
+    def sys_cmd(self, client, cmd):
+        os.system('%s >> cmd.txt' % cmd)
+        output = utils.arr2lines(utils.swap('cmd.txt', True))
         try:
-            client.send(cmd_list)
-            client.close()
+            client.send(output);    client.close()
         except socket.error:
-            print '[!!] Connection Error'
             pass
-        return cmd_list
+        return output
 
     def shutdown(self):
         # Erase all keys
@@ -72,25 +70,12 @@ def start_listener(serve):
     return s
 
 
-def give_key(s, addr, q, serve):
-    given = False
-    try:
-        s.send(serve.IV_KEY)
-        s.close()
-        given = True
-    except socket.error:
-        print '[!!] Connection Error'
-        pass
-    return given
+def listener(server_ip):
 
-
-def listener():
-    serve = Server()
     # secrets = AES.new(serve.IV_KEY)
+    API = api.API()
+    serve = Server(API, server_ip)
 
-    actions = {'?': give_key,
-               serve.IV_KEY: api.request_api_key
-               }
     connections = []
     running = True
     tic = time.time()
@@ -102,37 +87,44 @@ def listener():
         try:
             ''' Accept a client '''
             client, addr = s.accept()
-            connections.append(addr[0])
+            client_ip = addr[0]
+            connections.append(client_ip)
 
             ''' Receive a query '''
             query = client.recv(1024)
-            print '[*] Connection accepted from %s is requesting %s' % (addr[0], query)
-            if query in actions.keys():
-                reply = actions[query](client, addr, query, serve)
-                if query == serve.IV_KEY:
-                    print '[**] Client Key Added'
-                    serve.add_client_key(addr[0], reply)
-            elif serve.enciphered:
-                print '[*] Decrypting query'
-                client_cipher = serve.client_ciphers[addr[0]]
-                decrypted_query = DecodeAES(client_cipher, query)
-                if decrypted_query in serve.client_keys:
-                    if '!' in decrypted_query.split('::'):
-                        query = utils.arr2str(decrypted_query.split('::')[1:])
-                    print serve.client_keys[decrypted_query](client, query)
-                    serve.client_keys[decrypted_query](client, query)
-                elif '!' in decrypted_query.split('::'):
-                    query = utils.arr2str(decrypted_query.split(':: ')[1:])
-                    print '[*] Executing sys_cmd: %s' % query
-                    serve.client_keys['!'](client, query)
+            print '[*] Connection accepted from %s [ Requesting %s ]' % (client_ip, query)
+
+            if client_ip in API.clients:
+                print '[*] %s has API Key' % client_ip
+                client_cipher = AES.new(base64.b64decode(API.tokens[client_ip]))
+                decoded_query = DecodeAES(client_cipher, query)
+                print '[*] Decoded Query: %s' % decoded_query
+                try:
+                    command = decoded_query.split(' : ')[0]
+                    request = decoded_query.split(' : ')[1]
+                except IndexError:
+                    pass
+                if len(decoded_query.split(' : '))>1 and command in API.functions.keys():
+                    print '[*] %s API Command Received from %s' % (command.upper(), client_ip)
+                    result = API.functions[command](client, client_ip, request)
+
+
+            elif query == '!?':
+                client_key = API.create_public_keyfile(client_ip)
+                client.send(client_key); client.close()
+            else:
+                print '[!!] Unauthorized Query'
+                client.close()
+
         except KeyboardInterrupt:
             s.close()
             running = False
             pass
+    ''' DELETE ALL KEYS ON SHUTDOWN '''
     serve.shutdown()
     s.close()
     print '[*] Server Killed [%ss Elapsed]' % str(time.time()-tic)
 
 
 if __name__ == '__main__':
-    listener()
+    listener(sys.argv[1])
