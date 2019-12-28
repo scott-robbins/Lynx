@@ -53,18 +53,8 @@ def client_authentication(c, c_addr, pword):
     return authentic
 
 
-
 def serve():
-
-    def show_commands():
-        syntax = ['sys_cmd', 'cmd_set', 'get_file', 'send_file']
-        reply = '\t==== COMMAND_SET ====\n'
-        for i in range(1,len(syntax)):
-            reply += '[%d] %s\n' % (i, syntax[i])
-        return reply
-
-    actions = {'sys_cmd': os.system,
-               'cmd_set': show_commands}
+    actions = {'sys_cmd': os.system}    #'cmd_set': show_commands
 
     inbound_port = 11235
     if not os.path.isfile('trusted_peers.txt'):
@@ -119,13 +109,12 @@ def serve():
             print '[!!] Connection Error'
             s.close()
             running = False
-
-    ''' Now Authenticated, So all outgoing communication are encrypted with local_key '''
-    if queried and not args:
-        actions[query]()
-    elif queried and args:
-        actions[query](args)
-    s.close()
+        ''' Now Authenticated, So all outgoing communication are encrypted with local_key '''
+        if queried and not args:
+            actions[query]()
+        elif queried and args:
+            actions[query](args)
+        s.close()
 
 
 if __name__ == '__main__':

@@ -1,6 +1,4 @@
-from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
-import base64
 import sys
 import os
 
@@ -18,19 +16,6 @@ def cmd(shell):
     os.system('%s >> tmp.txt' % shell)
     return swap('tmp.txt', True)
 
-
-def arr2str(arr):
-    content = ''
-    for e in arr:
-        content += e + ' '
-    return content
-
-
-def arr2lines(arr):
-    content = ''
-    for line in arr:
-        content += line + '\n'
-    return content
 
 def get_lan_ip():
     ip = ''
