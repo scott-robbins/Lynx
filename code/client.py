@@ -5,6 +5,7 @@ import socket
 import utils
 import time
 import sys
+import os
 
 BLOCK_SIZE = 16     # the block size for the cipher object; must be 16 per FIPS-197
 PADDING = '{'
@@ -58,3 +59,25 @@ if 'send' in sys.argv and len(sys.argv) >= 4:
     cipher = AES.new(base64.b64decode(rmt_api_key))
     reply = send(rmt, 54123, EncodeAES(cipher, msg))
     print '[*] Received: %s' % DecodeAES(cipher, reply)
+
+if 'get' in sys.argv and len(sys.argv) >= 4:
+    rmt = sys.argv[2]
+    rmt_file = sys.argv[3]
+    if len(rmt_file.split('/'))>1:
+        local_file = rmt_file.split('/')[-1]
+    else:
+        local_file = rmt_file
+
+    print '[*] Fetching %s from %s'% (local_file, rmt)
+    api_key_file = rmt.replace('.', '') + '.api_key'
+    rmt_api_key = open(api_key_file, 'rb').read()
+    cipher = AES.new(base64.b64decode(rmt_api_key))
+    get_cmd = 'get_file : %s' % rmt_file
+    reply = send(rmt, 54123, EncodeAES(cipher, get_cmd))
+    if reply != 'Unable to Locate File!':
+        if os.path.isfile(local_file):
+            print '%s already exists.'
+            if raw_input('Do you want to overwrite/delete existing file? (y/n):').upper() =='Y':
+                open(local_file, 'wb').write(DecodeAES(cipher, reply))
+        else:
+            open(local_file, 'wb').write(DecodeAES(cipher, reply))

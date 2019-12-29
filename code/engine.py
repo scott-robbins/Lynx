@@ -112,9 +112,7 @@ def listener(server_ip):
             elif query == '!?':
                 client_key = API.create_public_keyfile(client_ip)
                 client.send(client_key); client.close()
-            else:
-                print '[!!] Unauthorized Query'
-                client.close()
+
 
         except KeyboardInterrupt:
             s.close()

@@ -24,6 +24,7 @@ class API:
     def __init__(self):
         self.tic = time.time()
         self.functions = {'sys_cmd': self.sys_cmd,
+                          'get_file': self.get_file,
                           'show_files': self.show_files}
 
     def request_api_key(self, client, ip_address, query):
@@ -59,7 +60,9 @@ class API:
     def show_files(self, client, ip_address, query):
         cipher = self.create_cipher(ip_address)
         content = ''
-        local_files = utils.cmd('ls')
+        if not os.path.isdir('Shared'):
+            os.mkdir('Shared')
+        local_files = utils.cmd('ls Shared')
         for file_name in local_files:
             content += file_name + '\n'
         encrypted_content = EncodeAES(cipher, content)
@@ -69,6 +72,7 @@ class API:
     def sys_cmd(self, client, ip_address, query):
         cipher = self.create_cipher(ip_address)
         result = utils.cmd(query)
+
         if len(result) > 1:
             content = utils.arr2lines(result)
         else:
@@ -76,8 +80,46 @@ class API:
         encrypted_content = EncodeAES(cipher, content)
         client.send(encrypted_content)
         client.close()
-
         return result
 
-# def list_local_files(client, ip_address, query, serve):
+    def get_file(self, client, ip_address, query):
+        cipher = self.create_cipher(ip_address)
+        found = False
+        try:
+            filesize = int(utils.cmd('ls -la %s'%query).pop().split(' ')[4])
+            print '%s is %dKb' % (query, int(filesize/1000.))
+            found = True
+        except IndexError:
+            print '\033[1m[!!]\033[31mUnable to Locate File\033[0m'
+            raw_content = 'Unable to Locate File!'
+        if found:
+            raw_content = utils.arr2lines(utils.cmd('cat %s' % query))
+        encrypted_content = EncodeAES(cipher, raw_content)
+        client.send(encrypted_content)
+        print '[*] File: %s sent \033[1msuccessfully\033[0m to %s' % (query, ip_address)
+        client.close()
+
+    def put_file(self, client, ip_address, query):
+        cipher = self.create_cipher(ip_address)
+        query
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
