@@ -92,5 +92,25 @@ if 'put' in sys.argv and len(sys.argv) >= 4:
     if not os.path.isfile(local_file):
         print '[!!] Cannot Find %s ' % local_file
     else:
-        print '[*] Sending '
-
+        print '[*] Sending %s' % local_file
+        clear_text = open(local_file, 'rb').read()
+        key = base64.b64decode(open(rmt.replace('.', '') + '.api_key','rb').read())
+        cipher = AES.new(key)
+        put_cmd = 'put_file : %s' % local_file
+        encrypted_put = EncodeAES(cipher, put_cmd)
+        encrypted_data = EncodeAES(cipher, open(local_file, 'rb').read())
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        except socket.error:
+            print '[!!] Unable to create socket'
+        try:
+            s.connect((rmt, 54123))
+            s.send(encrypted_put)
+            max_file_size = int(DecodeAES(cipher,s.recv(1024)))
+            print '[*] Recieved max file size: %dKb' % max_file_size
+            print '[*] Sending Encrypted File [%dKb]' % int(os.path.getsize(local_file)/1000)
+            s.send(encrypted_data)
+            s.close()
+        except socket.error:
+            print '[!!] Connection Broken'
+            s.close()

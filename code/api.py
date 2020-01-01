@@ -9,7 +9,11 @@ import time
 import sys
 import os
 
-
+COLOR = {'bold': '\033[1m',
+         'red': '\033[31m',
+         'green': '\033[32m',
+         'blue': '\033[34m'}
+END = '\033[0m'
 BLOCK_SIZE = 16     # the block size for the cipher object; must be 16 per FIPS-197
 PADDING = '{'
 pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING        # pad text to be encrypted
@@ -25,7 +29,7 @@ class API:
         self.tic = time.time()
         self.functions = {'sys_cmd': self.sys_cmd,
                           'get_file': self.get_file,
-                          'put_file' : self.put_file,
+                          'put_file': self.put_file,
                           'show_files': self.show_files}
 
     def request_api_key(self, client, ip_address, query):
@@ -91,13 +95,13 @@ class API:
             print '%s is %dKb' % (query, int(filesize/1000.))
             found = True
         except IndexError:
-            print '\033[1m[!!]\033[31mUnable to Locate File\033[0m'
+            print COLOR['bold']+COLOR['red']+'[!!] Unable to Locate File\033[0m'
             raw_content = 'Unable to Locate File!'
         if found:
             raw_content = utils.arr2lines(utils.cmd('cat %s' % query))
         encrypted_content = EncodeAES(cipher, raw_content)
         client.send(encrypted_content)
-        print '[*] File: %s sent \033[1msuccessfully\033[0m to %s' % (query, ip_address)
+        print COLOR['green']+'[*] File: %s sent \033[1msuccessfully\033[0m to %s' % (query, ip_address)
         client.close()
 
     def put_file(self, client, ip_address, query):
@@ -105,13 +109,15 @@ class API:
         cipher = self.create_cipher(ip_address)
         local_file = query
         if os.path.isfile(local_file):
-            print '[!!] %s already exists.' % local_file
+            print COLOR['bold']+COLOR['red']+'[!!] %s already exists.\033[0m' % local_file
             if raw_input('Do you want to overwrite/delete existing file? (y/n):').upper() !='Y':
                 exit()
-        client.send(EncodeAES(cipher, 'Max File Size: 500000'))
-        raw_content = client.recv(max_file_size)
+        client.send(EncodeAES(cipher, '50000000'))
+        raw_content = client.recv(int(max_file_size))
+        client.close()
         open(local_file, 'wb').write(DecodeAES(cipher, raw_content))
-        print '[*] File Transfer Complete [%d Bytes Transferred]' % os.path.getsize(local_file)
+        print COLOR['bold']+COLOR['green']+'[*] File Transfer Complete [%d Bytes Transferred]\033[0m' %\
+              os.path.getsize(local_file)
 
 
 

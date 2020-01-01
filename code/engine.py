@@ -124,7 +124,7 @@ def listener(server_ip):
     ''' DELETE ALL KEYS ON SHUTDOWN '''
     serve.shutdown()
     s.close()
-    print '[*] Server Killed [%ss Elapsed]' % str(time.time()-tic)
+    print '\033[1m\033[31m[*] Server Killed [%ss Elapsed]\033[0m' % str(time.time()-tic)
 
 
 if __name__ == '__main__':
