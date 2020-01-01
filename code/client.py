@@ -51,6 +51,7 @@ if 'add' in sys.argv and len(sys.argv) >= 3:
     print '[*] Receieved API Key: %s' % api_key
     open(file_name, 'wb').write(api_key)
 
+'''       SEND A COMMAND    '''
 if 'send' in sys.argv and len(sys.argv) >= 4:
     rmt = sys.argv[2]
     msg = utils.arr2str(sys.argv[3:])
@@ -60,6 +61,7 @@ if 'send' in sys.argv and len(sys.argv) >= 4:
     reply = send(rmt, 54123, EncodeAES(cipher, msg))
     print '[*] Received: %s' % DecodeAES(cipher, reply)
 
+'''     GET A FILE      '''
 if 'get' in sys.argv and len(sys.argv) >= 4:
     rmt = sys.argv[2]
     rmt_file = sys.argv[3]
@@ -67,7 +69,7 @@ if 'get' in sys.argv and len(sys.argv) >= 4:
         local_file = rmt_file.split('/')[-1]
     else:
         local_file = rmt_file
-
+    tic = time.time()
     print '[*] Fetching %s from %s'% (local_file, rmt)
     api_key_file = rmt.replace('.', '') + '.api_key'
     rmt_api_key = open(api_key_file, 'rb').read()
@@ -76,8 +78,19 @@ if 'get' in sys.argv and len(sys.argv) >= 4:
     reply = send(rmt, 54123, EncodeAES(cipher, get_cmd))
     if reply != 'Unable to Locate File!':
         if os.path.isfile(local_file):
-            print '%s already exists.'
+            print '%s already exists.' % local_file
             if raw_input('Do you want to overwrite/delete existing file? (y/n):').upper() =='Y':
                 open(local_file, 'wb').write(DecodeAES(cipher, reply))
         else:
             open(local_file, 'wb').write(DecodeAES(cipher, reply))
+    print '[*] Finished Transferring %d Bytes [%ss Elapsed]' % (os.path.getsize(local_file),
+                                                                str(time.time()-tic))
+
+if 'put' in sys.argv and len(sys.argv) >= 4:
+    rmt = sys.argv[2]
+    local_file = sys.argv[3]
+    if not os.path.isfile(local_file):
+        print '[!!] Cannot Find %s ' % local_file
+    else:
+        print '[*] Sending '
+

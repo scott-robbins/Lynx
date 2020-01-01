@@ -25,6 +25,7 @@ class API:
         self.tic = time.time()
         self.functions = {'sys_cmd': self.sys_cmd,
                           'get_file': self.get_file,
+                          'put_file' : self.put_file,
                           'show_files': self.show_files}
 
     def request_api_key(self, client, ip_address, query):
@@ -100,12 +101,17 @@ class API:
         client.close()
 
     def put_file(self, client, ip_address, query):
+        max_file_size = 5e5
         cipher = self.create_cipher(ip_address)
-        query
-
-
-
-
+        local_file = query
+        if os.path.isfile(local_file):
+            print '[!!] %s already exists.' % local_file
+            if raw_input('Do you want to overwrite/delete existing file? (y/n):').upper() !='Y':
+                exit()
+        client.send(EncodeAES(cipher, 'Max File Size: 500000'))
+        raw_content = client.recv(max_file_size)
+        open(local_file, 'wb').write(DecodeAES(cipher, raw_content))
+        print '[*] File Transfer Complete [%d Bytes Transferred]' % os.path.getsize(local_file)
 
 
 

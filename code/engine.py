@@ -19,12 +19,15 @@ DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
 
 class Server:
     INBOUND_PORT = 54123
-    #IV_KEY = base64.b64encode(get_random_bytes(16))
+    # IV_KEY = base64.b64encode(get_random_bytes(16))
     IV_KEY = ''
     enciphered = False
     client_keys = {}
 
     def __init__(self, API, local):
+        self.niface = utils.cmd('sh get_active_niface.sh').pop()
+        self.ip = utils.cmd('ifconfig %s | grep "inet "' %
+                            self.niface).pop().split(' netmask ')[0].split(' inet ')[1]
         self.api = API
         self.IV_KEY = self.load_public_key(local)
         self.tic = time.time()
