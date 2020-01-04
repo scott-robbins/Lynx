@@ -45,4 +45,13 @@ def get_lan_ip():
     return ip
 
 
+def udp_send(ip_addr, port, msg):
+    import socket
 
+    print "UDP target IP:", ip_addr
+    print "UDP target port:", port
+    print "message:", msg
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.sendto(msg, (ip_addr, port))
+    sock.close()
