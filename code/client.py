@@ -31,7 +31,7 @@ def add_remote_host_public_key(remote_host, remote_key_file):
         rmt_pub_key = s.recv(4096)
         open(remote_key_file, 'wb').write(rmt_pub_key)
         s.send(public_key.exportKey())
-        session_key = s.recv(4096)
+        session_key = base64.b64decode(s.recv(4096))
         open(remote_host.replace('.','')+'.token','wb').write(session_key)
         s.close()
     except socket.error:
@@ -40,10 +40,69 @@ def add_remote_host_public_key(remote_host, remote_key_file):
     return session_key
 
 
+def get_file(remote_host, query):
+    # Load Key
+    rmt_key = remote_host.replace('.', '') + '.pem'
+    if not os.path.isfile(rmt_key):
+        print '[!!] No Public Key for %s. Run python client.py add %s' % (rmt, rmt)
+        exit()
+    rmt_pub_key = engine.load_private_key(rmt_key)
+    encrypted_query = PKCS1_OAEP.new(rmt_pub_key).encrypt(query)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((remote_host, 54123))
+    s.send(encrypted_query)
+    tic = time.time()
+    # Receive Reply and decrypt it
+    reply = s.recv(65535)
+    encrypted_key = reply.split('::::')[0]
+
+    key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)
+    decrypted_data = utils.DecodeAES(AES.new(key), reply.split('::::')[1])
+    if os.path.isfile(query):
+        if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: ').upper() == 'Y':
+            os.remove(query)
+    resource = query.split(': ')[1]
+    open(resource, 'wb').write(decrypted_data)
+    print '[*] %d Bytes Transferred [%ss Elapsed]' % (os.path.getsize(resource),
+                                                      str(time.time()-tic))
+
+
+def query(remote_host, remote_key_file):
+    if not os.path.isfile(remote_key_file):
+        print '[!!] No Public Key for %s. Run python client.py add %s' % (rmt, rmt)
+        exit()
+    # Load Key
+    rmt_pub_key = engine.load_private_key(remote_key_file)
+    encrypted_query = PKCS1_OAEP.new(rmt_pub_key).encrypt(query)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((remote_host, 54123))
+    s.send(encrypted_query)
+
+    # Receive Reply and decrypt it
+    reply = s.recv(65535)
+    key = base64.b64decode(PKCS1_OAEP.new(private_key).decrypt(reply.split('::::')[0]))
+    decrypted_data = utils.DecodeAES(AES.new(key), reply.split('::::')[1])
+    print '[*] Reply:\n$ %s' % decrypted_data
+
+
 if 'add' in sys.argv and len(sys.argv) >= 3:
     rmt = sys.argv[2]
-    rmt_key = rmt.replace('.', '') + '.pem'
-    key = add_remote_host_public_key(rmt, rmt_key)
-    open(rmt.replace('.', '') + '.token', 'wb').write(key)
+    r_key = rmt.replace('.', '') + '.pem'
+    k = add_remote_host_public_key(rmt, r_key)
+    open(rmt.replace('.', '') + '.token', 'wb').write(k)
     print '[*] Keys Exchanged With %s' % rmt
+
+
+if 'query' in sys.argv and len(sys.argv) >= 4:
+    rmt = sys.argv[2]
+    r_key = rmt.replace('.', '') + '.pem'
+    q = utils.arr2str(sys.argv[3:])
+    print '[*] Querying %s: %s' % (rmt, 'SYS_CMD : '+q)
+
+
+if 'get' in sys.argv and len(sys.argv) >= 4:
+    remote = sys.argv[2]
+    request = 'GET_FILE : '+sys.argv[3]
+    get_file(remote, request)
+
 

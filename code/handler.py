@@ -24,13 +24,14 @@ class Serve:
     private_key = ''
     clients = []
 
-    def __init__(self):
+    def __init__(self, mode):
         self.session_key = get_random_bytes(32)
-        self.socket = utils.start_listener(self.inbound_port, 5)
+        self.socket = utils.start_listener(self.inbound_port, 7)
         self.lan_ip, self.ext_ip, self.nx_iface = self.initialize()
         self.functions = {'&?Key': self.key_exchange,
-                          'SYS_CMD': self.sys_cmd}
-        self.run()
+                          'SYS_CMD': self.sys_cmd,
+                          'GET_FILE': self.get_file}
+        self.run(mode)
 
     def initialize(self):
         int_ip, ext_ip, nx_iface = engine.get_public_private_ip(verbose=True)
@@ -44,12 +45,12 @@ class Serve:
         self.public_key = self.private_key.publickey()
         return int_ip, ext_ip, nx_iface
 
-    def run(self):
+    def run(self, MODE):
         RUNNING = True
         date, start_time = utils.create_timestamp()
         print '[*] Server Started %s - %s' % (date, start_time)
-        print 'Server Functions:'
-        print self.functions.keys()
+        # print 'Server Functions:'
+        # print self.functions.keys()
         while RUNNING:
             try:
                 '''        ACCEPT A CLIENT        '''
@@ -57,17 +58,22 @@ class Serve:
                 client_ip = client_addr[0]
                 self.clients.append(client_ip)
                 query = client.recv(1024)
+                print '%s has connected' % client_ip
                 try:
                     decrypted_query = PKCS1_OAEP.new(self.private_key).decrypt(query)
+                    print decrypted_query
+                    query = decrypted_query.split(' : ')[0]
+                    command = decrypted_query.split(' : ')[1]
+                    # print query
                 except ValueError:
                     pass
 
-                if query in self.functions.keys():
-                    print '[*] Replying to Query: %s' % query
+                if query == '&?Key':
+                    print '[*] Initializing Handshake with new client %s' % query
                     self.functions[query](client, client_ip)
                 elif query in self.functions.keys():
-                    print '[*] Replying to %s API request' % client_ip
-                    self.functions[query](client, client_ip, decrypted_query)
+                    print '[*] Replying to API request from %s' % client_ip
+                    self.functions[query](client, client_ip, command)
 
             except socket.error:
                 print '[!!] Server Socket Error'
@@ -79,8 +85,7 @@ class Serve:
         client.send(self.public_key.exportKey())
         client_public_key = RSA.importKey(client.recv(4096))
         open(client_key_file, 'wb').write(client_public_key.exportKey())
-
-        # client.send(engine_iv)
+        client.send(base64.b64encode(self.session_key))
         client.close()
 
     def sys_cmd(self, client, client_ip, query):
@@ -89,9 +94,32 @@ class Serve:
             try:
                 os.system('python client.py add %s' % client_ip)
             except OSError:
-                print '[!!] Unable to Add Client PBK'
-        else:
-            client_key = engine.load_private_key(client_ip.replace('.', '')+'.pem')
+                print '[!!] Unable to Load Client Public Key'
+                return ''
+
+        client_key = engine.load_private_key(client_ip.replace('.', '') + '.pem')
+        status = utils.arr2lines(utils.cmd(query))
+        print '$ %s' % query
+        print '$ %s' % status
+        encrypted_reply = PKCS1_OAEP.new(client_key).encrypt(status)
+        client.send(encrypted_reply)
+        client.close()
+
+    def get_file(self, client, client_ip, query):
+        if not os.path.isfile(client_ip.replace('.','')+'.pem'):
+            print '[!!] No Public Key for client %s' % client_ip
+            try:
+                os.system('python client.py add %s' % client_ip)
+            except OSError:
+                print '[!!] Unable to Load Client Public Key'
+                return ''
+        client_key = engine.load_private_key(client_ip.replace('.','')+'.pem')
+        print '[*] Sending %s to %s' % (query, client_ip)
+        content = open(query.replace(' ',''), 'rb').read()
+        key = get_random_bytes(32)
+        encrypted_key = PKCS1_OAEP.new(client_key).encrypt(key)
+        client.send(encrypted_key+'::::'+utils.EncodeAES(AES.new(key), content))
+        client.close()
 
 
 Serve()
