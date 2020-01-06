@@ -47,6 +47,7 @@ class Serve:
 
     def run(self, MODE):
         RUNNING = True
+        tic = time.time()
         date, start_time = utils.create_timestamp()
         print '[*] Server Started %s - %s' % (date, start_time)
         # print 'Server Functions:'
@@ -58,7 +59,7 @@ class Serve:
                 client_ip = client_addr[0]
                 self.clients.append(client_ip)
                 query = client.recv(1024)
-                print '%s has connected' % client_ip
+
                 try:
                     decrypted_query = PKCS1_OAEP.new(self.private_key).decrypt(query)
                     print decrypted_query
@@ -74,9 +75,15 @@ class Serve:
                 elif query in self.functions.keys():
                     print '[*] Replying to API request from %s' % client_ip
                     self.functions[query](client, client_ip, command)
-
+                else:
+                    client.close()
             except socket.error:
                 print '[!!] Server Socket Error'
+                self.socket.close()
+                RUNNING = False
+            except KeyboardInterrupt:
+                print '\033[1m[!!] \033[31mServer KILLED \033[0m\033[1m[%ss Elapsed]\033[0m' %\
+                      str(time.time()-tic)
                 self.socket.close()
                 RUNNING = False
 
@@ -101,8 +108,10 @@ class Serve:
         status = utils.arr2lines(utils.cmd(query))
         print '$ %s' % query
         print '$ %s' % status
-        encrypted_reply = PKCS1_OAEP.new(client_key).encrypt(status)
-        client.send(encrypted_reply)
+        key = get_random_bytes(32)
+        encrypted_key = PKCS1_OAEP.new(client_key).encrypt(key)
+        encrypted_reply = utils.EncodeAES(AES.new(key),status)
+        client.send(encrypted_key+'::::'+encrypted_reply)
         client.close()
 
     def get_file(self, client, client_ip, query):
@@ -122,4 +131,9 @@ class Serve:
         client.close()
 
 
-Serve()
+if len(sys.argv) >= 2:
+    server_mode = sys.argv[2]
+else:
+    server_mode = 'listener'
+Serve(mode=server_mode)
+

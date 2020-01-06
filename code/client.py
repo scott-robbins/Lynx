@@ -44,7 +44,8 @@ def get_file(remote_host, query):
     # Load Key
     rmt_key = remote_host.replace('.', '') + '.pem'
     if not os.path.isfile(rmt_key):
-        print '[!!] No Public Key for %s. Run python client.py add %s' % (rmt, rmt)
+        print '[!!] No Public Key for %s. Run python client.py add %s' % (remote_host,
+                                                                          remote_host)
         exit()
     rmt_pub_key = engine.load_private_key(rmt_key)
     encrypted_query = PKCS1_OAEP.new(rmt_pub_key).encrypt(query)
@@ -67,20 +68,21 @@ def get_file(remote_host, query):
                                                       str(time.time()-tic))
 
 
-def query(remote_host, remote_key_file):
+def query(remote_host, remote_key_file, cmd):
     if not os.path.isfile(remote_key_file):
         print '[!!] No Public Key for %s. Run python client.py add %s' % (rmt, rmt)
         exit()
     # Load Key
-    rmt_pub_key = engine.load_private_key(remote_key_file)
-    encrypted_query = PKCS1_OAEP.new(rmt_pub_key).encrypt(query)
+    rmt_pub_key = engine.load_private_key(remote_host.replace('.', '') + '.pem')
+    encrypted_query = PKCS1_OAEP.new(rmt_pub_key).encrypt(cmd)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((remote_host, 54123))
     s.send(encrypted_query)
+    print '[*] Query Sent to %s ' % remote_host
 
     # Receive Reply and decrypt it
     reply = s.recv(65535)
-    key = base64.b64decode(PKCS1_OAEP.new(private_key).decrypt(reply.split('::::')[0]))
+    key = PKCS1_OAEP.new(private_key).decrypt(reply.split('::::')[0])
     decrypted_data = utils.DecodeAES(AES.new(key), reply.split('::::')[1])
     print '[*] Reply:\n$ %s' % decrypted_data
 
@@ -98,7 +100,7 @@ if 'query' in sys.argv and len(sys.argv) >= 4:
     r_key = rmt.replace('.', '') + '.pem'
     q = utils.arr2str(sys.argv[3:])
     print '[*] Querying %s: %s' % (rmt, 'SYS_CMD : '+q)
-
+    query(rmt, r_key, 'SYS_CMD : '+q)
 
 if 'get' in sys.argv and len(sys.argv) >= 4:
     remote = sys.argv[2]
