@@ -49,7 +49,7 @@ class Serve:
         RUNNING = True
         tic = time.time()
         date, start_time = utils.create_timestamp()
-        print '[*] Server Started %s - %s' % (date, start_time)
+        print '\033[1m[*] \033[32mServer Started\033[0m\033[1m %s - %s\033[0m' % (date, start_time)
         # print 'Server Functions:'
         # print self.functions.keys()
         while RUNNING:
@@ -73,16 +73,16 @@ class Serve:
                     print '[*] Initializing Handshake with new client %s' % query
                     self.functions[query](client, client_ip)
                 elif query in self.functions.keys():
-                    print '[*] Replying to API request from %s' % client_ip
+                    print '[*] Replying to API request from \033[1m%s\033[0m' % client_ip
                     self.functions[query](client, client_ip, command)
                 else:
                     client.close()
             except socket.error:
-                print '[!!] Server Socket Error'
+                print '\033[31m\033[1m[!!] Server Socket Error\033[0m'
                 self.socket.close()
                 RUNNING = False
             except KeyboardInterrupt:
-                print '\033[1m[!!] \033[31mServer KILLED \033[0m\033[1m[%ss Elapsed]\033[0m' %\
+                print '\n\033[1m[!!] \033[31mServer KILLED \033[0m\033[1m[%ss Elapsed]\033[0m' %\
                       str(time.time()-tic)
                 self.socket.close()
                 RUNNING = False
@@ -97,11 +97,11 @@ class Serve:
 
     def sys_cmd(self, client, client_ip, query):
         if not os.path.isfile(client_ip.replace('.', '')+'.pem'):
-            print '[!!] No Public Key for client %s' % client_ip
+            print '\033[1m\033[31m[!!] No Public Key for client %s\033[0m' % client_ip
             try:
                 os.system('python client.py add %s' % client_ip)
             except OSError:
-                print '[!!] Unable to Load Client Public Key'
+                print '\033[1m\033[31m[!!] Unable to Load Client Public Key\033[0m'
                 return ''
 
         client_key = engine.load_private_key(client_ip.replace('.', '') + '.pem')
@@ -123,9 +123,12 @@ class Serve:
                 print '[!!] Unable to Load Client Public Key'
                 return ''
         client_key = engine.load_private_key(client_ip.replace('.','')+'.pem')
-        print '[*] Sending %s to %s' % (query, client_ip)
+        file_size = os.path.getsize(query.replace(' ', ''))
+        print '[*] Sending %s to %s [%d bytes]' % (query, client_ip, file_size)
+        # print '[*] %s is %d bytes' % (query, file_size)
         content = open(query.replace(' ',''), 'rb').read()
         key = get_random_bytes(32)
+        # print '[*] Encryption Key: %s' % base64.b64encode(key)
         encrypted_key = PKCS1_OAEP.new(client_key).encrypt(key)
         client.send(encrypted_key+'::::'+utils.EncodeAES(AES.new(key), content))
         client.close()

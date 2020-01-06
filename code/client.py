@@ -42,6 +42,7 @@ def add_remote_host_public_key(remote_host, remote_key_file):
 
 def get_file(remote_host, query):
     # Load Key
+    tic = time.time()
     rmt_key = remote_host.replace('.', '') + '.pem'
     if not os.path.isfile(rmt_key):
         print '[!!] No Public Key for %s. Run python client.py add %s' % (remote_host,
@@ -52,13 +53,16 @@ def get_file(remote_host, query):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((remote_host, 54123))
     s.send(encrypted_query)
-    tic = time.time()
+
     # Receive Reply and decrypt it
     reply = s.recv(65535)
     encrypted_key = reply.split('::::')[0]
 
     key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)
-    decrypted_data = utils.DecodeAES(AES.new(key), reply.split('::::')[1])
+    print '[*] Encryption Key: %s' % base64.b64encode(key)
+    encrypted_data = reply.split('::::')[1]
+    print '[*] Received %d pieces of encrypted data. Decrypting...' % len(encrypted_data)
+    decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
     if os.path.isfile(query):
         if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: ').upper() == 'Y':
             os.remove(query)
