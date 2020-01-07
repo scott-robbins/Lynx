@@ -64,12 +64,38 @@ def get_file(remote_host, query):
     print '[*] Received %d pieces of encrypted data. Decrypting...' % len(encrypted_data)
     decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
     if os.path.isfile(query):
-        if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: ').upper() == 'Y':
+        if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: '%query).upper() == 'Y':
             os.remove(query)
     resource = query.split(': ')[1]
     open(resource, 'wb').write(decrypted_data)
     print '[*] %d Bytes Transferred [%ss Elapsed]' % (os.path.getsize(resource),
                                                       str(time.time()-tic))
+
+
+def put_file(remote_host, file_name):
+    tic = time.time()
+    rmt_key = remote_host.replace('.', '') + '.pem'
+    if not os.path.isfile(rmt_key):
+        print '[!!] No Public Key for %s. Run python client.py add %s' % (remote_host,
+                                                                          remote_host)
+        exit()
+    # Tell server the file we want to upload, and it's size
+    rmt_pub_key = engine.load_private_key(rmt_key)
+    statement = 'PUT_FILE : %s = %d' % (file_name, os.path.getsize(file_name))
+    encrypted_query = PKCS1_OAEP.new(rmt_pub_key).encrypt(statement)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((remote_host, 54123))
+    s.send(encrypted_query)
+
+    # Encrypt the file and send it
+    raw_file_data = open(file_name, 'rb').read()
+    key = get_random_bytes(32)
+    encrypted_key = PKCS1_OAEP.new(rmt_pub_key).encrypt(key)
+    encrypted_data = utils.EncodeAES(AES.new(key), raw_file_data)
+    s.send(encrypted_key+';;;;'+encrypted_data)
+    s.close()
+    print '[*] Finished Sending %d bytes of Data to %s' % (os.path.getsize(file_name),
+                                                           remote_host)
 
 
 def query(remote_host, remote_key_file, cmd):
@@ -91,24 +117,30 @@ def query(remote_host, remote_key_file, cmd):
     print '[*] Reply:\n$ %s' % decrypted_data
 
 
-if 'add' in sys.argv and len(sys.argv) >= 3:
-    rmt = sys.argv[2]
-    r_key = rmt.replace('.', '') + '.pem'
-    k = add_remote_host_public_key(rmt, r_key)
-    open(rmt.replace('.', '') + '.token', 'wb').write(k)
-    print '[*] Keys Exchanged With %s' % rmt
+if __name__ == '__main__':
+    # client actions from the commandline below
+    if 'add' in sys.argv and len(sys.argv) >= 3:
+        rmt = sys.argv[2]
+        r_key = rmt.replace('.', '') + '.pem'
+        k = add_remote_host_public_key(rmt, r_key)
+        open(rmt.replace('.', '') + '.token', 'wb').write(k)
+        print '[*] Keys Exchanged With %s' % rmt
 
+    if 'query' in sys.argv and len(sys.argv) >= 4:
+        rmt = sys.argv[2]
+        r_key = rmt.replace('.', '') + '.pem'
+        q = utils.arr2str(sys.argv[3:])
+        print '[*] Querying %s: %s' % (rmt, 'SYS_CMD : ' + q)
+        query(rmt, r_key, 'SYS_CMD : ' + q)
 
-if 'query' in sys.argv and len(sys.argv) >= 4:
-    rmt = sys.argv[2]
-    r_key = rmt.replace('.', '') + '.pem'
-    q = utils.arr2str(sys.argv[3:])
-    print '[*] Querying %s: %s' % (rmt, 'SYS_CMD : '+q)
-    query(rmt, r_key, 'SYS_CMD : '+q)
+    if 'get' in sys.argv and len(sys.argv) >= 4:
+        remote = sys.argv[2]
+        request = 'GET_FILE : ' + sys.argv[3]
+        get_file(remote, request)
 
-if 'get' in sys.argv and len(sys.argv) >= 4:
-    remote = sys.argv[2]
-    request = 'GET_FILE : '+sys.argv[3]
-    get_file(remote, request)
-
-
+    if 'put' in sys.argv and len(sys.argv) >= 4:
+        remote = sys.argv[2]
+        local_file = sys.argv[3]
+        if not os.path.isfile(local_file):
+            print '[!!] Cannot Find %s' % local_file
+        put_file(remote, local_file)

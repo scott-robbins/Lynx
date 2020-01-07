@@ -50,8 +50,7 @@ class Serve:
         tic = time.time()
         date, start_time = utils.create_timestamp()
         print '\033[1m[*] \033[32mServer Started\033[0m\033[1m %s - %s\033[0m' % (date, start_time)
-        # print 'Server Functions:'
-        # print self.functions.keys()
+
         while RUNNING:
             try:
                 '''        ACCEPT A CLIENT        '''
@@ -96,14 +95,7 @@ class Serve:
         client.close()
 
     def sys_cmd(self, client, client_ip, query):
-        if not os.path.isfile(client_ip.replace('.', '')+'.pem'):
-            print '\033[1m\033[31m[!!] No Public Key for client %s\033[0m' % client_ip
-            try:
-                os.system('python client.py add %s' % client_ip)
-            except OSError:
-                print '\033[1m\033[31m[!!] Unable to Load Client Public Key\033[0m'
-                return ''
-
+        self.check_client(client_ip)
         client_key = engine.load_private_key(client_ip.replace('.', '') + '.pem')
         status = utils.arr2lines(utils.cmd(query))
         print '$ %s' % query
@@ -115,13 +107,7 @@ class Serve:
         client.close()
 
     def get_file(self, client, client_ip, query):
-        if not os.path.isfile(client_ip.replace('.','')+'.pem'):
-            print '[!!] No Public Key for client %s' % client_ip
-            try:
-                os.system('python client.py add %s' % client_ip)
-            except OSError:
-                print '[!!] Unable to Load Client Public Key'
-                return ''
+        self.check_client(client_ip)
         client_key = engine.load_private_key(client_ip.replace('.','')+'.pem')
         file_size = os.path.getsize(query.replace(' ', ''))
         print '[*] Sending %s to %s [%d bytes]' % (query, client_ip, file_size)
@@ -133,10 +119,36 @@ class Serve:
         client.send(encrypted_key+'::::'+utils.EncodeAES(AES.new(key), content))
         client.close()
 
+    def put_file(self, client, client_ip, query):
+        tic = time.time()
+        self.check_client(client_ip)
+        client_key = engine.load_private_key(client_ip.replace('.', '') + '.pem')
+        file_name = query.split(' = ')[0]
+        file_size = int(query.split(' = ')[1])
+        print '[*] %s is sending %s [%d bytes]' % (client_ip, file_name, file_size)
+        raw_data = client.recv(file_size+40)  # Get key and encrypted file in one reply
+        key = client_key.decrypt(raw_data.split(';;;;')[0])
+        encrypted_data = raw_data.split(';;;;')[1]
+        decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
+        if os.path.isfile(file_name):
+            if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: '%file_name).upper() == 'Y':
+                os.remove(file_name)
+        open(file_name, 'wb').write(decrypted_data)
+        bytes_transferred = os.path.getsize(file_name)
+        print '[*] %d Bytes transferred [%ss Elapsed]' % (bytes_transferred, str(time.time()-tic))
 
-if len(sys.argv) >= 2:
-    server_mode = sys.argv[2]
-else:
-    server_mode = 'listener'
-Serve(mode=server_mode)
+    def check_client(self, ip):
+        if not os.path.isfile(ip.replace('.', '') + '.pem'):
+            print '[!!] No Public Key for client %s' % ip
+            try:
+                os.system('python client.py add %s' % ip)
+            except OSError:
+                print '[!!] Unable to Load Client Public Key'
 
+
+if __name__ == '__main__':
+    if len(sys.argv) >= 2:
+        server_mode = sys.argv[2]
+    else:
+        server_mode = 'listener'
+    Serve(mode=server_mode)
