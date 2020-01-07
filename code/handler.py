@@ -30,7 +30,8 @@ class Serve:
         self.lan_ip, self.ext_ip, self.nx_iface = self.initialize()
         self.functions = {'&?Key': self.key_exchange,
                           'SYS_CMD': self.sys_cmd,
-                          'GET_FILE': self.get_file}
+                          'GET_FILE': self.get_file,
+                          'PUT_FILE': self.put_file}
         self.run(mode)
 
     def initialize(self):
@@ -126,7 +127,8 @@ class Serve:
         file_name = query.split(' = ')[0]
         file_size = int(query.split(' = ')[1])
         print '[*] %s is sending %s [%d bytes]' % (client_ip, file_name, file_size)
-        raw_data = client.recv(file_size+40)  # Get key and encrypted file in one reply
+        raw_data = client.recv(file_size + 40)
+        client.close()  # Get key and encrypted file in one reply
         key = client_key.decrypt(raw_data.split(';;;;')[0])
         encrypted_data = raw_data.split(';;;;')[1]
         decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
