@@ -1,10 +1,8 @@
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import PKCS1_OAEP, AES
-from Crypto.PublicKey import RSA
 import base64
 import socket
 import engine
-import utils
 import time
 import sys
 import os

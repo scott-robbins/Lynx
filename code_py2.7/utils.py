@@ -71,7 +71,6 @@ def start_listener(port, timeout):
             print '[!!] Unable to create listener'
             s.close()
             time.sleep(timeout)
-
     return s
 
 
