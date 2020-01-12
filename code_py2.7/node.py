@@ -61,7 +61,7 @@ print '[*] %d Peers Connected to Network' % (len(live_peers.keys())+1)  # count 
 for active in live_peers.keys():
     reachable, outer, inner = live_peers[active]
     client.put_file(reachable, 'peers.txt')
-
+    client.query_cmd(reachable, 'python node.py')
 try:
     listener.join()
 except KeyboardInterrupt:
