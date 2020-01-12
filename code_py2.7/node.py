@@ -26,30 +26,42 @@ if os.path.isfile('peers.txt'):
         except IndexError:
             pass
     print '[*] %d Peers in Peer_List' % peer_count
-
+else:
+    os.system('echo "%s : %s" >> peers.txt' % (ext_ip, int_ip))
 '''         CREATE A CLIENT TO QUERY OTHER PEERS        '''
 int_ip, ext_ip, nx_iface = engine.get_public_private_ip(verbose=False)
+live_peers = {}
 for peer_id, peer_info in PEERS.items():
     external = peer_info[0]
     internal = peer_info[1]
     print '[*] Contacting Peer %s' % external
     if int_ip != internal and ext_ip != external:
-        success = False
-        timeout = 20; tic = time.time(); attempting = True
-        while attempting and time.time()-tic < timeout:
-            client.add_peer(external)   # Make sure internal/external aren't a match first
-            attempting = False
-            success = True
-        if not success:
-            timeout = 20;
-            tic = time.time();
-            attempting = True
-            while attempting and time.time() - tic < timeout:
-                client.add_peer(internal)  # Make sure internal/external aren't a match first
+        success = False; reached = ''
+        timeout = 10; tic = time.time(); attempting = True
+        while attempting and (time.time()-tic) < timeout:
+            client.add_peer_cmd(internal)   # Make sure internal/external aren't a match first
+            ext_key = internal.replace('.','')+'.pem'
+            if os.path.isfile(ext_key):
                 attempting = False
-                success = True
+                success = True; reached = internal
+            else:
+                timeout = 10;
+                tic = time.time();
+                attempting = True
+                print '[*] Retrying with %s' % external
+                while attempting and (time.time() - tic) < timeout:
+                    client.add_peer_cmd(external)  # Make sure internal/external aren't a match first
+                    attempting = False
+                    success = True; reached = external
     if success:
-        print '[*] SUCCESSFULLY CONTACTED PEER %s:%s' % (external, internal)
+        # print '[*] SUCCESSFULLY CONTACTED PEER %s:%s' % (external, internal)
+        live_peers[peer_id] = [reached, external, internal]
+print '[*] %d Peers Connected to Network' % (len(live_peers.keys())+1)  # count yourself
+'''     Distribute Current Peer List '''
+for active in live_peers.keys():
+    reachable, outer, inner = live_peers[active]
+    client.put_file(reachable, 'peers.txt')
+
 try:
     listener.join()
 except KeyboardInterrupt:

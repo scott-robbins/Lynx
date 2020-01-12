@@ -69,7 +69,7 @@ def get_file(remote_host, query):
     open(resource, 'wb').write(decrypted_data)
     print '[*] %d Bytes Transferred [%ss Elapsed]' % (os.path.getsize(resource),
                                                       str(time.time()-tic))
-
+    s.close()
 
 def put_file(remote_host, file_name):
     tic = time.time()
@@ -115,29 +115,30 @@ def query(remote_host, remote_key_file, cmd):
     key = PKCS1_OAEP.new(private_key).decrypt(reply.split('::::')[0])
     decrypted_data = utils.DecodeAES(AES.new(key), reply.split('::::')[1])
     print '[*] Reply:\n$ %s' % decrypted_data
+    s.close()
+    return decrypted_data
 
 
-def add_peer(rem):
+def add_peer_cmd(rem):
     r_k = rem.replace('.', '') + '.pem'
     k = add_remote_host_public_key(rem, r_k)
     open(rem.replace('.', '') + '.token', 'wb').write(k)
     print '[*] Keys Exchanged With %s' % rem
 
 
-def query(rem):
+def query_cmd(rem, q):
     r_key = rem.replace('.', '') + '.pem'
-    q = utils.arr2str(sys.argv[3:])
     print '[*] Querying %s: %s' % (rem, 'SYS_CMD : ' + q)
-    query(rem, r_key, 'SYS_CMD : ' + q)
+    return query(rem, r_key, 'SYS_CMD : ' + q)
 
 
-def get_file(rem, resource):
+def get_file_req(rem, resource):
     request = 'GET_FILE : ' + resource
     get_file(rem, request)
 
 
-def put_file(rem, local):
-    if not os.path.isfile(local_file):
+def put_file_req(rem, local):
+    if not os.path.isfile(local):
         print '[!!] Cannot Find %s' % local
     put_file(rem, local)
 
