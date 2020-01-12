@@ -7,10 +7,12 @@ import time
 import sys
 import os
 
-'''   START A HANDLER TO LISTEN FOR INBOUND CONNECTIONS '''
-listener = Thread(target=handler.Serve, args=('listener',))
-listener.setDaemon(True)
-listener.start()
+tic = time.time()
+
+# '''   START A HANDLER TO LISTEN FOR INBOUND CONNECTIONS '''
+# listener = Thread(target=handler.Serve, args=('listener',))
+# listener.setDaemon(True)
+# listener.start()
 # listener = handler.Serve(mode='listener')
 int_ip, ext_ip, nx_iface = engine.get_public_private_ip(verbose=False)
 
@@ -49,7 +51,8 @@ def initialize_network(peers):
             tic = time.time();
             attempting = True
             while attempting and (time.time() - tic) < timeout:
-                client.add_peer_cmd(internal)  # Make sure internal/external aren't a match first
+                if not os.path.isfile(internal.replace('.', '') + '.pem'):
+                    client.add_peer_cmd(internal)  # Make sure internal/external aren't a match first
                 ext_key = internal.replace('.', '') + '.pem'
                 if os.path.isfile(ext_key):
                     attempting = False
@@ -68,7 +71,7 @@ def initialize_network(peers):
         if success:
             # print '[*] SUCCESSFULLY CONTACTED PEER %s:%s' % (external, internal)
             live_peers[peer_id] = [reached, external, internal]
-    print '[*] %d Peers Connected to Network' % (len(live_peers.keys()) + 1)  # count yourself
+    print '[*] %d Peers TOTAL Connected to Network' % (len(live_peers.keys()) + 1)  # count yourself
     '''     Distribute Current Peer List '''
     nx_times = {}
     for active in live_peers.keys():
@@ -79,6 +82,7 @@ def initialize_network(peers):
             nx_times[float(dns_time)] = active
         except IndexError:
             pass
+        client.query_cmd(reachable, 'python node.py&')
     fastest_peer = live_peers[nx_times[min(nx_times.keys())]][0]
     print '[*] %s is the Fastest Peer' % fastest_peer
     return fastest_peer, live_peers
@@ -86,3 +90,7 @@ def initialize_network(peers):
 
 '''         INITIALIZE THE NETWORK                '''
 best_node, active_nx = initialize_network(verify_peer_list(ext_ip, int_ip))
+print '[*] Network Initialized [%ss Elapsed]' % str(time.time()-tic)
+
+''' ESTABLISH INTERCONNECTIVITY ? '''
+

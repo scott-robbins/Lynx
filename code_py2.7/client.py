@@ -18,7 +18,7 @@ default_port = 54123
 lan_ip, ext_ip, nx_nic = engine.get_public_private_ip(verbose=True)
 private_key = engine.load_private_key(ext_ip.replace('.','')+'.pem')
 public_key = private_key.publickey()
-DEBUG = True
+DEBUG = False
 
 
 def add_remote_host_public_key(remote_host, remote_key_file):
@@ -58,9 +58,11 @@ def get_file(remote_host, query):
     encrypted_key = reply.split('::::')[0]
 
     key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)
-    #print '[*] Encryption Key: %s' % base64.b64encode(key)
+    if DEBUG:
+        print '[*] Encryption Key: %s' % base64.b64encode(key)
     encrypted_data = reply.split('::::')[1]
-    #print '[*] Received %d pieces of encrypted data. Decrypting...' % len(encrypted_data)
+    if DEBUG:
+        print '[*] Received %d pieces of encrypted data. Decrypting...' % len(encrypted_data)
     decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
     if os.path.isfile(query):
         if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: '%query).upper() == 'Y':
@@ -70,6 +72,7 @@ def get_file(remote_host, query):
     print '[*] %d Bytes Transferred [%ss Elapsed]' % (os.path.getsize(resource),
                                                       str(time.time()-tic))
     s.close()
+
 
 def put_file(remote_host, file_name):
     tic = time.time()
@@ -92,9 +95,9 @@ def put_file(remote_host, file_name):
     encrypted_key = PKCS1_OAEP.new(rmt_pub_key).encrypt(key)
     encrypted_data = utils.EncodeAES(AES.new(key), raw_file_data)
     s.send(encrypted_key+';;;;'+encrypted_data)
-    #print '[*] Sending %d Characters of encrypted Data' % len(list(encrypted_data))
     s.close()
-    print '[*] Finished Sending %d bytes of Data to %s' % (os.path.getsize(file_name),
+    if DEBUG:
+        print '[*] Finished Sending %d bytes of Data to %s' % (os.path.getsize(file_name),
                                                            remote_host)
 
 
@@ -108,13 +111,13 @@ def query(remote_host, remote_key_file, cmd):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((remote_host, 54123))
     s.send(encrypted_query)
-    print '[*] Query Sent to %s ' % remote_host
+    if DEBUG:
+        print '[*] Query Sent to %s ' % remote_host
 
     # Receive Reply and decrypt it
     reply = s.recv(65535)
     key = PKCS1_OAEP.new(private_key).decrypt(reply.split('::::')[0])
     decrypted_data = utils.DecodeAES(AES.new(key), reply.split('::::')[1])
-    #print '[*] Reply:\n$ %s' % decrypted_data
     s.close()
     return decrypted_data
 
@@ -122,13 +125,15 @@ def query(remote_host, remote_key_file, cmd):
 def add_peer_cmd(rem):
     r_k = rem.replace('.', '') + '.pem'
     k = add_remote_host_public_key(rem, r_k)
+    if DEBUG:
+        print '[*] Keys Exchanged With %s' % rem
     open(rem.replace('.', '') + '.token', 'wb').write(k)
-    print '[*] Keys Exchanged With %s' % rem
 
 
 def query_cmd(rem, q):
     r_key = rem.replace('.', '') + '.pem'
-    print '[*] Querying %s: %s' % (rem, 'SYS_CMD : ' + q)
+    if DEBUG:
+        print '[*] Querying %s: %s' % (rem, 'SYS_CMD : ' + q)
     return query(rem, r_key, 'SYS_CMD : ' + q)
 
 
