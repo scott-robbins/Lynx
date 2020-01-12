@@ -130,6 +130,7 @@ class Serve:
         raw_data = client.recv(file_size + 40)
         client.close()  # Get key and encrypted file in one reply
         key = client_key.decrypt(raw_data.split(';;;;')[0])
+        print key
         encrypted_data = raw_data.split(';;;;')[1]
         decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
         if os.path.isfile(file_name):

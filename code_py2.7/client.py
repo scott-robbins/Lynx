@@ -3,6 +3,7 @@ from Crypto.Cipher import PKCS1_OAEP, AES
 import base64
 import socket
 import engine
+import utils
 import time
 import sys
 import os
