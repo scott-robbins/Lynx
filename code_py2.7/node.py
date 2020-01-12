@@ -82,6 +82,7 @@ def initialize_network(peers):
             nx_times[float(dns_time)] = active
         except IndexError:
             pass
+        client.put_file(reachable, 'peers.txt')
         client.query_cmd(reachable, 'python node.py&')
     fastest_peer = live_peers[nx_times[min(nx_times.keys())]][0]
     print '[*] %s is the Fastest Peer' % fastest_peer
