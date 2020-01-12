@@ -57,7 +57,7 @@ def get_file(remote_host, query):
     reply = s.recv(65535)
     encrypted_key = reply.split('::::')[0]
 
-    key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)
+    key = PKCS1_OAEP.new(rmt_key).decrypt(encrypted_key)
     print '[*] Encryption Key: %s' % base64.b64encode(key)
     encrypted_data = reply.split('::::')[1]
     print '[*] Received %d pieces of encrypted data. Decrypting...' % len(encrypted_data)
