@@ -63,14 +63,13 @@ class Serve:
                 try:
                     decrypted_query = PKCS1_OAEP.new(self.private_key).decrypt(query)
                     print decrypted_query
-                except UnboundLocalError:
-                    print '\033[31m[*] Failed to Decrypt Query From %s\033[0m' % client_ip
 
                     query = decrypted_query.split(' : ')[0]
                     command = decrypted_query.split(' : ')[1]
                 except ValueError:
                     pass
-
+                except UnboundLocalError:
+                    print '\033[31m[*] Failed to Decrypt Query From %s\033[0m' % client_ip
 
                 if query == '&?Key':
                     print '[*] Initializing Handshake with new client %s' % query
