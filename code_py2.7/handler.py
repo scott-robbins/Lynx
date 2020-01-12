@@ -137,8 +137,11 @@ class Serve:
         print '[*] Recieving [%d bytes]' % (file_size)
 
         encrypted_data = client.recv(file_size+50)
-        key = PKCS1_OAEP.new(self.private_key).decrypt(encrypted_data.split(';;;;')[0])
-        decrypted_data = utils.DecodeAES(AES.new(key),encrypted_data)
+        encrypted_key = encrypted_data.split(';;;;')[0]
+        cipher_text = encrypted_data.split(';;;;')[1]
+        print '[*] Decrypting %d characters of cipher text' % len(cipher_text)
+        key = PKCS1_OAEP.new(self.private_key).decrypt(encrypted_key)
+        decrypted_data = utils.DecodeAES(AES.new(key), cipher_text)
         if os.path.isfile(query):
             if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: ' % query).upper() == 'Y':
                 os.remove(query)
