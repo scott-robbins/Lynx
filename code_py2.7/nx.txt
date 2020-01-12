@@ -1,3 +1,0 @@
-Public IP:	173.239.198.24
-Private IP:	10.0.0.8
-Nx Iface:	wlp2s0
