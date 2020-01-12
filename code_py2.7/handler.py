@@ -35,7 +35,7 @@ class Serve:
         self.run(mode)
 
     def initialize(self):
-        int_ip, ext_ip, nx_iface = engine.get_public_private_ip(verbose=True)
+        int_ip, ext_ip, nx_iface = engine.get_public_private_ip(verbose=False)
 
         '''     LOAD KEYS     '''
         private_key_file = ext_ip.replace('.', '')

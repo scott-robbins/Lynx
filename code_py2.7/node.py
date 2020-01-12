@@ -28,13 +28,28 @@ if os.path.isfile('peers.txt'):
     print '[*] %d Peers in Peer_List' % peer_count
 
 '''         CREATE A CLIENT TO QUERY OTHER PEERS        '''
+int_ip, ext_ip, nx_iface = engine.get_public_private_ip(verbose=False)
 for peer_id, peer_info in PEERS.items():
     external = peer_info[0]
     internal = peer_info[1]
     print '[*] Contacting Peer %s' % external
-    # Make sure internal/external dont match self first
-    client.add_peer(external)
-
+    if int_ip != internal and ext_ip != external:
+        success = False
+        timeout = 20; tic = time.time(); attempting = True
+        while attempting and time.time()-tic < timeout:
+            client.add_peer(external)   # Make sure internal/external aren't a match first
+            attempting = False
+            success = True
+        if not success:
+            timeout = 20;
+            tic = time.time();
+            attempting = True
+            while attempting and time.time() - tic < timeout:
+                client.add_peer(internal)  # Make sure internal/external aren't a match first
+                attempting = False
+                success = True
+    if success:
+        print '[*] SUCCESSFULLY CONTACTED PEER %s:%s' % (external, internal)
 try:
     listener.join()
 except KeyboardInterrupt:
