@@ -62,10 +62,11 @@ class Serve:
                 print '[*] %s Has Connected' % client_ip
                 try:
                     decrypted_query = PKCS1_OAEP.new(self.private_key).decrypt(query)
-                    print decrypted_query
+
                     query = decrypted_query.split(' : ')[0]
                     command = decrypted_query.split(' : ')[1]
                 except ValueError:
+                    print decrypted_query
                     pass
 
                 if query == '&?Key':
@@ -90,6 +91,7 @@ class Serve:
                       str(time.time()-tic)
                 self.socket.close()
                 RUNNING = False
+                os.system('sh cleaner.sh')
 
     def key_exchange(self, client, client_addr):
         client_key_file = client_addr.replace('.', '') + '.pem'
@@ -131,18 +133,17 @@ class Serve:
         file_name = query.split(' = ')[0]
         file_size = int(query.split(' = ')[1])
         print '[*] %s is sending %s [%d bytes]' % (client_ip, file_name, file_size)
-        raw_data = client.recv(file_size + 400)
-        print raw_data.split(';;;;')[0]
-        key = client_key.decrypt(raw_data.split(';;;;')[0])
-        encrypted_data = raw_data.split(';;;;')[1]
-        decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
+        print '[*] Recieving [%d bytes]' % (file_size)
+
+        encrypted_data = client.recv(file_size+50)
+        key = PKCS1_OAEP.new(self.private_key).decrypt(encrypted_data.split(';;;;')[0])
+        decrypted_data = utils.DecodeAES(AES.new(key),encrypted_data)
         if os.path.isfile(file_name):
-            if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: '%file_name).upper() == 'Y':
+            if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: ' % file_name).upper() == 'Y':
                 os.remove(file_name)
         open(file_name, 'wb').write(decrypted_data)
-        bytes_transferred = os.path.getsize(file_name)
-        client.close()  # Get key and encrypted file in one reply
-        print '[*] %d Bytes transferred [%ss Elapsed]' % (bytes_transferred, str(time.time()-tic))
+
+        print '[*] %d Bytes transferred [%ss Elapsed]' % (file_size, str(time.time()-tic))
 
     def check_client(self, ip):
         if not os.path.isfile(ip.replace('.', '') + '.pem'):
