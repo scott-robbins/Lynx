@@ -154,4 +154,5 @@ if __name__ == '__main__':
         server_mode = sys.argv[2]
     else:
         server_mode = 'listener'
+    os.system('sh cleaner.sh')
     Serve(mode=server_mode)

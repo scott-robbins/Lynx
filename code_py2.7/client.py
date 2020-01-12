@@ -117,6 +117,7 @@ def query(remote_host, remote_key_file, cmd):
 
 
 if __name__ == '__main__':
+
     # client actions from the commandline below
     if 'add' in sys.argv and len(sys.argv) >= 3:
         rmt = sys.argv[2]
