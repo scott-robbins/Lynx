@@ -58,9 +58,9 @@ def get_file(remote_host, query):
     encrypted_key = reply.split('::::')[0]
 
     key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)
-    print '[*] Encryption Key: %s' % base64.b64encode(key)
+    #print '[*] Encryption Key: %s' % base64.b64encode(key)
     encrypted_data = reply.split('::::')[1]
-    print '[*] Received %d pieces of encrypted data. Decrypting...' % len(encrypted_data)
+    #print '[*] Received %d pieces of encrypted data. Decrypting...' % len(encrypted_data)
     decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
     if os.path.isfile(query):
         if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: '%query).upper() == 'Y':
@@ -92,7 +92,7 @@ def put_file(remote_host, file_name):
     encrypted_key = PKCS1_OAEP.new(rmt_pub_key).encrypt(key)
     encrypted_data = utils.EncodeAES(AES.new(key), raw_file_data)
     s.send(encrypted_key+';;;;'+encrypted_data)
-    print '[*] Sending %d Characters of encrypted Data' % len(list(encrypted_data))
+    #print '[*] Sending %d Characters of encrypted Data' % len(list(encrypted_data))
     s.close()
     print '[*] Finished Sending %d bytes of Data to %s' % (os.path.getsize(file_name),
                                                            remote_host)
@@ -114,7 +114,7 @@ def query(remote_host, remote_key_file, cmd):
     reply = s.recv(65535)
     key = PKCS1_OAEP.new(private_key).decrypt(reply.split('::::')[0])
     decrypted_data = utils.DecodeAES(AES.new(key), reply.split('::::')[1])
-    print '[*] Reply:\n$ %s' % decrypted_data
+    #print '[*] Reply:\n$ %s' % decrypted_data
     s.close()
     return decrypted_data
 

@@ -58,13 +58,15 @@ for peer_id, peer_info in PEERS.items():
         live_peers[peer_id] = [reached, external, internal]
 print '[*] %d Peers Connected to Network' % (len(live_peers.keys())+1)  # count yourself
 '''     Distribute Current Peer List '''
+nx_times = {}
 for active in live_peers.keys():
     reachable, outer, inner = live_peers[active]
-    client.put_file(reachable, 'peers.txt')
-    client.query_cmd(reachable, 'python node.py')
-try:
-    listener.join()
-except KeyboardInterrupt:
-    print '[!!] KILLED'
-    exit()
-    os.system('ps aux | grep "python node.py" | cut -d ' ' -f 2 | while read n; do kill -9 $n; done')
+    ping_time = client.query_cmd(reachable,  'ping -c 1 1.1.1.1')
+    try:
+        dns_time = ping_time.split('time=')[1].split('\n')[0].split(' ')[0]
+        nx_times[float(dns_time)] = active
+    except IndexError:
+        pass
+
+fastest_peer = live_peers[nx_times[min(nx_times.keys())]][0]
+print '[*] %s is the Fastest Peer' % fastest_peer
