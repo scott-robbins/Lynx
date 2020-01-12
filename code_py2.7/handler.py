@@ -14,6 +14,8 @@ Algorithm 	Sender uses: 	Receiver uses:
 Encryption 	Public key 	    Private key
 Signature 	Private key 	Public key
 '''
+# TODO: NEED TO HAVE A QUIET MODE THAT DOESNT HAVE SO MUCH OUTPUT WHEN RUNNING
+DEBUGGER = False
 
 
 class Serve:
@@ -106,8 +108,9 @@ class Serve:
         self.check_client(client_ip)
         client_key = engine.load_private_key(client_ip.replace('.', '') + '.pem')
         status = utils.arr2lines(utils.cmd(query))
-        print '$ %s' % query
-        print '$ %s' % status
+        if DEBUGGER:
+            print '$ %s' % query
+            print '$ %s' % status
         key = get_random_bytes(32)
         encrypted_key = PKCS1_OAEP.new(client_key).encrypt(key)
         encrypted_reply = utils.EncodeAES(AES.new(key),status)
@@ -118,7 +121,8 @@ class Serve:
         self.check_client(client_ip)
         client_key = engine.load_private_key(client_ip.replace('.','')+'.pem')
         file_size = os.path.getsize(query.replace(' ', ''))
-        print '[*] Sending %s to %s [%d bytes]' % (query, client_ip, file_size)
+        if DEBUGGER:
+            print '[*] Sending %s to %s [%d bytes]' % (query, client_ip, file_size)
         # print '[*] %s is %d bytes' % (query, file_size)
         content = open(query.replace(' ',''), 'rb').read()
         key = get_random_bytes(32)
@@ -130,14 +134,15 @@ class Serve:
     def put_file(self, client, client_ip, query):
         tic = time.time()
         self.check_client(client_ip)
-        client_key = engine.load_private_key(client_ip.replace('.', '') + '.pem')
         file_name = query.split(' = ')[0]
         file_size = int(query.split(' = ')[1])
         print '[*] %s is sending %s [%d bytes]' % (client_ip, file_name, file_size)
-        print '[*] Recieving [%d bytes]' % (file_size)
+        if DEBUGGER:
+            print '[*] Recieving [%d bytes]' % (file_size)
 
         encrypted_data = client.recv(file_size+3200)
-        print '[*] Decrypting %d characters of encrypted data' % len(encrypted_data)
+        if DEBUGGER:
+            print '[*] Decrypting %d characters of encrypted data' % len(encrypted_data)
         encrypted_key = encrypted_data.split(';;;;')[0]
         cipher_text = encrypted_data.split(';;;;')[1]
 
@@ -148,7 +153,6 @@ class Serve:
                          file_name).upper() == 'Y':
                 os.remove(file_name)
         open(file_name, 'wb').write(decrypted_data)
-
         print '[*] %d Bytes transferred [%ss Elapsed]' % (file_size, str(time.time()-tic))
 
     def check_client(self, ip):

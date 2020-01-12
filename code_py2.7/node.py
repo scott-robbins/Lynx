@@ -85,4 +85,4 @@ def initialize_network(peers):
 
 
 '''         INITIALIZE THE NETWORK                '''
-initialize_network(verify_peer_list(ext_ip, int_ip))
+best_node, active_nx = initialize_network(verify_peer_list(ext_ip, int_ip))
