@@ -74,7 +74,11 @@ class Serve:
                     self.functions[query](client, client_ip)
                 elif query in self.functions.keys():
                     print '[*] Replying to API request from \033[1m%s\033[0m' % client_ip
-                    self.functions[query](client, client_ip, command)
+                    try:
+                        self.functions[query](client, client_ip, command)
+                    except:
+                        self.functions[query](client, client_ip, command)
+                        pass
                 else:
                     client.close()
             except socket.error:
