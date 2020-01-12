@@ -1,10 +1,7 @@
-from threading import Thread
-import handler
 import engine
 import client
 import utils
 import time
-import sys
 import os
 
 tic = time.time()
@@ -82,16 +79,14 @@ def initialize_network(peers):
             nx_times[float(dns_time)] = active
         except IndexError:
             pass
-        client.put_file(reachable, 'peers.txt')
-        client.query_cmd(reachable, 'python node.py&')
     fastest_peer = live_peers[nx_times[min(nx_times.keys())]][0]
     print '[*] %s is the Fastest Peer' % fastest_peer
     return fastest_peer, live_peers
 
 
-'''         INITIALIZE THE NETWORK                '''
-best_node, active_nx = initialize_network(verify_peer_list(ext_ip, int_ip))
-print '[*] Network Initialized [%ss Elapsed]' % str(time.time()-tic)
+if __name__ == '__main__':
+    '''         INITIALIZE THE NETWORK                '''
+    best_node, active_nx = initialize_network(verify_peer_list(ext_ip, int_ip))
+    print '[*] Network Initialized [%ss Elapsed]' % str(time.time() - tic)
 
-''' ESTABLISH INTERCONNECTIVITY ? '''
-
+    ''' ESTABLISH INTERCONNECTIVITY ? '''

@@ -54,7 +54,7 @@ def get_file(remote_host, query):
     s.send(encrypted_query)
 
     # Receive Reply and decrypt it
-    reply = s.recv(65535)
+    reply = s.recv(1200000)
     encrypted_key = reply.split('::::')[0]
 
     key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)
