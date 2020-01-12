@@ -136,10 +136,10 @@ class Serve:
         print '[*] %s is sending %s [%d bytes]' % (client_ip, file_name, file_size)
         print '[*] Recieving [%d bytes]' % (file_size)
 
-        encrypted_data = client.recv(file_size+50)
+        encrypted_data = client.recv(file_size+36)
         print '[*] Decrypting %d characters of encrypted data' % len(encrypted_data)
-        encrypted_key = encrypted_data.split(' ;;;; ')[0]
-        cipher_text = encrypted_data.split(' ;;;; ')[1]
+        encrypted_key = encrypted_data.split(';;;;')[0]
+        cipher_text = encrypted_data.split(';;;;')[1]
 
         key = PKCS1_OAEP.new(self.private_key).decrypt(encrypted_key)
         decrypted_data = utils.DecodeAES(AES.new(key), cipher_text)

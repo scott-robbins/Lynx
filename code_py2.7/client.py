@@ -91,7 +91,7 @@ def put_file(remote_host, file_name):
     key = get_random_bytes(32)
     encrypted_key = PKCS1_OAEP.new(rmt_pub_key).encrypt(key)
     encrypted_data = utils.EncodeAES(AES.new(key), raw_file_data)
-    s.send(encrypted_key+' ;;;; '+encrypted_data)
+    s.send(encrypted_key+';;;;'+encrypted_data)
     print '[*] Sending %d Characters of encrypted Data' % len(encrypted_data)
     s.close()
     print '[*] Finished Sending %d bytes of Data to %s' % (os.path.getsize(file_name),
