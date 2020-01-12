@@ -136,7 +136,7 @@ class Serve:
         print '[*] %s is sending %s [%d bytes]' % (client_ip, file_name, file_size)
         print '[*] Recieving [%d bytes]' % (file_size)
 
-        encrypted_data = client.recv(file_size+36)
+        encrypted_data = client.recv(file_size+32)
         print '[*] Decrypting %d characters of encrypted data' % len(encrypted_data)
         encrypted_key = encrypted_data.split(';;;;')[0]
         cipher_text = encrypted_data.split(';;;;')[1]
