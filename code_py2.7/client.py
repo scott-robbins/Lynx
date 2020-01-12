@@ -117,6 +117,31 @@ def query(remote_host, remote_key_file, cmd):
     print '[*] Reply:\n$ %s' % decrypted_data
 
 
+def add_peer(rem):
+    r_k = rem.replace('.', '') + '.pem'
+    k = add_remote_host_public_key(rem, r_k)
+    open(rem.replace('.', '') + '.token', 'wb').write(k)
+    print '[*] Keys Exchanged With %s' % rem
+
+
+def query(rem):
+    r_key = rem.replace('.', '') + '.pem'
+    q = utils.arr2str(sys.argv[3:])
+    print '[*] Querying %s: %s' % (rem, 'SYS_CMD : ' + q)
+    query(rem, r_key, 'SYS_CMD : ' + q)
+
+
+def get_file(rem, resource):
+    request = 'GET_FILE : ' + resource
+    get_file(rem, request)
+
+
+def put_file(rem, local):
+    if not os.path.isfile(local_file):
+        print '[!!] Cannot Find %s' % local
+    put_file(rem, local)
+
+
 if __name__ == '__main__':
 
     # client actions from the commandline below
