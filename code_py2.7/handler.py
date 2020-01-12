@@ -75,7 +75,7 @@ class Serve:
                     print '[*] Replying to API request from \033[1m%s\033[0m' % client_ip
                     try:
                         self.functions[query](client, client_ip, command)
-                    except:
+                    except KeyError:
                         self.functions[query](client, client_ip, command)
                         pass
                 else:
@@ -129,7 +129,7 @@ class Serve:
         tic = time.time()
         self.check_client(client_ip)
         client_key = engine.load_private_key(client_ip.replace('.', '') + '.pem')
-        file_name = query.split(' = ')[0]
+        file_name = int(query.split(' = ')[0])
         file_size = int(query.split(' = ')[1])
         print '[*] %s is sending %s [%d bytes]' % (client_ip, file_name, file_size)
         print '[*] Recieving [%d bytes]' % (query, client_ip, file_size)
