@@ -59,13 +59,12 @@ class Serve:
                 client_ip = client_addr[0]
                 self.clients.append(client_ip)
                 query = client.recv(1024)
-
+                print '[*] %s Has Connected' % client_ip
                 try:
                     decrypted_query = PKCS1_OAEP.new(self.private_key).decrypt(query)
                     print decrypted_query
                     query = decrypted_query.split(' : ')[0]
                     command = decrypted_query.split(' : ')[1]
-                    # print query
                 except ValueError:
                     pass
 
@@ -80,6 +79,7 @@ class Serve:
                         self.functions[query](client, client_ip, command)
                         pass
                 else:
+                    print decrypted_query
                     client.close()
             except socket.error:
                 print '\033[31m\033[1m[!!] Server Socket Error\033[0m'
@@ -131,10 +131,9 @@ class Serve:
         file_name = query.split(' = ')[0]
         file_size = int(query.split(' = ')[1])
         print '[*] %s is sending %s [%d bytes]' % (client_ip, file_name, file_size)
-        raw_data = client.recv(file_size + 40)
-
+        raw_data = client.recv(file_size + 400)
+        print raw_data.split(';;;;')[0]
         key = client_key.decrypt(raw_data.split(';;;;')[0])
-        print key
         encrypted_data = raw_data.split(';;;;')[1]
         decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
         if os.path.isfile(file_name):

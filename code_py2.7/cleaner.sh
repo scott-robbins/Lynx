@@ -1,7 +1,7 @@
 #!/bin/sh
 
-ls *.pem | while read pbk; do rm $pbk; done
-ls *.token | while read toke; do rm $toke; done
+ls *.pem | while read pbk; do rm $pbk > /dev/null 2>&1 ; done
+ls *.token | while read toke; do rm $toke > /dev/null 2>&1 ; done
 echo '[*] Keys Deleted'
 
 # EOF
