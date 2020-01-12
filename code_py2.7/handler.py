@@ -132,7 +132,7 @@ class Serve:
         file_name = query.split(' = ')[0]
         file_size = int(query.split(' = ')[1])
         print '[*] %s is sending %s [%d bytes]' % (client_ip, file_name, file_size)
-        print '[*] Recieving [%d bytes]' % (query, client_ip, file_size)
+        print '[*] Recieving [%d bytes]' % (file_size)
 
         encrypted_data = client.recv(file_size+50)
         key = PKCS1_OAEP.new(self.private_key).decrypt(encrypted_data.split(';;;;')[0])
