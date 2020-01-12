@@ -143,11 +143,11 @@ class Serve:
 
         key = PKCS1_OAEP.new(self.private_key).decrypt(encrypted_key)
         decrypted_data = utils.DecodeAES(AES.new(key), cipher_text)
-        if os.path.isfile(query):
-            if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: ' % query).upper() == 'Y':
-                os.remove(query)
-        resource = query.split(': ')[1]
-        open(resource, 'wb').write(decrypted_data)
+        if os.path.isfile(file_name):
+            if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: ' %
+                         file_name).upper() == 'Y':
+                os.remove(file_name)
+        open(file_name, 'wb').write(decrypted_data)
 
         print '[*] %d Bytes transferred [%ss Elapsed]' % (file_size, str(time.time()-tic))
 
