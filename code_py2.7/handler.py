@@ -132,7 +132,7 @@ class Serve:
         file_size = int(query.split(' = ')[1])
         print '[*] %s is sending %s [%d bytes]' % (client_ip, file_name, file_size)
         raw_data = client.recv(file_size + 40)
-        client.close()  # Get key and encrypted file in one reply
+
         key = client_key.decrypt(raw_data.split(';;;;')[0])
         print key
         encrypted_data = raw_data.split(';;;;')[1]
@@ -142,6 +142,7 @@ class Serve:
                 os.remove(file_name)
         open(file_name, 'wb').write(decrypted_data)
         bytes_transferred = os.path.getsize(file_name)
+        client.close()  # Get key and encrypted file in one reply
         print '[*] %d Bytes transferred [%ss Elapsed]' % (bytes_transferred, str(time.time()-tic))
 
     def check_client(self, ip):
