@@ -65,7 +65,7 @@ def get_file(remote_host, query):
     if os.path.isfile(query):
         if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: '%query).upper() == 'Y':
             os.remove(query)
-    resource = query.split(': ')[1]
+    resource = query.split(':')[1]
     open(resource, 'wb').write(decrypted_data)
     print '[*] %d Bytes Transferred [%ss Elapsed]' % (os.path.getsize(resource),
                                                       str(time.time()-tic))

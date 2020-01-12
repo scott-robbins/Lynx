@@ -62,11 +62,10 @@ class Serve:
                 print '[*] %s Has Connected' % client_ip
                 try:
                     decrypted_query = PKCS1_OAEP.new(self.private_key).decrypt(query)
-
+                    print decrypted_query
                     query = decrypted_query.split(' : ')[0]
                     command = decrypted_query.split(' : ')[1]
                 except ValueError:
-                    print decrypted_query
                     pass
 
                 if query == '&?Key':
@@ -133,15 +132,16 @@ class Serve:
         file_name = query.split(' = ')[0]
         file_size = int(query.split(' = ')[1])
         print '[*] %s is sending %s [%d bytes]' % (client_ip, file_name, file_size)
-        print '[*] Recieving [%d bytes]' % (file_size)
+        print '[*] Recieving [%d bytes]' % (query, client_ip, file_size)
 
         encrypted_data = client.recv(file_size+50)
         key = PKCS1_OAEP.new(self.private_key).decrypt(encrypted_data.split(';;;;')[0])
         decrypted_data = utils.DecodeAES(AES.new(key),encrypted_data)
-        if os.path.isfile(file_name):
-            if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: ' % file_name).upper() == 'Y':
-                os.remove(file_name)
-        open(file_name, 'wb').write(decrypted_data)
+        if os.path.isfile(query):
+            if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: ' % query).upper() == 'Y':
+                os.remove(query)
+        resource = query.split(': ')[1]
+        open(resource, 'wb').write(decrypted_data)
 
         print '[*] %d Bytes transferred [%ss Elapsed]' % (file_size, str(time.time()-tic))
 
