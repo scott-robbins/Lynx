@@ -43,7 +43,7 @@ def add_remote_host_public_key(remote_host, remote_key_file):
 def get_file(remote_host, query):
     # Load Key
     tic = time.time()
-    rmt_key = remote_host.replace('.', '') + '.pem'
+    rmt_key = remote_host.replace('.', '-') + '.pem'
     if not os.path.isfile(rmt_key):
         print '[!!] No Public Key for %s. Run python client.py add %s' % (remote_host,
                                                                           remote_host)
@@ -77,7 +77,7 @@ def get_file(remote_host, query):
 
 def put_file(remote_host, file_name):
     tic = time.time()
-    rmt_key = remote_host.replace('.', '') + '.pem'
+    rmt_key = remote_host.replace('.', '-') + '.pem'
     if not os.path.isfile(rmt_key):
         print '[!!] No Public Key for %s. Run python client.py add %s' % (remote_host,
                                                                           remote_host)
@@ -107,7 +107,7 @@ def query(remote_host, remote_key_file, cmd):
         print '[!!] No Public Key for %s. Run python client.py add %s' % (rmt, rmt)
         exit()
     # Load Key
-    rmt_pub_key = engine.load_private_key(remote_host.replace('.', '') + '.pem')
+    rmt_pub_key = engine.load_private_key(remote_host.replace('.', '-') + '.pem')
     encrypted_query = PKCS1_OAEP.new(rmt_pub_key).encrypt(cmd)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((remote_host, 54123))
@@ -132,7 +132,7 @@ def add_peer_cmd(rem):
 
 
 def query_cmd(rem, q):
-    r_key = rem.replace('.', '') + '.pem'
+    r_key = rem.replace('.', '-') + '.pem'
     if DEBUG:
         print '[*] Querying %s: %s' % (rem, 'SYS_CMD : ' + q)
     return query(rem, r_key, 'SYS_CMD : ' + q)
@@ -151,8 +151,8 @@ def put_file_req(rem, local):
 
 def check_peer_connections(node_a, node_b):
     PEERS = {node_a: [], node_b: []}
-    rkey_a = node_a.replace('.', '') + '.pem'
-    rkey_b = node_b.replace('.', '') + '.pem'
+    rkey_a = node_a.replace('.', '-') + '.pem'
+    rkey_b = node_b.replace('.', '-') + '.pem'
     keys = utils.cmd('ls *pem')
     if rkey_a not in keys:
         print '[*] Adding Peer %s' % node_a
