@@ -13,7 +13,7 @@ Algorithm 	Sender uses: 	Receiver uses:
 Encryption 	Public key 	    Private key
 Signature 	Private key 	Public key
 '''
-
+# =========================== GLOBAL SETTINGS ============================= #
 default_port = 54123
 lan_ip, ext_ip, nx_nic = engine.get_public_private_ip(verbose=True)
 private_key = engine.load_private_key(ext_ip.replace('.','')+'.pem')
@@ -21,6 +21,7 @@ public_key = private_key.publickey()
 DEBUG = False
 
 
+# =========================== CLIENT FUNCTIONS ============================ #
 def add_remote_host_public_key(remote_host, remote_key_file):
     session_key = ''
     try:
@@ -155,7 +156,7 @@ def check_peer_connections(node_a, node_b):
     keys = utils.cmd('ls *pem')
     if rkey_a not in keys:
         print '[*] Adding Peer %s' % node_a
-        os.system('python client.py add %s' % node_a)
+        os.system('python client.py add %s >> /dev/null 2>&1' % node_a)
         if os.path.isfile(rkey_a):  # TODO: Make sure this doesnt timeout
             routed, latency = engine.parse_ping(query_cmd(node_a, 'ping -c 1 %s' % node_b))
             if routed:
@@ -167,7 +168,7 @@ def check_peer_connections(node_a, node_b):
 
     if rkey_b not in keys:
         print '[*] Adding Peer %s' % node_b
-        os.system('python client.py add %s' % node_b)
+        os.system('python client.py add %s >> /dev/null 2>&1' % node_b)
         if os.path.isfile(rkey_b):
             routed, latency = engine.parse_ping(query_cmd(node_b, 'ping -c 1 %s' % node_a))
             if routed:
@@ -197,6 +198,7 @@ def check_npeer_connections(nodes):
     return PEERS
 
 
+# ===========================       MAIN       ============================ #
 if __name__ == '__main__':
 
     # client actions from the commandline below
@@ -234,8 +236,18 @@ if __name__ == '__main__':
     if '?NAT' in sys.argv and len(sys.argv) == 4:
         node_a = sys.argv[2]
         node_b = sys.argv[3]
-        print check_peer_connections(node_a, node_b)
+        connectivity = check_peer_connections(node_a, node_b)
+        print connectivity
 
     if '?NAT' in sys.argv and len(sys.argv) > 4:
+        tic = time.time()
         machines = sys.argv[2:]
-        print check_npeer_connections(machines)
+        connectivity = check_npeer_connections(machines)
+        print connectivity
+        print '[*] FINISHED [%ss Elapsed]' % str(time.time()-tic)
+
+    if 'sync' in sys.argv:
+        tic = time.time()
+        machines = sys.argv[2:]
+
+# EOF

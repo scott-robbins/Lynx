@@ -104,7 +104,7 @@ class Serve:
                       str(time.time()-tic)
                 self.socket.close()
                 RUNNING = False
-                os.system('sh cleaner.sh')
+                os.system('sh cleaner.sh >> /dev/null 2>&1')
 
     def key_exchange(self, client, client_addr):
         client_key_file = client_addr.replace('.', '') + '.pem'
