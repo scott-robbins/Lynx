@@ -198,9 +198,19 @@ def check_npeer_connections(nodes):
     return PEERS
 
 
+def create_manifest():
+    tic = time.time()
+    shared, file_hashes = engine.crawl_dir('SHARED', verbose=False)
+    header = '[*] %d Files in Shared Folder\n' % len(shared['file'])
+    for f, h in file_hashes.iteritems():
+        header += '%s = %s\n' % (f, h)
+    open('shared_manifest.txt', 'wb').write(header)
+    print '[*] Finished Logging %d Files [%ss Elapsed]' % (len(file_hashes.keys()),
+                                                           str(time.time()-tic))
+
+
 # ===========================       MAIN       ============================ #
 if __name__ == '__main__':
-
     # client actions from the commandline below
     if 'add' in sys.argv and len(sys.argv) >= 3:
         rmt = sys.argv[2]
@@ -228,6 +238,9 @@ if __name__ == '__main__':
             print '[!!] Cannot Find %s' % local_file
         put_file(remote, local_file)
 
+    if 'log' in sys.argv:
+        engine.log_known_peers(DEBUG)
+
     if '?NAT' in sys.argv and len(sys.argv)<=3:
         node_a = raw_input('Enter Server_A IP Address: ')
         node_b = raw_input('Enter Server_B IP Address: ')
@@ -247,7 +260,13 @@ if __name__ == '__main__':
         print '[*] FINISHED [%ss Elapsed]' % str(time.time()-tic)
 
     if 'sync' in sys.argv:
-        tic = time.time()
         machines = sys.argv[2:]
+        if not os.path.isfile('shared_manifest.txt'):
+            create_manifest()
+        else: # TODO: Save time by loading files/directories
+            file_data = engine.parse_manifest_file('shared_manifest.txt')
+        manifest_hash = engine.get_sha256_sum('shared_manifest.txt', verbose=False)
+        engine.log_known_peers()
+
 
 # EOF

@@ -41,7 +41,7 @@ class Serve:
         int_ip, ext_ip, nx_iface = engine.get_public_private_ip(verbose=False)
 
         '''     LOAD KEYS     '''
-        private_key_file = ext_ip.replace('.', '')
+        private_key_file = ext_ip.replace('.', '-')
         if not os.path.isfile(private_key_file + '.pem'):
             self.private_key = engine.create_rsa_key(private_key_file + '.pem')
         else:
@@ -62,6 +62,7 @@ class Serve:
         RUNNING = True
         tic = time.time()
         date, start_time = utils.create_timestamp()
+        os.system('python client.py sync')
         print '\033[1m[*] \033[32mServer Started\033[0m\033[1m %s - %s\033[0m' % (date, start_time)
 
         while RUNNING:
