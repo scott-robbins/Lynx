@@ -59,3 +59,17 @@ def load_private_key(name):
     return private_key
 
 
+def parse_ping(result):
+    open('ping.txt', 'wb').write(result)
+    routable = False
+    ping_time = 0
+    for line in utils.swap('ping.txt', True):
+        try:
+            ping_time = float(line.split('time=')[1].split(' ')[0])
+            routable = True
+        except IndexError:
+            pass
+    return routable, ping_time
+
+
+

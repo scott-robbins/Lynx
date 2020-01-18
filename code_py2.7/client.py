@@ -97,8 +97,8 @@ def put_file(remote_host, file_name):
     s.send(encrypted_key+';;;;'+encrypted_data)
     s.close()
     if DEBUG:
-        print '[*] Finished Sending %d bytes of Data to %s' % (os.path.getsize(file_name),
-                                                           remote_host)
+        print '[*] Finished Sending %d bytes of Data to %s [%ss Elapsed]' % \
+              (os.path.getsize(file_name), remote_host, str(time.time()-tic))
 
 
 def query(remote_host, remote_key_file, cmd):
@@ -115,7 +115,7 @@ def query(remote_host, remote_key_file, cmd):
         print '[*] Query Sent to %s ' % remote_host
 
     # Receive Reply and decrypt it
-    reply = s.recv(65535)
+    reply = s.recv(65535)  # OAEP should help against plaintext attacks on RSA key
     key = PKCS1_OAEP.new(private_key).decrypt(reply.split('::::')[0])
     decrypted_data = utils.DecodeAES(AES.new(key), reply.split('::::')[1])
     s.close()
@@ -148,6 +148,37 @@ def put_file_req(rem, local):
     put_file(rem, local)
 
 
+def check_peer_connections(node_a, node_b):
+    PEERS = {node_a: [], node_b: []}
+    rkey_a = node_a.replace('.', '') + '.pem'
+    rkey_b = node_b.replace('.', '') + '.pem'
+    keys = utils.cmd('ls *pem')
+    if rkey_a not in keys:
+        print '[*] Adding Peer %s' % node_a
+        os.system('python client.py add %s' % node_a)
+        if os.path.isfile(rkey_a):  # TODO: Make sure this doesnt timeout
+            routed, latency = engine.parse_ping(query_cmd(node_a, 'ping -c 1 %s' % node_b))
+            if routed:
+                PEERS[node_a].append(node_b)
+    else:
+        routed, latency = engine.parse_ping(query_cmd(node_a, 'ping -c 1 %s' % node_b))
+        if routed:
+            PEERS[node_a].append(node_b)
+
+    if rkey_b not in keys:
+        print '[*] Adding Peer %s' % node_b
+        os.system('python client.py add %s' % node_b)
+        if os.path.isfile(rkey_b):
+            routed, latency = engine.parse_ping(query_cmd(node_b, 'ping -c 1 %s' % node_a))
+            if routed:
+                PEERS[node_b].append(node_a)
+    else:
+        routed, latency = engine.parse_ping(query_cmd(node_b, 'ping -c 1 %s' % node_a))
+        if routed:
+            PEERS[node_b].append(node_a)
+    return PEERS
+
+
 if __name__ == '__main__':
 
     # client actions from the commandline below
@@ -176,3 +207,12 @@ if __name__ == '__main__':
         if not os.path.isfile(local_file):
             print '[!!] Cannot Find %s' % local_file
         put_file(remote, local_file)
+
+    if '?NAT' in sys.argv and len(sys.argv)<=3:
+        node_a = raw_input('Enter Server_A IP Address: ')
+        node_b = raw_input('Enter Server_B IP Address: ')
+        print engine.check_peer_connections(node_a, node_b)
+    elif '?NAT' in sys.argv and len(sys.argv) >= 4:
+        node_a = sys.argv[2]
+        node_b = sys.argv[3]
+        print check_peer_connections(node_a, node_b)
