@@ -32,7 +32,7 @@ def add_remote_host_public_key(remote_host, remote_key_file):
         open(remote_key_file, 'wb').write(rmt_pub_key)
         s.send(public_key.exportKey())
         session_key = base64.b64decode(s.recv(4096))
-        open(remote_host.replace('.','')+'.token','wb').write(session_key)
+        open(remote_host.replace('.', '-')+'.token','wb').write(session_key)
         s.close()
     except socket.error:
         s.close()
@@ -266,7 +266,9 @@ if __name__ == '__main__':
         else: # TODO: Save time by loading files/directories
             file_data = engine.parse_manifest_file('shared_manifest.txt')
         manifest_hash = engine.get_sha256_sum('shared_manifest.txt', verbose=False)
-        engine.log_known_peers(DEBUG)
-
+        if os.path.isfile('peers.txt') and os.path.isfile('peers.key'):
+            utils.decrypt_file('peers.txt', 'peer_list.txt',False)
+            for peer in utils.swap('peer_list.txt', True):
+                print peer
 
 # EOF

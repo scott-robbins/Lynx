@@ -83,7 +83,7 @@ def encrypt_file(content, file_name_out):
 
 
 def decrypt_file(file_name, file_out, destroy):
-    key_file = file_name.split('.')+'.key'
+    key_file = file_name.split('.')[0]+'.key'
     key = base64.b64decode(open(key_file,'rb').read())
     encrypted_data = open(file_name, 'rb').read()
     decrypted_data = DecodeAES(AES.new(key),encrypted_data)
