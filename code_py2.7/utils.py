@@ -74,4 +74,20 @@ def start_listener(port, timeout):
     return s
 
 
+def encrypt_file(content, file_name_out):
+    key = get_random_bytes(32)
+    key_file = file_name_out.split('.')[0]+'.key'
+    encrypted_data = EncodeAES(AES.new(key), content)
+    open(file_name_out, 'wb').write(encrypted_data)
+    open(key_file, 'wb').write(base64.b64encode(key))
 
+
+def decrypt_file(file_name, file_out, destroy):
+    key_file = file_name.split('.')+'.key'
+    key = base64.b64decode(open(key_file,'rb').read())
+    encrypted_data = open(file_name, 'rb').read()
+    decrypted_data = DecodeAES(AES.new(key),encrypted_data)
+    if destroy:
+        os.remove(key_file)
+        os.remove(file_name)
+    open(file_out, 'wb').write(decrypted_data)
