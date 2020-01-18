@@ -54,7 +54,7 @@ def get_file(remote_host, query):
     s.send(encrypted_query)
 
     # Receive Reply and decrypt it
-    reply = s.recv(1200000)
+    reply = s.recv(120000)
     encrypted_key = reply.split('::::')[0]
 
     key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)
@@ -163,7 +163,7 @@ if __name__ == '__main__':
         r_key = rmt.replace('.', '') + '.pem'
         q = utils.arr2str(sys.argv[3:])
         print '[*] Querying %s: %s' % (rmt, 'SYS_CMD : ' + q)
-        query(rmt, r_key, 'SYS_CMD : ' + q)
+        print query(rmt, r_key, 'SYS_CMD : ' + q)
 
     if 'get' in sys.argv and len(sys.argv) >= 4:
         remote = sys.argv[2]
