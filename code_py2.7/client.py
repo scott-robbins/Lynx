@@ -179,6 +179,24 @@ def check_peer_connections(node_a, node_b):
     return PEERS
 
 
+def check_npeer_connections(nodes):
+    PEERS = {}
+    for n in nodes:
+        PEERS[n] = []
+    for a in nodes:
+        for b in nodes:
+            if a != b:
+                if b not in PEERS[a]:
+                    p2p = check_peer_connections(a, b)
+                    for node in p2p.keys():
+                        for peer in p2p[node]:
+                            PEERS[peer].append(node)
+    # Remove duplicates (a connection is two sided
+    for dev in PEERS.keys():
+        PEERS[dev] = list(set(PEERS[dev]))
+    return PEERS
+
+
 if __name__ == '__main__':
 
     # client actions from the commandline below
@@ -212,7 +230,12 @@ if __name__ == '__main__':
         node_a = raw_input('Enter Server_A IP Address: ')
         node_b = raw_input('Enter Server_B IP Address: ')
         print engine.check_peer_connections(node_a, node_b)
-    elif '?NAT' in sys.argv and len(sys.argv) >= 4:
+
+    if '?NAT' in sys.argv and len(sys.argv) == 4:
         node_a = sys.argv[2]
         node_b = sys.argv[3]
         print check_peer_connections(node_a, node_b)
+
+    if '?NAT' in sys.argv and len(sys.argv) > 4:
+        machines = sys.argv[2:]
+        print check_npeer_connections(machines)
