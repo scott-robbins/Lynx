@@ -72,4 +72,60 @@ def parse_ping(result):
     return routable, ping_time
 
 
+def crawl_dir(file_path, verbose):
+    directory = {'dir': [], 'file': []}
+    hashes = {}
+    folders = [file_path]
+    while len(folders) > 0:
+        direct = folders.pop()
+        if verbose:
+            print 'Exploring %s' % direct
+        for item in os.listdir(direct):
+            if os.path.isfile(direct + '/' + item):
+                file_name = direct + "/" + item
+                directory['file'].append(file_name)
+                hashes[file_name] = get_sha256_sum(file_name, False)
+            else:
+                directory['dir'].append(direct + '/' + item)
+                folders.append(direct + '/' + item)
+    return directory, hashes
 
+
+def get_sha256_sum(file_name, verbose):
+    if len(file_name.split("'")) >= 2:
+        file_name = ("{!r:}".format(file_name))
+        os.system("sha256sum "+file_name + ' >> out.txt')
+    else:
+        os.system("sha256sum '%s' >> out.txt" % file_name)
+    try:
+        sum_data = utils.swap('out.txt', True).pop().split(' ')[0]
+    except:
+        print file_name
+    if verbose:
+        print sum_data
+    return sum_data
+
+
+def parse_manifest_file(file_name):
+    shared_data = {}
+    for line in utils.swap(file_name, False):
+        try:
+            file_hash = line.split(' = ')[1]
+            file_name = line.split(' = ')[0]
+            shared_data[file_name] = file_hash
+        except IndexError:
+            pass
+    return shared_data
+
+
+def log_known_peers(verbose):
+    peer_list = ''
+    n_peers = 0
+    for name in utils.cmd('ls *.pem'):
+        peer_list += name.replace('-','.')+'\n'
+        n_peers += 1
+    # Encrypt this
+    utils.encrypt_file(peer_list, 'peers.txt')
+    if verbose:
+        print '[*] %d Peers Logged' % n_peers
+        print '[*] Encrypted Peer List in peers.txt'
