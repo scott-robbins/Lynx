@@ -103,6 +103,7 @@ class Serve:
             except KeyboardInterrupt:
                 print '\n\033[1m[!!] \033[31mServer KILLED \033[0m\033[1m[%ss Elapsed]\033[0m' %\
                       str(time.time()-tic)
+                engine.log_known_peers(False)
                 self.socket.close()
                 RUNNING = False
                 os.system('sh cleaner.sh >> /dev/null 2>&1')
