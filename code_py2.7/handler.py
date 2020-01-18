@@ -25,6 +25,7 @@ class Serve:
     public_key = ''
     private_key = ''
     clients = []
+    shared_folder = {}
 
     def __init__(self, mode):
         self.session_key = get_random_bytes(32)
@@ -46,6 +47,15 @@ class Serve:
         else:
             self.private_key = engine.load_private_key(private_key_file + '.pem')
         self.public_key = self.private_key.publickey()
+
+        '''     CREATE SHARED FOLDER    '''
+        if not os.path.isdir('SHARED'):
+            os.mkdir('SHARED')
+        else:
+            print '\033[31m[!!] \033[1mSHARED/ \033[3mAlready Exists.\n\033[0m' \
+                  'Do you want to synchronize/distribute this folder? (y/n): '
+            if raw_input('').upper() != ('Y' or 'YES'):
+                exit()
         return int_ip, ext_ip, nx_iface
 
     def run(self, MODE):
