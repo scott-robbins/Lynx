@@ -52,7 +52,7 @@ class Serve:
         if not os.path.isdir('SHARED'):
             os.mkdir('SHARED')
         else:
-            print '\033[31m[!!] \033[1mSHARED/ \033[3mAlready Exists.\n\033[0m' \
+            print '\033[31m\033[1m[!!] SHARED folder \033[3mAlready Exists.\n\033[0m' \
                   'Do you want to synchronize/distribute this folder? (y/n): '
             if raw_input('').upper() != ('Y' or 'YES'):
                 exit()
@@ -180,5 +180,5 @@ if __name__ == '__main__':
         server_mode = sys.argv[2]
     else:
         server_mode = 'listener'
-    os.system('sh cleaner.sh')
+    os.system('sh cleaner.sh >> /dev/null 2>&1')
     Serve(mode=server_mode)
