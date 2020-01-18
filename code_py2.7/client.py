@@ -266,7 +266,7 @@ if __name__ == '__main__':
         else: # TODO: Save time by loading files/directories
             file_data = engine.parse_manifest_file('shared_manifest.txt')
         manifest_hash = engine.get_sha256_sum('shared_manifest.txt', verbose=False)
-        engine.log_known_peers()
+        engine.log_known_peers(DEBUG)
 
 
 # EOF
