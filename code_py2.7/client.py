@@ -124,11 +124,11 @@ def query(remote_host, remote_key_file, cmd):
 
 
 def add_peer_cmd(rem):
-    r_k = rem.replace('.', '') + '.pem'
+    r_k = rem.replace('.', '-') + '.pem'
     k = add_remote_host_public_key(rem, r_k)
     if DEBUG:
         print '[*] Keys Exchanged With %s' % rem
-    open(rem.replace('.', '') + '.token', 'wb').write(k)
+    open(rem.replace('.', '-') + '.token', 'wb').write(k)
 
 
 def query_cmd(rem, q):
