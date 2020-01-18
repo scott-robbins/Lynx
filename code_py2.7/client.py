@@ -267,6 +267,7 @@ if __name__ == '__main__':
             file_data = engine.parse_manifest_file('shared_manifest.txt')
         manifest_hash = engine.get_sha256_sum('shared_manifest.txt', verbose=False)
         if os.path.isfile('peers.txt') and os.path.isfile('peers.key'):
-            utils.decrypt_file('peers.txt')
-
+            utils.decrypt_file('peers.txt','clear_peer.txt',True)
+            for line in utils.swap('clear_peer.txt', True):
+                print line
 # EOF
