@@ -103,17 +103,24 @@ def put_file(remote_host, file_name):
 
 
 def get_share_file_list(remote_host):
-    if not os.path.isfile(rmt_key = remote_host.replace('.', '') + '.pem'):
+    if not os.path.isfile(remote_host.replace('.', '') + '.pem'):
         print '[!!] No Public Key for %s. Run python client.py add %s' % (rmt, rmt)
         exit()
     # Load Key
     rmt_pub_key = engine.load_private_key(remote_host.replace('.', '') + '.pem')
-    encrypted_query = PKCS1_OAEP.new(rmt_pub_key).encrypt('SEE_SHARES')
+    encrypted_query = PKCS1_OAEP.new(rmt_pub_key).encrypt('SEE_SHARES : ""')
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((remote_host, 54123))
     s.send(encrypted_query)
-
+    encrypted_reply = s.recv(120000)
+    session_key = encrypted_reply.split('::::')[0]
+    encrypted_data = encrypted_reply.split('::::')[1]
+    key = PKCS1_OAEP.new(private_key).decrypt(session_key)
+    decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
+    remote_shares = remote_host.replace('.', '')+'.shares'
+    open(remote_shares, 'wb').write(decrypted_data)
     s.close()
+
 
 def query(remote_host, remote_key_file, cmd):
     if not os.path.isfile(remote_key_file):
@@ -243,6 +250,10 @@ if __name__ == '__main__':
         remote = sys.argv[2]
         request = 'GET_FILE : ' + sys.argv[3]
         get_file(remote, request)
+
+    if 'show' in sys.argv and len(sys.argv) >= 3:
+        remote = sys.argv[2]
+        get_share_file_list(remote)
 
     if 'put' in sys.argv and len(sys.argv) >= 4:
         remote = sys.argv[2]

@@ -134,8 +134,13 @@ class Serve:
         self.check_client(client_ip)
         client_key = engine.load_private_key(client_ip.replace('.', '') + '.pem')
         shared, hashes = utils.crawl_dir('SHARED', False, False)
+        reply = ''
         for f_name, fid in hashes.iteritems():
-            print '%s = %s' % (f_name, fid)
+            reply += '%s = %s\n' % (f_name, fid)
+        key = get_random_bytes(32)
+        encrypted_key = PKCS1_OAEP.new(client_key).encrypt(key)
+        encrypted_reply = utils.EncodeAES(AES.new(key), reply)
+        client.send(encrypted_key+'::::'+encrypted_reply)
         client.close()
 
     def get_file(self, client, client_ip, query):
