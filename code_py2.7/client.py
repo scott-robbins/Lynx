@@ -117,6 +117,7 @@ def get_share_file_list(remote_host):
     encrypted_data = encrypted_reply.split('::::')[1]
     key = PKCS1_OAEP.new(private_key).decrypt(session_key)
     decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
+    print decrypted_data
     remote_shares = remote_host.replace('.', '')+'.shares'
     open(remote_shares, 'wb').write(decrypted_data)
     s.close()
