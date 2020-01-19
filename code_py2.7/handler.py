@@ -34,7 +34,8 @@ class Serve:
         self.functions = {'&?Key': self.key_exchange,
                           'SYS_CMD': self.sys_cmd,
                           'GET_FILE': self.get_file,
-                          'PUT_FILE': self.put_file}
+                          'PUT_FILE': self.put_file,
+                          'SEE_SHARES': self.show_share_folder}
         self.run(mode)
 
     def initialize(self):
@@ -106,7 +107,7 @@ class Serve:
                 engine.log_known_peers(False)
                 self.socket.close()
                 RUNNING = False
-                os.system('sh cleaner.sh >> /dev/null 2>&1')
+                os.system('sh cleaner.sh')
 
     def key_exchange(self, client, client_addr):
         client_key_file = client_addr.replace('.', '') + '.pem'
@@ -127,6 +128,14 @@ class Serve:
         encrypted_key = PKCS1_OAEP.new(client_key).encrypt(key)
         encrypted_reply = utils.EncodeAES(AES.new(key),status)
         client.send(encrypted_key+'::::'+encrypted_reply)
+        client.close()
+
+    def show_share_folder(self, client, client_ip, query):
+        self.check_client(client_ip)
+        client_key = engine.load_private_key(client_ip.replace('.', '') + '.pem')
+        shared, hashes = utils.crawl_dir('SHARED', False, False)
+        for f_name, fid in hashes.iteritems():
+            print '%s = %s' % (f_name, fid)
         client.close()
 
     def get_file(self, client, client_ip, query):
@@ -168,7 +177,8 @@ class Serve:
         open(file_name, 'wb').write(decrypted_data)
         print '[*] %d Bytes transferred [%ss Elapsed]' % (file_size, str(time.time()-tic))
 
-    def check_client(self, ip):
+    @staticmethod
+    def check_client(ip):
         if not os.path.isfile(ip.replace('.', '') + '.pem'):
             print '[!!] No Public Key for client %s' % ip
             try:

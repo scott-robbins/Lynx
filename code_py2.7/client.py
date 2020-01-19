@@ -102,6 +102,19 @@ def put_file(remote_host, file_name):
               (os.path.getsize(file_name), remote_host, str(time.time()-tic))
 
 
+def get_share_file_list(remote_host):
+    if not os.path.isfile(rmt_key = remote_host.replace('.', '') + '.pem'):
+        print '[!!] No Public Key for %s. Run python client.py add %s' % (rmt, rmt)
+        exit()
+    # Load Key
+    rmt_pub_key = engine.load_private_key(remote_host.replace('.', '') + '.pem')
+    encrypted_query = PKCS1_OAEP.new(rmt_pub_key).encrypt('SEE_SHARES')
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((remote_host, 54123))
+    s.send(encrypted_query)
+
+    s.close()
+
 def query(remote_host, remote_key_file, cmd):
     if not os.path.isfile(remote_key_file):
         print '[!!] No Public Key for %s. Run python client.py add %s' % (rmt, rmt)
@@ -270,4 +283,7 @@ if __name__ == '__main__':
             utils.decrypt_file('peers.txt','clear_peer.txt',True)
             for line in utils.swap('clear_peer.txt', True):
                 print line
+
+
+
 # EOF

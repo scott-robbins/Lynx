@@ -91,3 +91,41 @@ def decrypt_file(file_name, file_out, destroy):
         os.remove(key_file)
         os.remove(file_name)
     open(file_out, 'wb').write(decrypted_data)
+
+
+def crawl_dir(file_path, h, verbose):
+    directory = {'dir': [], 'file': []}
+    hashes = {}
+    folders = [file_path]
+    while len(folders) > 0:
+        direct = folders.pop()
+        if verbose:
+            print 'Exploring %s' % direct
+        for item in os.listdir(direct):
+            if os.path.isfile(direct + '/' + item):
+                file_name = direct + "/" + item
+                directory['file'].append(file_name)
+                if h:
+                    hashes['"'+file_name+'"'] = get_sha256_sum(file_name, False)
+                if verbose:
+                    print '\033[3m- %s Added to Shared Folder\033[0m' % file_name
+            else:
+                directory['dir'].append(direct + '/' + item)
+                folders.append(direct + '/' + item)
+    return directory, hashes
+
+
+def get_sha256_sum(file_name, verbose):
+    if len(file_name.split("'"))>=2:
+        file_name = ("{!r:}".format(file_name))
+        os.system("sha256sum "+file_name + ' >> out.txt')
+    else:
+        os.system("sha256sum '%s' >> out.txt" % file_name)
+    try:
+        sum_data = swap('out.txt', True).pop().split(' ')[0]
+    except:
+        print file_name
+    if verbose:
+        print sum_data
+    return sum_data
+
