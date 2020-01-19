@@ -154,13 +154,14 @@ class Serve:
     def get_file(self, client, client_ip, query):
         self.check_client(client_ip)
         client_key = engine.load_private_key(client_ip.replace('.','-')+'.pem')
-        file_size = os.path.getsize(query.replace(' ', ''))
+        file_name = query.replace(' ','')
+        file_size = os.path.getsize(file_name)
         if file_size > 1000000:
             print '[!] File is greater than 1Mb. Compressing...'
         if DEBUGGER:
             print '[*] Sending %s to %s [%d bytes]' % (query, client_ip, file_size)
         # print '[*] %s is %d bytes' % (query, file_size)
-        content = open(query.replace(' ',''), 'rb').read()
+        content = open(file_name, 'rb').read()
         key = get_random_bytes(32)
         # print '[*] Encryption Key: %s' % base64.b64encode(key)
         encrypted_key = PKCS1_OAEP.new(client_key).encrypt(key)

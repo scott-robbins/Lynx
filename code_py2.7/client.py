@@ -58,17 +58,26 @@ def get_file(remote_host, query):
     ''' Introducing a Timeout in case no reply comes '''
     timeout = 30; success = False
     while not success or (time.time()-tic) < timeout:
-        # Receive Reply and decrypt it
-        reply = s.recv(120000000)
-        encrypted_key = reply.split('::::')[0]
+        def doGet():
+            reply = s.recv(120000000)
+            encrypted_key = reply.split('::::')[0]
 
-        key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)
-        if DEBUG:
-            print '[*] Encryption Key: %s' % base64.b64encode(key)
-        encrypted_data = reply.split('::::')[1]
-        if DEBUG:
-            print '[*] Received %d pieces of encrypted data. Decrypting...' % len(encrypted_data)
-        decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
+            key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)
+            if DEBUG:
+                print '[*] Encryption Key: %s' % base64.b64encode(key)
+            encrypted_data = reply.split('::::')[1]
+            if DEBUG:
+                print '[*] Received %d pieces of encrypted data. Decrypting...' % len(encrypted_data)
+            return utils.DecodeAES(AES.new(key), encrypted_data)
+        # Receive Reply and decrypt it
+        try:
+            decrypted_data = doGet()
+        except ValueError:
+            try:
+                decrypted_data = doGet()
+            except ValueError:
+                print '[!!] Unable to get %s:%s' % (remote_host, query)
+            return ''
         if os.path.isfile(query):
             if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: ' % query).upper() == 'Y':
                 os.remove(query)
