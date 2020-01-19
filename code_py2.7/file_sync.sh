@@ -43,7 +43,16 @@ add_host () {
 sh cleaner.sh >> /dev/null 2>&1
 rm shared_manifest.txt >> /dev/null 2>&1
 
-add_hosts_prompt
+if [ $# -eq 0 ]; then
+    add_hosts_prompt
+else
+    for var in "$@"
+    do
+        python client.py add "$var"
+    done
+fi
+
+
 python client.py log
 
 echo 'Synchronizing Shared Files with Peers'
