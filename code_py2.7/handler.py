@@ -187,6 +187,7 @@ class Serve:
                 if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: ' %
                              file_name).upper() == 'Y':
                     os.remove(file_name)
+        # TODO: handle nested folders!
         open(file_name, 'wb').write(decrypted_data)
         print '[*] %d Bytes transferred [%ss Elapsed]' % (file_size, str(time.time()-tic))
 

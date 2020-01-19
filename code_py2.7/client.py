@@ -1,5 +1,6 @@
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import PKCS1_OAEP, AES
+import multiprocessing
 import base64
 import socket
 import engine
@@ -54,29 +55,36 @@ def get_file(remote_host, query):
     s.connect((remote_host, 54123))
     s.send(encrypted_query)
 
-    # Receive Reply and decrypt it
-    reply = s.recv(120000)
-    encrypted_key = reply.split('::::')[0]
+    ''' Introducing a Timeout in case no reply comes '''
+    timeout = 30; success = False
+    while not success or (time.time()-tic) < timeout:
+        # Receive Reply and decrypt it
+        reply = s.recv(120000)
+        encrypted_key = reply.split('::::')[0]
 
-    key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)
-    if DEBUG:
-        print '[*] Encryption Key: %s' % base64.b64encode(key)
-    encrypted_data = reply.split('::::')[1]
-    if DEBUG:
-        print '[*] Received %d pieces of encrypted data. Decrypting...' % len(encrypted_data)
-    decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
-    if os.path.isfile(query):
-        if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: '%query).upper() == 'Y':
-            os.remove(query)
-    resource = query.split(':')[1].replace(' ','')
-    open(resource, 'wb').write(decrypted_data)
-    print '[*] %d Bytes Transferred [%ss Elapsed]' % (os.path.getsize(resource),
-                                                      str(time.time()-tic))
-    s.close()
+        key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)
+        if DEBUG:
+            print '[*] Encryption Key: %s' % base64.b64encode(key)
+        encrypted_data = reply.split('::::')[1]
+        if DEBUG:
+            print '[*] Received %d pieces of encrypted data. Decrypting...' % len(encrypted_data)
+        decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
+        if os.path.isfile(query):
+            if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: ' % query).upper() == 'Y':
+                os.remove(query)
+        resource = query.split(':')[1].replace(' ', '')
+        open(resource, 'wb').write(decrypted_data)
+        print '[*] %d Bytes Transferred [%ss Elapsed]' % (os.path.getsize(resource),
+                                                          str(time.time() - tic))
+        s.close()
+        success = True
+    if not success:
+        print '[!!] GetFile Timed Out'
+        s.close()
 
 
 def put_file(remote_host, file_name):
-    tic = time.time()
+
     rmt_key = remote_host.replace('.', '-') + '.pem'
     if not os.path.isfile(rmt_key):
         print '[!!] No Public Key for %s. Run python client.py add %s' % (remote_host,
@@ -90,14 +98,20 @@ def put_file(remote_host, file_name):
     s.connect((remote_host, 54123))
     s.send(encrypted_query)
 
-    # Encrypt the file and send it
-    raw_file_data = open(file_name, 'rb').read()
-    key = get_random_bytes(32)
-    encrypted_key = PKCS1_OAEP.new(rmt_pub_key).encrypt(key)
-    encrypted_data = utils.EncodeAES(AES.new(key), raw_file_data)
-    s.send(encrypted_key+';;;;'+encrypted_data)
-    s.close()
-    if DEBUG:
+    ''' Introducing a Timeout in case no reply comes '''
+    tic = time.time(); success = True
+    while not success or (time.time() - tic) < 30:
+        # Encrypt the file and send it
+        raw_file_data = open(file_name, 'rb').read()
+        key = get_random_bytes(32)
+        encrypted_key = PKCS1_OAEP.new(rmt_pub_key).encrypt(key)
+        encrypted_data = utils.EncodeAES(AES.new(key), raw_file_data)
+        s.send(encrypted_key + ';;;;' + encrypted_data)
+        s.close(); success = True
+    if not success:
+        print '[!!] PutFile Timed Out'
+        s.close()
+    if success and DEBUG:
         print '[*] Finished Sending %d bytes of Data to %s [%ss Elapsed]' % \
               (os.path.getsize(file_name), remote_host, str(time.time()-tic))
 
@@ -169,6 +183,7 @@ def put_file_req(rem, local):
     if not os.path.isfile(local):
         print '[!!] Cannot Find %s' % local
     put_file(rem, local)
+    return True
 
 
 def check_peer_connections(node_a, node_b):
@@ -293,12 +308,15 @@ if __name__ == '__main__':
         manifest_hash = engine.get_sha256_sum('shared_manifest.txt', verbose=False)
         shared_files = file_data.keys()
 
+        # worker = multiprocessing.Pool(processes=4)
+
         if os.path.isfile('peers.txt') and os.path.isfile('peers.key'):
             utils.decrypt_file('peers.txt', 'clear_peer.txt',True)
             for line in utils.swap('clear_peer.txt', True):
                 remote = line.replace('-', '.')
                 if os.path.isfile(remote.replace('.', '')+'.shares'):
                     os.remove(remote.replace('.', '')+'.shares')
+                time.sleep(0.1)   # Requests are being made to fast to catch replies
                 get_share_file_list(remote)
                 try:
                     remote_shares = utils.swap(remote.replace('.', '') + '.shares', False)
@@ -318,7 +336,9 @@ if __name__ == '__main__':
                     for f in shared_files:
                         if f not in remote_shares:
                             print '[*] Sending %s to %s' % (f, remote)
+                            time.sleep(0.1)  # Requests are being made to fast to catch replies
                             put_file(remote, f)
+
                 except IOError:
                     print '[!] %s has no Shared Files' % remote
 
