@@ -121,9 +121,7 @@ def get_sha256_sum(file_name, verbose):
         os.system("sha256sum "+file_name + ' >> out.txt')
     else:
         os.system("sha256sum '%s' >> out.txt" % file_name)
-    try:
         sum_data = swap('out.txt', True).pop().split(' ')[0]
-    except:
         print file_name
     if verbose:
         print sum_data
