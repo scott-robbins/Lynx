@@ -138,8 +138,8 @@ class Serve:
         shared, hashes = utils.crawl_dir('SHARED', True, False)
         print '[*] Sharing Names of %d Files in Shared Folder' % len(shared.keys())
         reply = ''
-        for f_name in shared['"'+f_name+'"']:
-            checksum = hashes[f_name]
+        for f_name in shared.keys():
+            checksum = hashes['"'+f_name+'"']
             reply += '%s = %s\n' % (f_name, checksum)
 
         key = get_random_bytes(32)
