@@ -59,7 +59,7 @@ def get_file(remote_host, query):
     timeout = 30; success = False
     while not success or (time.time()-tic) < timeout:
         # Receive Reply and decrypt it
-        reply = s.recv(120000)
+        reply = s.recv(120000000)
         encrypted_key = reply.split('::::')[0]
 
         key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)

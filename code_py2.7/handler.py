@@ -155,6 +155,8 @@ class Serve:
         self.check_client(client_ip)
         client_key = engine.load_private_key(client_ip.replace('.','-')+'.pem')
         file_size = os.path.getsize(query.replace(' ', ''))
+        if file_size > 1000000:
+            print '[!] File is greater than 1Mb. Compressing...'
         if DEBUGGER:
             print '[*] Sending %s to %s [%d bytes]' % (query, client_ip, file_size)
         # print '[*] %s is %d bytes' % (query, file_size)
