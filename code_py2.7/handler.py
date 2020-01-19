@@ -135,11 +135,12 @@ class Serve:
         client_key = engine.load_private_key(client_ip.replace('.', '') + '.pem')
         if not os.path.isdir('SHARED'):
             print 'Cannot find SHARED folder'
-        shared, hashes = utils.crawl_dir('SHARED', False, False)
+        shared, hashes = utils.crawl_dir('SHARED', True, False)
         print '[*] Sharing Names of %d Files in Shared Folder' % len(shared.keys())
         reply = ''
         for f_name in shared['file']:
-            reply += '%s\n' % f_name
+            checksum = hashes[f_name]
+            reply += '%s = %s\n' % (f_name, checksum)
 
         key = get_random_bytes(32)
         encrypted_key = PKCS1_OAEP.new(client_key).encrypt(key)
