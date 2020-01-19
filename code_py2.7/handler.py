@@ -69,7 +69,7 @@ class Serve:
             try:
 
                 if int(time.time()-tic)%60 == 0:
-                    os.system('python client.py log >> /dev/num >2&1')
+                    os.system('python client.py log >> /dev/null >2&1')
                     os.system('cp peers.key SHARED/%s' % self.lan_ip.replace('.', '' + '.peers'))
 
                 '''        ACCEPT A CLIENT        '''
