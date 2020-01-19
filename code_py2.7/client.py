@@ -32,7 +32,7 @@ def add_remote_host_public_key(remote_host, remote_key_file):
         open(remote_key_file, 'wb').write(rmt_pub_key)
         s.send(public_key.exportKey())
         session_key = base64.b64decode(s.recv(4096))
-        open(remote_host.replace('.','-')+'.token','wb').write(session_key)
+        open(remote_host.replace('.','')+'.token','wb').write(session_key)
         s.close()
     except socket.error:
         s.close()
@@ -118,8 +118,9 @@ def get_share_file_list(remote_host):
     key = PKCS1_OAEP.new(private_key).decrypt(session_key)
     decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
     print decrypted_data
-    remote_shares = remote_host.replace('.', '')+'.shares'
-    open(remote_shares, 'wb').write(decrypted_data)
+    if decrypted_data != '':
+        remote_shares = remote_host.replace('.', '')+'.shares'
+        open(remote_shares, 'wb').write(decrypted_data)
     s.close()
 
 
@@ -153,7 +154,7 @@ def add_peer_cmd(rem):
 
 
 def query_cmd(rem, q):
-    r_key = rem.replace('.', -'') + '.pem'
+    r_key = rem.replace('.', '-') + '.pem'
     if DEBUG:
         print '[*] Querying %s: %s' % (rem, 'SYS_CMD : ' + q)
     return query(rem, r_key, 'SYS_CMD : ' + q)
@@ -288,14 +289,28 @@ if __name__ == '__main__':
         machines = sys.argv[2:]
         if not os.path.isfile('shared_manifest.txt'):
             create_manifest()
-        else: # TODO: Save time by loading files/directories
+        else:  # TODO: Save time by loading files/directories
             file_data = engine.parse_manifest_file('shared_manifest.txt')
         manifest_hash = engine.get_sha256_sum('shared_manifest.txt', verbose=False)
         if os.path.isfile('peers.txt') and os.path.isfile('peers.key'):
-            utils.decrypt_file('peers.txt','clear_peer.txt',True)
+            utils.decrypt_file('peers.txt', 'clear_peer.txt',True)
             for line in utils.swap('clear_peer.txt', True):
-                print line
-
+                remote = line.replace('-', '.')
+                if os.path.isfile(remote.replace('.', '')+'.shares'):
+                    os.remove(remote.replace('.', '')+'.shares')
+                get_share_file_list(remote)
+                try:
+                    for ln in utils.swap(remote.replace('.', '') + '.shares', False):
+                        try:
+                            name = ln.split(' = ')[0]
+                            checksum = ln.split(' = ')[1]
+                            get_file(remote, 'GET_FILE : %s' % name)
+                            if utils.get_sha256_sum(name, False) != checksum:
+                                print '[!!] %s FILE HASH DOES NOT MACH' % name
+                        except IndexError:
+                            pass
+                except IOError:
+                    print '[!] %s has no Shared Files' % remote
 
 
 # EOF

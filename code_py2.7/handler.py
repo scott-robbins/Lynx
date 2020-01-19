@@ -52,6 +52,7 @@ class Serve:
         '''     CREATE SHARED FOLDER    '''
         if not os.path.isdir('SHARED'):
             os.mkdir('SHARED')
+            os.system('cp nx.txt SHARED')
         else:
             print '\033[31m\033[1m[!!] SHARED folder \033[3mAlready Exists.\n\033[0m' \
                   'Do you want to synchronize/distribute this folder? (y/n): '
