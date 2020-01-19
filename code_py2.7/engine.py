@@ -122,7 +122,7 @@ def log_known_peers(verbose):
     peer_list = ''
     n_peers = 0
     for name in utils.cmd('ls *.pem'):
-        peer_list += name.replace('-','.')+'\n'
+        peer_list += name.split('.pem')[0]+'\n'
         n_peers += 1
     # Encrypt this
     utils.encrypt_file(peer_list, 'peers.txt')

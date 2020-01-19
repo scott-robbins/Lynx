@@ -16,7 +16,7 @@ Signature 	Private key 	Public key
 # =========================== GLOBAL SETTINGS ============================= #
 default_port = 54123
 lan_ip, ext_ip, nx_nic = engine.get_public_private_ip(verbose=True)
-private_key = engine.load_private_key(ext_ip.replace('.','')+'.pem')
+private_key = engine.load_private_key(ext_ip.replace('.','-')+'.pem')
 public_key = private_key.publickey()
 DEBUG = False
 
@@ -32,7 +32,7 @@ def add_remote_host_public_key(remote_host, remote_key_file):
         open(remote_key_file, 'wb').write(rmt_pub_key)
         s.send(public_key.exportKey())
         session_key = base64.b64decode(s.recv(4096))
-        open(remote_host.replace('.','')+'.token','wb').write(session_key)
+        open(remote_host.replace('.','-')+'.token','wb').write(session_key)
         s.close()
     except socket.error:
         s.close()
@@ -43,7 +43,7 @@ def add_remote_host_public_key(remote_host, remote_key_file):
 def get_file(remote_host, query):
     # Load Key
     tic = time.time()
-    rmt_key = remote_host.replace('.', '') + '.pem'
+    rmt_key = remote_host.replace('.', '-') + '.pem'
     if not os.path.isfile(rmt_key):
         print '[!!] No Public Key for %s. Run python client.py add %s' % (remote_host,
                                                                           remote_host)
@@ -77,7 +77,7 @@ def get_file(remote_host, query):
 
 def put_file(remote_host, file_name):
     tic = time.time()
-    rmt_key = remote_host.replace('.', '') + '.pem'
+    rmt_key = remote_host.replace('.', '-') + '.pem'
     if not os.path.isfile(rmt_key):
         print '[!!] No Public Key for %s. Run python client.py add %s' % (remote_host,
                                                                           remote_host)
@@ -103,11 +103,11 @@ def put_file(remote_host, file_name):
 
 
 def get_share_file_list(remote_host):
-    if not os.path.isfile(remote_host.replace('.', '') + '.pem'):
+    if not os.path.isfile(remote_host.replace('.', '-') + '.pem'):
         print '[!!] No Public Key for %s. Run python client.py add %s' % (rmt, rmt)
         exit()
     # Load Key
-    rmt_pub_key = engine.load_private_key(remote_host.replace('.', '') + '.pem')
+    rmt_pub_key = engine.load_private_key(remote_host.replace('.', '-') + '.pem')
     encrypted_query = PKCS1_OAEP.new(rmt_pub_key).encrypt('SEE_SHARES : ""')
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((remote_host, 54123))
@@ -128,7 +128,7 @@ def query(remote_host, remote_key_file, cmd):
         print '[!!] No Public Key for %s. Run python client.py add %s' % (rmt, rmt)
         exit()
     # Load Key
-    rmt_pub_key = engine.load_private_key(remote_host.replace('.', '') + '.pem')
+    rmt_pub_key = engine.load_private_key(remote_host.replace('.', '-') + '.pem')
     encrypted_query = PKCS1_OAEP.new(rmt_pub_key).encrypt(cmd)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((remote_host, 54123))
@@ -145,7 +145,7 @@ def query(remote_host, remote_key_file, cmd):
 
 
 def add_peer_cmd(rem):
-    r_k = rem.replace('.', '') + '.pem'
+    r_k = rem.replace('.', '-') + '.pem'
     k = add_remote_host_public_key(rem, r_k)
     if DEBUG:
         print '[*] Keys Exchanged With %s' % rem
@@ -153,7 +153,7 @@ def add_peer_cmd(rem):
 
 
 def query_cmd(rem, q):
-    r_key = rem.replace('.', '') + '.pem'
+    r_key = rem.replace('.', -'') + '.pem'
     if DEBUG:
         print '[*] Querying %s: %s' % (rem, 'SYS_CMD : ' + q)
     return query(rem, r_key, 'SYS_CMD : ' + q)
@@ -172,8 +172,8 @@ def put_file_req(rem, local):
 
 def check_peer_connections(node_a, node_b):
     PEERS = {node_a: [], node_b: []}
-    rkey_a = node_a.replace('.', '') + '.pem'
-    rkey_b = node_b.replace('.', '') + '.pem'
+    rkey_a = node_a.replace('.', '-') + '.pem'
+    rkey_b = node_b.replace('.', '-') + '.pem'
     keys = utils.cmd('ls *pem')
     if rkey_a not in keys:
         print '[*] Adding Peer %s' % node_a

@@ -42,7 +42,7 @@ class Serve:
         int_ip, ext_ip, nx_iface = engine.get_public_private_ip(verbose=False)
 
         '''     LOAD KEYS     '''
-        private_key_file = ext_ip.replace('.', '')
+        private_key_file = ext_ip.replace('.', '-')
         if not os.path.isfile(private_key_file + '.pem'):
             self.private_key = engine.create_rsa_key(private_key_file + '.pem')
         else:
@@ -110,7 +110,7 @@ class Serve:
                 os.system('sh cleaner.sh')
 
     def key_exchange(self, client, client_addr):
-        client_key_file = client_addr.replace('.', '') + '.pem'
+        client_key_file = client_addr.replace('.', '-') + '.pem'
         client.send(self.public_key.exportKey())
         client_public_key = RSA.importKey(client.recv(4096))
         open(client_key_file, 'wb').write(client_public_key.exportKey())
@@ -119,7 +119,7 @@ class Serve:
 
     def sys_cmd(self, client, client_ip, query):
         self.check_client(client_ip)
-        client_key = engine.load_private_key(client_ip.replace('.', '') + '.pem')
+        client_key = engine.load_private_key(client_ip.replace('.', '-') + '.pem')
         status = utils.arr2lines(utils.cmd(query))
         if DEBUGGER:
             print '$ %s' % query
@@ -132,7 +132,7 @@ class Serve:
 
     def show_share_folder(self, client, client_ip, query):
         self.check_client(client_ip)
-        client_key = engine.load_private_key(client_ip.replace('.', '') + '.pem')
+        client_key = engine.load_private_key(client_ip.replace('.', '-') + '.pem')
         if not os.path.isdir('SHARED'):
             print 'Cannot find SHARED folder'
         shared, hashes = utils.crawl_dir('SHARED', True, False)
@@ -149,7 +149,7 @@ class Serve:
 
     def get_file(self, client, client_ip, query):
         self.check_client(client_ip)
-        client_key = engine.load_private_key(client_ip.replace('.','')+'.pem')
+        client_key = engine.load_private_key(client_ip.replace('.','-')+'.pem')
         file_size = os.path.getsize(query.replace(' ', ''))
         if DEBUGGER:
             print '[*] Sending %s to %s [%d bytes]' % (query, client_ip, file_size)
@@ -188,7 +188,7 @@ class Serve:
 
     @staticmethod
     def check_client(ip):
-        if not os.path.isfile(ip.replace('.', '') + '.pem'):
+        if not os.path.isfile(ip.replace('.', '-') + '.pem'):
             print '[!!] No Public Key for client %s' % ip
             try:
                 os.system('python client.py add %s' % ip)
