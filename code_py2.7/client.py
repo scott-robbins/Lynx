@@ -260,7 +260,7 @@ def file_sync():
             if remote != ext_ip and remote != lan_ip:
                 if os.path.isfile(remote.replace('.', '') + '.shares'):
                     os.remove(remote.replace('.', '') + '.shares')
-                # time.sleep(0.1)  # Requests are being made to fast to catch replies
+                time.sleep(0.1)  # Requests are being made to fast to catch replies
 
                 get_share_file_list(remote)
                 try:
@@ -282,7 +282,7 @@ def file_sync():
                     for f in shared_files:
                         if f not in remote_shares:
                             print '[*] Sending %s to %s' % (f, remote)
-                            # time.sleep(0.1)  # Requests are being made to fast to catch replies
+                            time.sleep(0.1)  # Requests are being made to fast to catch replies
                             put_file(remote, f)
                 except IOError:
                     print '[!] %s has no Shared Files' % remote
