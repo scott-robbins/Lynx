@@ -289,9 +289,10 @@ if __name__ == '__main__':
         machines = sys.argv[2:]
         if not os.path.isfile('shared_manifest.txt'):
             create_manifest()
-        else:  # TODO: Save time by loading files/directories
-            file_data = engine.parse_manifest_file('shared_manifest.txt')
+        file_data = engine.parse_manifest_file('shared_manifest.txt')
         manifest_hash = engine.get_sha256_sum('shared_manifest.txt', verbose=False)
+        shared_files = file_data.keys()
+
         if os.path.isfile('peers.txt') and os.path.isfile('peers.key'):
             utils.decrypt_file('peers.txt', 'clear_peer.txt',True)
             for line in utils.swap('clear_peer.txt', True):
@@ -300,15 +301,24 @@ if __name__ == '__main__':
                     os.remove(remote.replace('.', '')+'.shares')
                 get_share_file_list(remote)
                 try:
-                    for ln in utils.swap(remote.replace('.', '') + '.shares', False):
+                    remote_shares = utils.swap(remote.replace('.', '') + '.shares', False)
+                    # Get remote file if its not in local share file
+                    for ln in remote_shares:
                         try:
                             name = ln.split(' = ')[0]
                             checksum = ln.split(' = ')[1]
-                            get_file(remote, 'GET_FILE : %s' % name)
-                            if utils.get_sha256_sum(name, False) != checksum:
-                                print '[!!] %s FILE HASH DOES NOT MACH' % name
+                            if name not in shared_files:
+                                get_file(remote, 'GET_FILE : %s' % name)
+                                if utils.get_sha256_sum(name, False) != checksum:
+                                    print '[!!] %s FILE HASH DOES NOT MACH' % name
+                                    os.remove(name)
                         except IndexError:
                             pass
+                    # Now put local files onto remote if they dont have them
+                    for f in shared_files:
+                        if f not in remote_shares:
+                            print '[*] Sending %s to %s' % (f, remote)
+                            put_file(remote, f)
                 except IOError:
                     print '[!] %s has no Shared Files' % remote
 
