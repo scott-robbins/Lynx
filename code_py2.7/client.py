@@ -246,6 +246,48 @@ def create_manifest():
                                                            str(time.time()-tic))
 
 
+def file_sync():
+    if not os.path.isfile('shared_manifest.txt'):
+        create_manifest()
+    file_data = engine.parse_manifest_file('shared_manifest.txt')
+    manifest_hash = engine.get_sha256_sum('shared_manifest.txt', verbose=False)
+    shared_files = file_data.keys()
+
+    if os.path.isfile('peers.txt') and os.path.isfile('peers.key'):
+        utils.decrypt_file('peers.txt', 'clear_peer.txt', True)
+        for line in utils.swap('clear_peer.txt', True):
+            remote = line.replace('-', '.').replace(' ', '')
+            if remote != ext_ip and remote != lan_ip:
+                if os.path.isfile(remote.replace('.', '') + '.shares'):
+                    os.remove(remote.replace('.', '') + '.shares')
+                # time.sleep(0.1)  # Requests are being made to fast to catch replies
+
+                get_share_file_list(remote)
+                try:
+                    remote_shares = utils.swap(remote.replace('.', '') + '.shares', False)
+                    # Get remote file if its not in local share file
+                    for ln in remote_shares:
+                        try:
+                            name = ln.split(' = ')[0]
+                            checksum = ln.split(' = ')[1]
+                            if name not in shared_files:
+                                get_file(remote, 'GET_FILE : %s' % name)
+                                if utils.get_sha256_sum(name, False) != checksum:
+                                    print '[!!] %s FILE HASH DOES NOT MACH' % name
+                                    os.remove(name)
+                        except IndexError:
+                            print '[!!] Error Getting: %s:%s' % (remote, name)
+                            pass
+                    # Now put local files onto remote if they dont have them
+                    for f in shared_files:
+                        if f not in remote_shares:
+                            print '[*] Sending %s to %s' % (f, remote)
+                            # time.sleep(0.1)  # Requests are being made to fast to catch replies
+                            put_file(remote, f)
+                except IOError:
+                    print '[!] %s has no Shared Files' % remote
+
+
 # ===========================       MAIN       ============================ #
 if __name__ == '__main__':
     # client actions from the commandline below
@@ -301,46 +343,7 @@ if __name__ == '__main__':
         print '[*] FINISHED [%ss Elapsed]' % str(time.time()-tic)
 
     if 'sync' in sys.argv:
-        machines = sys.argv[2:]
-        if not os.path.isfile('shared_manifest.txt'):
-            create_manifest()
-        file_data = engine.parse_manifest_file('shared_manifest.txt')
-        manifest_hash = engine.get_sha256_sum('shared_manifest.txt', verbose=False)
-        shared_files = file_data.keys()
-
-        # worker = multiprocessing.Pool(processes=4)
-
-        if os.path.isfile('peers.txt') and os.path.isfile('peers.key'):
-            utils.decrypt_file('peers.txt', 'clear_peer.txt',True)
-            for line in utils.swap('clear_peer.txt', True):
-                remote = line.replace('-', '.')
-                if os.path.isfile(remote.replace('.', '')+'.shares'):
-                    os.remove(remote.replace('.', '')+'.shares')
-                time.sleep(0.1)   # Requests are being made to fast to catch replies
-                get_share_file_list(remote)
-                try:
-                    remote_shares = utils.swap(remote.replace('.', '') + '.shares', False)
-                    # Get remote file if its not in local share file
-                    for ln in remote_shares:
-                        try:
-                            name = ln.split(' = ')[0]
-                            checksum = ln.split(' = ')[1]
-                            if name not in shared_files:
-                                get_file(remote, 'GET_FILE : %s' % name)
-                                if utils.get_sha256_sum(name, False) != checksum:
-                                    print '[!!] %s FILE HASH DOES NOT MACH' % name
-                                    os.remove(name)
-                        except IndexError:
-                            pass
-                    # Now put local files onto remote if they dont have them
-                    for f in shared_files:
-                        if f not in remote_shares:
-                            print '[*] Sending %s to %s' % (f, remote)
-                            time.sleep(0.1)  # Requests are being made to fast to catch replies
-                            put_file(remote, f)
-
-                except IOError:
-                    print '[!] %s has no Shared Files' % remote
+        file_sync()
 
 
 # EOF
