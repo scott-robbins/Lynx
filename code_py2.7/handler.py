@@ -52,7 +52,6 @@ class Serve:
         '''     CREATE SHARED FOLDER    '''
         if not os.path.isdir('SHARED'):
             os.mkdir('SHARED')
-            os.system('cp nx.txt SHARED')
         else:
             print '\033[31m\033[1m[!!] SHARED folder \033[3mAlready Exists.\n\033[0m' \
                   'Do you want to synchronize/distribute this folder? (y/n): '
@@ -65,6 +64,7 @@ class Serve:
         tic = time.time()
         date, start_time = utils.create_timestamp()
         os.system('python client.py sync')
+        os.system('cp peers.key SHARED/%s' % self.lan_ip.replace('.',''+'.peers'))
         print '\033[1m[*] \033[32mServer Started\033[0m\033[1m %s - %s\033[0m' % (date, start_time)
 
         while RUNNING:
