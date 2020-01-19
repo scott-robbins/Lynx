@@ -138,7 +138,7 @@ class Serve:
         shared, hashes = utils.crawl_dir('SHARED', True, False)
         print '[*] Sharing Names of %d Files in Shared Folder' % len(shared.keys())
         reply = ''
-        for f_name in shared['file']:
+        for f_name in shared['"'+'file'+'"'+]:
             checksum = hashes[f_name]
             reply += '%s = %s\n' % (f_name, checksum)
 
