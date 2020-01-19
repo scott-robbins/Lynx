@@ -235,14 +235,14 @@ if __name__ == '__main__':
     # client actions from the commandline below
     if 'add' in sys.argv and len(sys.argv) >= 3:
         rmt = sys.argv[2]
-        r_key = rmt.replace('.', '') + '.pem'
+        r_key = rmt.replace('.', '-') + '.pem'
         k = add_remote_host_public_key(rmt, r_key)
         open(rmt.replace('.', '') + '.token', 'wb').write(k)
         print '[*] Keys Exchanged With %s' % rmt
 
     if 'query' in sys.argv and len(sys.argv) >= 4:
         rmt = sys.argv[2]
-        r_key = rmt.replace('.', '') + '.pem'
+        r_key = rmt.replace('.', '-') + '.pem'
         q = utils.arr2str(sys.argv[3:])
         print '[*] Querying %s: %s' % (rmt, 'SYS_CMD : ' + q)
         print query(rmt, r_key, 'SYS_CMD : ' + q)
