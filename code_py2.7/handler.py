@@ -136,12 +136,11 @@ class Serve:
         if not os.path.isdir('SHARED'):
             print 'Cannot find SHARED folder'
         shared, hashes = utils.crawl_dir('SHARED', True, False)
-        print '[*] Sharing Names of %d Files in Shared Folder' % len(shared.keys())
+        print '[*] Sharing Names of %d Files in Shared Folder' % len(shared['file'])
         reply = ''
-        for f_name in shared['file'].keys():
+        for f_name in shared['file']:
             checksum = hashes['"'+f_name+'"']
             reply += '%s = %s\n' % (f_name, checksum)
-
         key = get_random_bytes(32)
         encrypted_key = PKCS1_OAEP.new(client_key).encrypt(key)
         encrypted_reply = utils.EncodeAES(AES.new(key), reply)
