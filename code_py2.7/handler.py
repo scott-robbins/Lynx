@@ -133,10 +133,12 @@ class Serve:
     def show_share_folder(self, client, client_ip, query):
         self.check_client(client_ip)
         client_key = engine.load_private_key(client_ip.replace('.', '') + '.pem')
-        shared, hashes = utils.crawl_dir('SHARED', False, False)
+        shared, hashes = utils.crawl_dir(os.getcwd()+'SHARED', False, False)
+        print '[*] Sharing Names of %d Files in Shared Folder' % len(hashes.keys())
         reply = ''
         for f_name, fid in hashes.iteritems():
             reply += '%s = %s\n' % (f_name, fid)
+
         key = get_random_bytes(32)
         encrypted_key = PKCS1_OAEP.new(client_key).encrypt(key)
         encrypted_reply = utils.EncodeAES(AES.new(key), reply)
