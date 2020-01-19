@@ -136,7 +136,7 @@ class Serve:
         if not os.path.isdir('SHARED'):
             print 'Cannot find SHARED folder'
         shared, hashes = utils.crawl_dir('SHARED', False, False)
-        print '[*] Sharing Names of %d Files in Shared Folder' % len(hashes.keys())
+        print '[*] Sharing Names of %d Files in Shared Folder' % len(shared.keys())
         reply = ''
         for f_name, fid in hashes.iteritems():
             reply += '%s = %s\n' % (f_name, fid)
