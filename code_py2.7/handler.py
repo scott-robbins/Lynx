@@ -63,12 +63,15 @@ class Serve:
         RUNNING = True
         tic = time.time()
         date, start_time = utils.create_timestamp()
-        os.system('python client.py sync')
-        os.system('cp peers.key SHARED/%s' % self.lan_ip.replace('.',''+'.peers'))
         print '\033[1m[*] \033[32mServer Started\033[0m\033[1m %s - %s\033[0m' % (date, start_time)
 
         while RUNNING:
             try:
+
+                if int(time.time()-tic)%60 == 0:
+                    os.system('python client.py log >> /dev/num >2&1')
+                    os.system('cp peers.key SHARED/%s' % self.lan_ip.replace('.', '' + '.peers'))
+
                 '''        ACCEPT A CLIENT        '''
                 client, client_addr = self.socket.accept()
                 client_ip = client_addr[0]
