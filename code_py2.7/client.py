@@ -20,9 +20,9 @@ lan_ip, ext_ip, nx_nic = engine.get_public_private_ip(verbose=True)
 private_key = engine.load_private_key(ext_ip.replace('.','-')+'.pem')
 public_key = private_key.publickey()
 DEBUG = False
-
-
 # =========================== CLIENT FUNCTIONS ============================ #
+
+
 def add_remote_host_public_key(remote_host, remote_key_file):
     session_key = ''
     try:
@@ -39,6 +39,22 @@ def add_remote_host_public_key(remote_host, remote_key_file):
         s.close()
         print '[!!] Connection Broken'
     return session_key
+
+
+def doGet(c):
+    try:
+        reply = c.recv(65535)
+        encrypted_key = reply.split('::::')[0]
+
+        key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)
+        if DEBUG:
+            print '[*] Encryption Key: %s' % base64.b64encode(key)
+        encrypted_data = reply.split('::::')[1]
+        if DEBUG:
+            print '[*] Received %d pieces of encrypted data. Decrypting...' % len(encrypted_data)
+    except socket.error:
+        return '', False
+    return utils.DecodeAES(AES.new(key), encrypted_data), c
 
 
 def get_file(remote_host, query):
@@ -58,38 +74,25 @@ def get_file(remote_host, query):
     ''' Introducing a Timeout in case no reply comes '''
     timeout = 30; success = False
     while not success or (time.time()-tic) < timeout:
-        def doGet():
-            reply = s.recv(120000000)
-            encrypted_key = reply.split('::::')[0]
-
-            key = PKCS1_OAEP.new(private_key).decrypt(encrypted_key)
-            if DEBUG:
-                print '[*] Encryption Key: %s' % base64.b64encode(key)
-            encrypted_data = reply.split('::::')[1]
-            if DEBUG:
-                print '[*] Received %d pieces of encrypted data. Decrypting...' % len(encrypted_data)
-            return utils.DecodeAES(AES.new(key), encrypted_data)
+        time.sleep(0.3)
         # Receive Reply and decrypt it
         try:
-            decrypted_data = doGet()
+            decrypted_data, s = doGet(s)
+            success = True
         except ValueError:
-            try:
-                decrypted_data = doGet()
-            except ValueError:
-                print '[!!] Unable to get %s:%s' % (remote_host, query)
             return ''
         if os.path.isfile(query):
             if raw_input('[!!] %s Already Exists, do you want to Overwrite it (y/n)?: ' % query).upper() == 'Y':
                 os.remove(query)
         resource = query.split(':')[1].replace(' ', '')
         open(resource, 'wb').write(decrypted_data)
-        print '[*] %d Bytes Transferred [%ss Elapsed]' % (os.path.getsize(resource),
-                                                          str(time.time() - tic))
-        s.close()
         success = True
     if not success:
         print '[!!] GetFile Timed Out'
-        s.close()
+    else:
+        print '[*] %d Bytes Transferred [%ss Elapsed]' % (os.path.getsize(resource),
+                                                          str(time.time() - tic))
+    s.close()
 
 
 def put_file(remote_host, file_name):
@@ -129,22 +132,26 @@ def get_share_file_list(remote_host):
     if not os.path.isfile(remote_host.replace('.', '-') + '.pem'):
         print '[!!] No Public Key for %s. Run python client.py add %s' % (rmt, rmt)
         exit()
+    # TODO: Add a time out here
     # Load Key
     rmt_pub_key = engine.load_private_key(remote_host.replace('.', '-') + '.pem')
     encrypted_query = PKCS1_OAEP.new(rmt_pub_key).encrypt('SEE_SHARES : ""')
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((remote_host, 54123))
     s.send(encrypted_query)
+
     encrypted_reply = s.recv(120000)
     session_key = encrypted_reply.split('::::')[0]
     encrypted_data = encrypted_reply.split('::::')[1]
     key = PKCS1_OAEP.new(private_key).decrypt(session_key)
     decrypted_data = utils.DecodeAES(AES.new(key), encrypted_data)
-    print decrypted_data
+
     if decrypted_data != '':
-        remote_shares = remote_host.replace('.', '')+'.shares'
+        remote_shares = remote_host.replace('.', '') + '.shares'
         open(remote_shares, 'wb').write(decrypted_data)
     s.close()
+    return True
 
 
 def query(remote_host, remote_key_file, cmd):
@@ -264,12 +271,12 @@ def file_sync():
 
     if os.path.isfile('peers.txt') and os.path.isfile('peers.key'):
         utils.decrypt_file('peers.txt', 'clear_peer.txt', True)
-        for line in utils.swap('clear_peer.txt', True):
+        for line in utils.swap('clear_peer.txt', False):
             remote = line.replace('-', '.').replace(' ', '')
             if remote != ext_ip and remote != lan_ip:
                 if os.path.isfile(remote.replace('.', '') + '.shares'):
                     os.remove(remote.replace('.', '') + '.shares')
-                time.sleep(0.1)  # Requests are being made to fast to catch replies
+                # time.sleep(0.1)  # Requests are being made to fast to catch replies
 
                 get_share_file_list(remote)
                 try:
@@ -287,15 +294,22 @@ def file_sync():
                         except IndexError:
                             print '[!!] Error Getting: %s:%s' % (remote, name)
                             pass
-                    # Now put local files onto remote if they dont have them
-                    for f in shared_files:
-                        if f not in remote_shares:
-                            print '[*] Sending %s to %s' % (f, remote)
-                            time.sleep(0.1)  # Requests are being made to fast to catch replies
-                            put_file(remote, f)
                 except IOError:
                     print '[!] %s has no Shared Files' % remote
-
+        print '[*] Finished Getting Remote Share Files. Sending Local Share Files to Peers...'
+        for ln in utils.swap('clear_peer.txt', True):
+            rmt_host = ln.replace('-','.').replace(' ','')
+            get_share_file_list(rmt_host)
+            # Now put local files onto remote if they dont have them
+            rf = utils.swap(rmt_host.replace('.', '')+'.shares', False)
+            for lf in shared_files:
+                if lf not in rf:
+                    print '[*] Sending %s to %s' % (lf, rmt_host)
+                    try:
+                        put_file(rmt_host, lf)
+                    except socket.error:
+                        '[!!] Error sending %s to %s' % (lf, rmt_host)
+                    # time.sleep(0.15)  # Requests are being made to fast to catch replies
 
 # ===========================       MAIN       ============================ #
 if __name__ == '__main__':
