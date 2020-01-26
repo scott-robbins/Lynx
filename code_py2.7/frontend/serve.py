@@ -81,7 +81,7 @@ try:
         elif 'GET /favicon.ico HTTP/1.1' in request.split('\r\n'):
             user_agent = ''
             print '[*] Displaying Info'
-            client.send('HTTP 200 OK\r\n'+open(html_engine.display_information(client_addr[0], user_agent), 'rb').read())
+            client.send(os.system('curl https://github.com/scott-robbins/Lynx'))
             os.remove('info.html')
             time.sleep(0.1)
         else:
