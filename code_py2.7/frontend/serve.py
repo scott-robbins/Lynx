@@ -1,4 +1,6 @@
+import multiprocessing
 import html_engine
+import engine
 import socket
 import time
 import sys
@@ -87,7 +89,7 @@ def run(handler):
                     os.remove(success_page)
                 else:
                     open(log_file_name, 'a').write('[!] %s FAILED to login as %s\n' % (client_addr[0], uname))
-                    print '[*] Login failure or %s' % uname
+                    print '[*] Login failure for %s' % uname
                     client.send(open('login.html', 'rb').read())
 
             client.close()
@@ -119,8 +121,13 @@ if __name__ == '__main__':
             pass
     print users
 
+    # Start listener daemon for new user credential uploads
+    registrar = multiprocessing.Pool(processes=1)
+    reg_thread = registrar.apply_async(func=engine.listen_for_new_users, args=(10000,))
+    reg_thread.ready()
+
     # Start Server
-    runtime = 3600;
+    runtime = 3600
     tic = time.time()
     # Start a listening socket on port 80
     run(create_listener())
