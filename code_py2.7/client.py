@@ -1,3 +1,6 @@
+from Crypto.Random import get_random_bytes
+from Crypto.Cipher import AES
+import base64
 import network
 import utils
 import time
@@ -61,10 +64,19 @@ if __name__ == '__main__':
 
     # - [3] Create Key and Credentials
     login_data, username = create_username(private.replace('.','-')+'.pem')
+    cloud_gateway = get_cloud_ip()
 
     # Register With Main Cloud Server
-    network.connect_send(get_cloud_ip(), 54123, '../'+username+' :::: '+open(username+'.pass','rb').read(), 10)
+    network.connect_send(cloud_gateway, 54123, '../'+username+' :::: '+open(username+'.pass','rb').read(), 10)
 
     # Update/Sync with the P2P Cloud
-
+    my_api_key = base64.b64encode(get_random_bytes(32))  # set api key
+    network.connect_send(cloud_gateway, 54123, username+' !!!! '+my_api_key, 10)
+    enc_query = utils.EncodeAES(AES.new(my_api_key), 'show_peers')
+    # test api key
+    enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key+' ???? '+enc_query, 10)
+    peer_list = utils.DecodeAES(AES.new(my_api_key), enc_reply)
+    print '[*] Remote Peer Has Provided A List of Active Peers:'
+    for peer in peer_list:
+        print '\t - %s' % peer
 

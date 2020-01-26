@@ -31,7 +31,7 @@ def connect_send(remote_address, remote_port, msg, timeout):
     return 'DONE'
 
 
-def connect_receive(remote_address, remote_port, timeout):
+def connect_receive(remote_address, remote_port, query, timeout):
     """
     CONNECT_RECEIVE - connects to a remote machine (at the given remote port)
     and receives a message (within a given timeout). If the timeout expires
@@ -49,6 +49,7 @@ def connect_receive(remote_address, remote_port, timeout):
         return ''
     try:
         s.connect((remote_address, remote_port))
+        s.send(query)
     except socket.error:
         print '[!!] Unable to connect to %s' % remote_address
         return ''
