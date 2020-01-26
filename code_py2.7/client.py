@@ -6,7 +6,7 @@ import os
 verbose = True  # TODO: DEBUG setting
 date, localtime = utils.create_timestamp()
 print '[{(~\033[1m LYNX CLIENT \033[0m~ )}]\t\t%s - %s' % (localtime, date)
-domain = 'http://stickysprings.bounceme.com'
+domain = 'http://stickysprings.bounceme.net'
 
 # get operating system. this is currently only designed for linux!
 if os.name == 'nt':
