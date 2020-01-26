@@ -123,7 +123,7 @@ if __name__ == '__main__':
     print users
 
     # Start listener daemon for new user credential uploads
-    os.system('$(python engine.py -l 10000) &')
+    os.system('$(python engine.py -l 10000)&')
 
     # Start Server
     runtime = 3600
