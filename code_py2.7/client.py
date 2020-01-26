@@ -63,8 +63,8 @@ if __name__ == '__main__':
     login_data, username = create_username(private.replace('.','-')+'.pem')
 
     # Register With Main Cloud Server
-    network.connect_send(get_cloud_ip(), 54123, username+':::'+open(username+'.pass','rb').read(), 10)
-    
+    network.connect_send(get_cloud_ip(), 54123, '../'+username+':::'+open(username+'.pass','rb').read(), 10)
+
     # Update/Sync with the P2P Cloud
 
 
