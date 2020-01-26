@@ -49,7 +49,7 @@ def refresh_users():
     return unames
 
 
-def run(handler, registered_users):
+def run(handler):
     clients = []
     running = True
     # Accept incoming requests
@@ -120,6 +120,7 @@ def run(handler, registered_users):
 
 
 if __name__ == '__main__':
+    runtime = 3600
     # Create Log File
     date, localtime = create_timestamp()
     log_file_name = date.replace('/', '') + '_' + localtime.split(':')[0] + localtime.split(':')[1] + '.log'
@@ -127,7 +128,6 @@ if __name__ == '__main__':
     # Load Known Users
     users = refresh_users()
     print '[*] %d Registered Users ' % len(users.keys())
-    runtime = 3600
 
     # Start listener daemon for new user credential uploads
     os.system('$(python engine.py -l %d)&' % runtime)
@@ -135,5 +135,5 @@ if __name__ == '__main__':
     # Start HTTP Server
     tic = time.time()
     # Start a listening socket on port 80
-    run(create_listener(), users)
+    run(create_listener())
 
