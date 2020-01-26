@@ -27,7 +27,6 @@ def listen_for_new_users(timeout):
             if legit_pass:
                 print '[*] Adding User: %s' % query_user
                 open(query_user+'.pass','wb').write(query_pass)
-                client.send('ACK')
             client.close()
         except socket.error:
             print '[!!] Connection Error'

@@ -27,18 +27,8 @@ def connect_send(remote_address, remote_port, msg, timeout):
     except socket.error:
         print '[!!] Failed to connect to %s' % remote_address
         return ''
-    # Now Get a Reply
-    tic = time.time(); unacknowledged = True; reply = ''
-    while unacknowledged and (time.time()-tic) < timeout:
-        try:
-            reply = s.recv(256)
-            print '[*] %s' % reply
-            unacknowledged = False
-        except socket.error:
-            print '[!!] Connection Broken'
-            break
     s.close()
-    return reply
+    return 'DONE'
 
 
 def connect_receive(remote_address, remote_port, timeout):
