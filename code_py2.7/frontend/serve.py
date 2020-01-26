@@ -113,7 +113,7 @@ def run(handler, registered_users):
 
     except KeyboardInterrupt:
         print '[!!] Server Killed'
-        os.system('sh kill_listeners.sh >> /dev/null 2>&1')
+        os.system('../kill_listeners.sh >> /dev/null 2>&1')
         running = False
         pass
     handler.close()
