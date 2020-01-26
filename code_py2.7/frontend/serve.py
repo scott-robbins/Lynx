@@ -79,7 +79,8 @@ try:
             client.send(open(html_engine.display_information(client_addr[0], user_agent),'rb').read())
             os.remove('info.html')
             time.sleep(0.4)   # These requests seem to come in multiples from the browser?
-
+        else:
+            print request
         # Login attempts
         if len(request.split('username=')) > 1:
             uname = request.split('username=')[1].split('&')[0]
