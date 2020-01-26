@@ -4,6 +4,21 @@ import sys
 import os
 
 
+def create_timestamp():
+    date = time.localtime(time.time())
+    mo = str(date.tm_mon)
+    day = str(date.tm_mday)
+    yr = str(date.tm_year)
+
+    hr = str(date.tm_hour)
+    min = str(date.tm_min)
+    sec = str(date.tm_sec)
+
+    date = mo + '/' + day + '/' + yr
+    timestamp = hr + ':' + min + ':' + sec
+    return date, timestamp
+
+
 def create_listener():
     created = False
     while not created:
@@ -19,6 +34,11 @@ def create_listener():
     return s
 
 
+# TODO: Create a logfile
+date, localtime = create_timestamp()
+log_file_name = date.replace('/','')+'_'+localtime.split(':')[0]+localtime.split(':')[1]+'.log'
+open(log_file_name, 'wb').write('[*] Server Started %s -%s' % (date, localtime))
+# Load Known Users
 users = {}
 os.system('ls ../*.pass >> passwords.txt')
 for name in open('passwords.txt', 'rb').readlines():
@@ -29,6 +49,7 @@ for name in open('passwords.txt', 'rb').readlines():
         pass
 print users
 
+# Start Server
 runtime = 3600; tic = time.time()
 # Start a listening socket on port 80
 handler = create_listener()
@@ -50,8 +71,10 @@ try:
             passwd = request.split('password=')[1].split('%')[0]
             if users[uname] == passwd:
                 print '\033[1m[*] %s Has Logged in Successfully \033[0m' % uname
+                # TODO: Dynamically Generate success page, and user dashboards
+                open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (client_addr[0], uname))
             else:
-                # TODO: Display on the page that the login/pass provided was incorrect
+                open(log_file_name, 'a').write('[!] %s FAILED to login as %s\n' % (client_addr[0], uname))
                 print '[*] Login failure or %s' % uname
                 client.send(open('login.html', 'rb').read())
         client.close()
