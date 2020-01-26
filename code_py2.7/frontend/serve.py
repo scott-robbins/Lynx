@@ -37,7 +37,19 @@ def create_listener():
     return s
 
 
-def run(handler):
+def refresh_users():
+    unames = {}
+    os.system('ls ../*.pass >> passwords.txt')
+    for name in open('passwords.txt', 'rb').readlines():
+        try:
+            username = name.split('../')[1].split('.pass')[0].replace('\n', '')
+            unames[username] = open(name.replace('\n', '')).read()
+        except IndexError:
+            pass
+    return unames
+
+
+def run(handler, registered_users):
     clients = []
     running = True
     # Accept incoming requests
@@ -46,7 +58,8 @@ def run(handler):
             client, client_addr = handler.accept()
             clients.append(client_addr[0])
             request = client.recv(2048)
-
+            if (time.time()-tic) % 3 == 0:
+                registered_users = refresh_users()
             # Serve login page to new connections, and handle logins
             if 'GET / HTTP/1.1' in request.split('\r\n'):
                 client.send(open('login.html', 'rb').read())
@@ -82,7 +95,7 @@ def run(handler):
             if len(request.split('username=')) > 1:
                 uname = request.split('username=')[1].split('&')[0]
                 passwd = request.split('password=')[1].split('%')[0]
-                if uname in users.keys() and users[uname] == passwd:
+                if uname in registered_users.keys() and registered_users[uname] == passwd:
                     print '\033[1m[*] %s Has Logged in Successfully from %s\033[0m' % (uname, client_addr[0])
                     open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (client_addr[0], uname))
                     success_page = html_engine.generate_success(uname)
@@ -112,14 +125,7 @@ if __name__ == '__main__':
     log_file_name = date.replace('/', '') + '_' + localtime.split(':')[0] + localtime.split(':')[1] + '.log'
     open(log_file_name, 'wb').write('[*] Server Started %s -%s\n' % (date, localtime))
     # Load Known Users
-    users = {}
-    os.system('ls ../*.pass >> passwords.txt')
-    for name in open('passwords.txt', 'rb').readlines():
-        try:
-            username = name.split('../')[1].split('.pass')[0].replace('\n', '')
-            users[username] = open(name.replace('\n', '')).read()
-        except IndexError:
-            pass
+    users = refresh_users()
     print users
 
     # Start listener daemon for new user credential uploads
@@ -129,5 +135,5 @@ if __name__ == '__main__':
     runtime = 3600
     tic = time.time()
     # Start a listening socket on port 80
-    run(create_listener())
+    run(create_listener(), users)
 
