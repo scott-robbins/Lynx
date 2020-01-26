@@ -130,7 +130,7 @@ if __name__ == '__main__':
     print '[*] %d Registered Users ' % len(users.keys())
 
     # Start listener daemon for new user credential uploads
-    os.system('$(python engine.py -l %d)& ' % (runtime, log_file_name))
+    os.system('$(python engine.py -l %d)& ' % runtime)
 
     # Start HTTP Server
     tic = time.time()
