@@ -113,6 +113,7 @@ def run(handler, registered_users):
 
     except KeyboardInterrupt:
         print '[!!] Server Killed'
+        os.system('sh kill_listeners.sh >> /dev/null 2>&1')
         running = False
         pass
     handler.close()
@@ -125,13 +126,13 @@ if __name__ == '__main__':
     open(log_file_name, 'wb').write('[*] Server Started %s -%s\n' % (date, localtime))
     # Load Known Users
     users = refresh_users()
-    print users
+    print '[*] %d Registered Users ' % len(users.keys())
+    runtime = 3600
 
     # Start listener daemon for new user credential uploads
-    os.system('$(python engine.py -l 10000)&')
+    os.system('$(python engine.py -l %d)&' % runtime)
 
-    # Start Server
-    runtime = 3600
+    # Start HTTP Server
     tic = time.time()
     # Start a listening socket on port 80
     run(create_listener(), users)
