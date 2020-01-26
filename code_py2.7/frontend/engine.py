@@ -4,7 +4,7 @@ import time
 import sys
 
 
-def listen_for_new_users(timeout):
+def listen_alt_channel(timeout):
     tic = time.time(); running = True
     listener = utils.start_listener(54123, timeout)
     existing_users = utils.cmd('ls ../*.pass')
@@ -37,4 +37,4 @@ if __name__ == '__main__':
     if '-l' in sys.argv and len(sys.argv) >= 3:
         timer = int(sys.argv[2])
         print '[*] Starting Backend Listener'
-        listen_for_new_users(timer)
+        listen_alt_channel(timer)
