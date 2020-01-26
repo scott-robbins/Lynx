@@ -72,9 +72,8 @@ def run(handler):
                 uname = request.split('username=')[1].split('&')[0]
                 passwd = request.split('password=')[1].split('%')[0]
                 if users[uname] == passwd:
-                    print '\033[1m[*] %s Has Logged in Successfully \033[0m' % uname
-                    open(log_file_name, 'a').write(
-                        '[*] %s has logged in SUCCESSFULLY as %s\n' % (client_addr[0], uname))
+                    print '\033[1m[*] %s Has Logged in Successfully from %s\033[0m' % (uname, client_addr[0])
+                    open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (client_addr[0], uname))
                     success_page = html_engine.generate_success(uname)
                     client.send(open(success_page, 'rb').read())
                     os.remove(success_page)
