@@ -59,15 +59,19 @@ if __name__ == '__main__':
     public, private, nic_name = utils.get_nx_info(verbose=False)
 
     # Register locally
+    cloud_gateway = get_cloud_ip()
     # - [1] Create/Load Local Private Key
     private_key, public_key, shared_files = initialize_keys(private)
-
     # - [3] Create Key and Credentials
-    login_data, username = create_username(private.replace('.','-')+'.pem')
-    cloud_gateway = get_cloud_ip()
+    if not os.path.isfile(private.replace('.','-')+'.pem'):
+        login_data, username = create_username(private.replace('.','-')+'.pem')
+        # Register With Main Cloud Server
+        network.connect_send(cloud_gateway, 54123, '../' + username + ' :::: ' + open(username + '.pass', 'rb').read(), 10)
+    else:
+        pass_file = utils.cmd('ls *.pass').pop()
+        login_data = open(pass_file, 'rb').read()
+        username = pass_file.split('.pass')[0]
 
-    # Register With Main Cloud Server
-    network.connect_send(cloud_gateway, 54123, '../'+username+' :::: '+open(username+'.pass','rb').read(), 10)
 
     # Update/Sync with the P2P Cloud
     my_api_key = base64.b64encode(get_random_bytes(32))  # set api key
