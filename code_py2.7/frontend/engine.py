@@ -17,7 +17,7 @@ def listen_alt_channel(timeout):
         try:
             client, client_addr = listener.accept()
             raw_data = client.recv(1028).replace('\n','')
-            print raw_data
+            print raw_data.split(' !!!! ')
             # Check for api_key exchange command
             if len(raw_data.split(' !!!!  ')) >= 2:
                 print '[*] API_KEY Received from %s' % client_addr[0]
