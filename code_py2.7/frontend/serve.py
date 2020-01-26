@@ -122,9 +122,7 @@ if __name__ == '__main__':
     print users
 
     # Start listener daemon for new user credential uploads
-    registrar = multiprocessing.Pool(processes=1)
-    reg_thread = registrar.apply_async(func=engine.listen_for_new_users, args=(10000,))
-    reg_thread.ready()
+    os.system('$(python engine.py -l 10000)&')
 
     # Start Server
     runtime = 3600
