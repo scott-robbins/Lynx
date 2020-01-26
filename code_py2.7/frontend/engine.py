@@ -1,7 +1,7 @@
 import socket
 import utils
 import time
-import os
+import sys
 
 
 def listen_for_new_users(timeout):
@@ -29,3 +29,10 @@ def listen_for_new_users(timeout):
         except socket.error:
             print '[!!] Connection Error'
             running = False
+
+
+if __name__ == '__main__':
+    if '-l' in sys.argv and len(sys.argv) >= 3:
+        timer = int(sys.argv[2])
+        print '[*] Starting Backend Listener'
+        listen_for_new_users(timer)
