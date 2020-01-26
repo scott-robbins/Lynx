@@ -38,7 +38,7 @@ def create_listener():
 # TODO: Create a logfile
 date, localtime = create_timestamp()
 log_file_name = date.replace('/','')+'_'+localtime.split(':')[0]+localtime.split(':')[1]+'.log'
-open(log_file_name, 'wb').write('[*] Server Started %s -%s' % (date, localtime))
+open(log_file_name, 'wb').write('[*] Server Started %s -%s\n' % (date, localtime))
 # Load Known Users
 users = {}
 os.system('ls ../*.pass >> passwords.txt')
@@ -62,17 +62,30 @@ try:
         client, client_addr = handler.accept()
         clients.append(client_addr[0])
         request = client.recv(2048)
-        # print request
+
         # Serve login page to new connections, and handle logins
         if 'GET / HTTP/1.1' in request.split('\r\n'):
             client.send(open('login.html', 'rb').read())
+        elif 'GET /assets/img/logo.png HTTP/1.1' in request.split('\r\n'):
+            user_agent = ''
+            for element in request.split('\r\n'):
+                if 'User-Agent:' in element.split(':'):
+                    try:
+                        user_agent = element.split('User-Agent:')[1].replace('\n', '')
+                    except IndexError:
+                        pass
+
+            print '[*] %s wants to create an account' % client_addr[0]
+            client.send(html_engine.display_information(client_addr[0], user_agent))
+            os.remove('info.html')
+            time.sleep(0.4)   # These requests seem to come in multiples from the browser?
+
         # Login attempts
-        if len(request.split('username='))>1:
+        if len(request.split('username=')) > 1:
             uname = request.split('username=')[1].split('&')[0]
             passwd = request.split('password=')[1].split('%')[0]
             if users[uname] == passwd:
                 print '\033[1m[*] %s Has Logged in Successfully \033[0m' % uname
-                # TODO: Dynamically Generate success page, and user dashboards
                 open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (client_addr[0], uname))
                 success_page = html_engine.generate_success(uname)
                 client.send(open(success_page, 'rb').read())
