@@ -32,6 +32,7 @@ def connect_send(remote_address, remote_port, msg, timeout):
     while unacknowledged and (time.time()-tic) < timeout:
         try:
             reply = s.recv(256)
+            print '[*] %s' % reply
             unacknowledged = False
         except socket.error:
             print '[!!] Connection Broken'

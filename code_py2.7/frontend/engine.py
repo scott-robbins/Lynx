@@ -17,6 +17,8 @@ def listen_for_new_users(timeout):
             query_pass = ''
             legit_pass = False
             try:
+                print query_user
+                print query_user
                 query_pass = raw_data.split('::::')[1]
                 legit_pass = True
             except IndexError:
