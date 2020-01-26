@@ -58,8 +58,7 @@ def run(handler, registered_users):
             client, client_addr = handler.accept()
             clients.append(client_addr[0])
             request = client.recv(2048)
-            if (time.time()-tic) % 3 == 0:
-                registered_users = refresh_users()
+            registered_users = refresh_users()
             # Serve login page to new connections, and handle logins
             if 'GET / HTTP/1.1' in request.split('\r\n'):
                 client.send(open('login.html', 'rb').read())
