@@ -76,7 +76,7 @@ try:
                         pass
 
             print '[*] %s wants to create an account' % client_addr[0]
-            client.send(html_engine.display_information(client_addr[0], user_agent))
+            client.send(open(html_engine.display_information(client_addr[0], user_agent),'rb').read())
             os.remove('info.html')
             time.sleep(0.4)   # These requests seem to come in multiples from the browser?
 
