@@ -45,7 +45,7 @@ def listen_alt_channel(timeout):
                 # Check for show shares command
                 try:
                     if decrypted_query == 'show_shares':
-                        get_shares = 'ls ../SHARED | while read n; do sha256sum $n >> files.txt; done'
+                        get_shares = 'ls ../SHARED | while read n; do sha256sum ../SHARED/$n >> files.txt; done'
                         os.system(get_shares)
                         clear_reply = utils.arr2lines(utils.swap('files.txt', True))
                         client.send(utils.EncodeAES(cipher, clear_reply))

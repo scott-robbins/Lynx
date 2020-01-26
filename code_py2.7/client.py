@@ -82,8 +82,9 @@ if __name__ == '__main__':
     print '[*] Remote Peer Has Provided A List of Active Peers:'
     print peer_list
 
-    enc_shares_request = utils.EncodeAES(AES.new(base64.b64decode(my_api_key), 'show_shares'))
+    enc_shares_request = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), 'show_shares')
     enc_shares_query = my_api_key + ' ???? ' + enc_shares_request
     enc_shares = network.connect_receive(cloud_gateway, 54123, enc_shares_query, 10)
     print '[*] Remote Peer has following data in SHARED/ folder:'
-    print utils.DecodeAES(AES.new(base64.b64decode(my_api_key), enc_shares))
+    remote_shares = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_shares)
+    print remote_shares
