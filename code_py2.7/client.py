@@ -63,7 +63,7 @@ if __name__ == '__main__':
     # - [1] Create/Load Local Private Key
     private_key, public_key, shared_files = initialize_keys(private)
     # - [3] Create Key and Credentials
-    if not os.cmd('ls *.pass'):
+    if not utils.cmd('ls *.pass'):
         login_data, username = create_username(private.replace('.','-')+'.pem')
         # Register With Main Cloud Server
         network.connect_send(cloud_gateway, 54123, '../' + username + ' :::: ' + open(username + '.pass', 'rb').read(), 10)
