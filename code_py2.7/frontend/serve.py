@@ -83,8 +83,7 @@ try:
                 pass
         elif 'GET /favicon.ico HTTP/1.1' in request.split('\r\n'):
             time.sleep(0.1)
-        else:
-            print request
+
         # Login attempts
         if len(request.split('username=')) > 1:
             uname = request.split('username=')[1].split('&')[0]
