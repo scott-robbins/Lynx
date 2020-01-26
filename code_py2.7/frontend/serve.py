@@ -66,7 +66,7 @@ def run(handler):
             elif 'GET /assets/img/logo.png HTTP/1.1' in request.split('\r\n'):
                 user_agent = ''
                 for element in request.split('\r\n'):
-                    if 'User-Agent:' in element.split(':'):
+                    if 'User-Agent:' in element.split(' '):
                         try:
                             user_agent = element.split('User-Agent:')[1].replace('\n', '')
                         except IndexError:
@@ -82,7 +82,7 @@ def run(handler):
             elif 'POST / HTTP/1.1' in request.split('\r\n'):
                 user_agent = ''
                 for ln in request.split('\r\n'):
-                    if 'User-Agent:' in ln.split(':'):
+                    if 'User-Agent:' in ln.split(' '):
                         try:
                             user_agent = ln.split('User-Agent:')[1].replace('\n', '')
                         except IndexError:
