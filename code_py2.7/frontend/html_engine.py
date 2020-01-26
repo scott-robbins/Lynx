@@ -24,8 +24,8 @@ def generate_success(uname):
 
 def display_information(client_addr, user_agent):
     header = '<!DOCTYPE html>\n<html>\n <body>\n'
-    box = '<div style="background-color:MediumSeaGreen;color:white;paddding:30px;">\n' \
-          '<title>Information<title>\n<h2> How to Join Lynx</h2>\n' \
+    box = '<div style="background-color:DarkGreen;color:white;paddding:30px;">\n' \
+          '<title>Information</title>\n<h2> How to Join Lynx</h2>\n' \
           '<p> Lynx is a experimental peer to peer network. Many attempts have been made, and forms of' \
           'peer to peer file sharing are successful, but most have either been plagued with inherent <br>\n' \
           'centrality, or are difficult to trust because the protocol/code is not made public. <br>\n' \
