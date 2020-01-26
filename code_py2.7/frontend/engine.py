@@ -4,6 +4,7 @@ import socket
 import utils
 import time
 import sys
+import os
 
 
 def listen_alt_channel(timeout):
@@ -17,7 +18,6 @@ def listen_alt_channel(timeout):
         try:
             client, client_addr = listener.accept()
             raw_data = client.recv(1028).replace('\n','')
-            print len(raw_data.split(' !!!! '))
             # Check for api_key exchange command
             if len(raw_data.split(' !!!! ')) == 2:
                 username = raw_data.split(' !!!! ')[0]
@@ -28,19 +28,30 @@ def listen_alt_channel(timeout):
                     clients[api_key] = username
                 except IndexError:
                     print '[!!] Error during key exchange with %s' % client_addr[0]
-            # Check for check peer names command
+            # Encypted API Queries
             if len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
+
+                # Check for check peer names command
                 try:
                     decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
-                    print decrypted_query
                     if decrypted_query == 'show_peers':
                         reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
                         encrypted_content = utils.EncodeAES(cipher, reply)
                         client.send(encrypted_content)
                 except IndexError:
                     print '[!!] Error Decrypting Check Peers Command from %s' % clients[raw_data.split(' ???? ')[0]]
-            # Check for show shares command
+
+                # Check for show shares command
+                try:
+                    if decrypted_query == 'show_shares':
+                        get_shares = 'ls ../SHARED | while read n; do sha256sum $n >> files.txt; done'
+                        os.system(get_shares)
+                        clear_reply = utils.arr2lines(utils.swap('files.txt', True))
+                        client.send(utils.EncodeAES(cipher, clear_reply))
+                except IndexError:
+                    print
+
             # Check for Add User Command
             query_user = raw_data.split(' :::: ')[0]
             query_pass = ''

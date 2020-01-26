@@ -72,15 +72,18 @@ if __name__ == '__main__':
         login_data = open(pass_file, 'rb').read()
         username = pass_file.split('.pass')[0]
 
-
     # Update/Sync with the P2P Cloud
     my_api_key = base64.b64encode(get_random_bytes(32))  # set api key
     network.connect_send(cloud_gateway, 54123, username+' !!!! '+my_api_key, 10)
     enc_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), 'show_peers')
     # test api key
     enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key+' ???? '+enc_query, 10)
-    peer_list = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_reply)
+    peer_list = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_reply).split('\n')
     print '[*] Remote Peer Has Provided A List of Active Peers:'
-    for peer in peer_list:
-        print '\t - %s' % peer
+    print peer_list
 
+    enc_shares_request = utils.EncodeAES(AES.new(base64.b64decode(my_api_key), 'show_shares'))
+    enc_shares_query = my_api_key + ' ???? ' + enc_shares_request
+    enc_shares = network.connect_receive(cloud_gateway, 54123, enc_shares_query, 10)
+    print '[*] Remote Peer has following data in SHARED/ folder:'
+    print utils.DecodeAES(AES.new(base64.b64decode(my_api_key), enc_shares))
