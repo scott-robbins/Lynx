@@ -13,11 +13,12 @@ def listen_for_new_users(timeout):
         try:
             client, client_addr = listener.accept()
             raw_data = client.recv(1028)
-            query_user = raw_data.split('::::')[0]
+            query_user = raw_data.split(' :::: ')[0]
             query_pass = ''
             legit_pass = False
+            print '[*] Client Connected %s' % client_addr[0]
             try:
-                query_pass = raw_data.split('::::')[1]
+                query_pass = raw_data.split(' :::: ')[1]
                 print query_user
                 print query_pass
                 legit_pass = True
