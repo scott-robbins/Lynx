@@ -79,6 +79,8 @@ try:
         elif 'GET /favicon.ico HTTP/1.1' in request.split('\r\n'):
             client.send(open(html_engine.display_information(client_addr[0], user_agent), 'rb').read())
             os.remove('info.html')
+        else:
+            print request
         # Login attempts
         if len(request.split('username=')) > 1:
             uname = request.split('username=')[1].split('&')[0]
