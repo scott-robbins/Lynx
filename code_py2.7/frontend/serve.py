@@ -77,11 +77,11 @@ try:
 
             print '[*] %s wants to create an account' % client_addr[0]
             client.send('HTTP 200 OK\r\n'+open(html_engine.display_information(client_addr[0], user_agent), 'rb').read())
-            os.remove('info.html')
+            try:
+                os.remove('info.html')
+            except OSError:
+                pass
         elif 'GET /favicon.ico HTTP/1.1' in request.split('\r\n'):
-            user_agent = ''
-            print '[*] Displaying Info'
-            os.remove('info.html')
             time.sleep(0.1)
         else:
             print request
