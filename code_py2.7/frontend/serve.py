@@ -1,3 +1,4 @@
+import html_engine
 import socket
 import time
 import sys
@@ -73,10 +74,14 @@ try:
                 print '\033[1m[*] %s Has Logged in Successfully \033[0m' % uname
                 # TODO: Dynamically Generate success page, and user dashboards
                 open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (client_addr[0], uname))
+                success_page = html_engine.generate_success(uname)
+                client.send(open(success_page, 'rb').read())
+                os.remove(success_page)
             else:
                 open(log_file_name, 'a').write('[!] %s FAILED to login as %s\n' % (client_addr[0], uname))
                 print '[*] Login failure or %s' % uname
                 client.send(open('login.html', 'rb').read())
+
         client.close()
         # HTTP 100 Continue: The server has received the request headers,
         # and the client should proceed to send the request body
