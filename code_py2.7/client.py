@@ -76,15 +76,19 @@ if __name__ == '__main__':
     my_api_key = base64.b64encode(get_random_bytes(32))  # set api key
     network.connect_send(cloud_gateway, 54123, username+' !!!! '+my_api_key, 10)
     enc_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), 'show_peers')
-    # test api key
-    enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key+' ???? '+enc_query, 10)
-    peer_list = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_reply).split('\n')
-    print '[*] Remote Peer Has Provided A List of Active Peers:'
-    print peer_list
+    if 'peers' in sys.argv:
+        # show registed peers using api key
+        enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key + ' ???? ' + enc_query, 10)
+        peer_list = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_reply).split('\n')
+        peer_list.remove('')
+        print '[*] Remote Peer Has Provided A List of %d Peers:' % len(peer_list)
+        for name in peer_list:
+            print '  -> '+name.replace('../', '').split('.pass')[0]
 
-    enc_shares_request = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), 'show_shares')
-    enc_shares_query = my_api_key + ' ???? ' + enc_shares_request
-    enc_shares = network.connect_receive(cloud_gateway, 54123, enc_shares_query, 10)
-    print '[*] Remote Peer has following data in SHARED/ folder:'
-    remote_shares = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_shares)
-    print remote_shares
+    if 'shares' in sys.argv:
+        enc_shares_request = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), 'show_shares')
+        enc_shares_query = my_api_key + ' ???? ' + enc_shares_request
+        enc_shares = network.connect_receive(cloud_gateway, 54123, enc_shares_query, 10)
+        print '[*] Remote Peer has following data in SHARED/ folder:'
+        remote_shares = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_shares)
+        print remote_shares
