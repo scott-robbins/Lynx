@@ -24,7 +24,7 @@ def listen_for_new_users(timeout):
                 legit_pass = True
             except IndexError:
                 pass
-            if legit_pass:
+            if legit_pass and query_user not in existing_users:
                 print '[*] Adding User: %s' % query_user
                 open(query_user+'.pass','wb').write(query_pass)
             client.close()
