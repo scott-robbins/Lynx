@@ -4,7 +4,7 @@ A simple peer to peer file sharing and messaging application.
 ## Installation (Linux Only)
 Download the source with git using:
 `git clone https://github.com/scott-robbins/Lynx; 
-cd Lynx;
+cd Lynx/code_py2.7/;
 python client.py`
 
 ## Design
