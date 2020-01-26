@@ -35,79 +35,86 @@ def create_listener():
     return s
 
 
-# TODO: Create a logfile
-date, localtime = create_timestamp()
-log_file_name = date.replace('/','')+'_'+localtime.split(':')[0]+localtime.split(':')[1]+'.log'
-open(log_file_name, 'wb').write('[*] Server Started %s -%s\n' % (date, localtime))
-# Load Known Users
-users = {}
-os.system('ls ../*.pass >> passwords.txt')
-for name in open('passwords.txt', 'rb').readlines():
+def run(handler):
+    clients = []
+    running = True
+    # Accept incoming requests
     try:
-        username = name.split('../')[1].split('.pass')[0].replace('\n', '')
-        users[username] = open(name.replace('\n', '')).read()
-    except IndexError:
-        pass
-print users
+        while running and (time.time() - tic) < runtime:
+            client, client_addr = handler.accept()
+            clients.append(client_addr[0])
+            request = client.recv(2048)
 
-# Start Server
-runtime = 3600; tic = time.time()
-# Start a listening socket on port 80
-handler = create_listener()
-running = True
-clients = []
-# Accept incoming requests
-try:
-    while running and (time.time() - tic) < runtime:
-        client, client_addr = handler.accept()
-        clients.append(client_addr[0])
-        request = client.recv(2048)
-
-        # Serve login page to new connections, and handle logins
-        if 'GET / HTTP/1.1' in request.split('\r\n'):
-            client.send(open('login.html', 'rb').read())
-        elif 'GET /assets/img/logo.png HTTP/1.1' in request.split('\r\n'):
-            user_agent = ''
-            for element in request.split('\r\n'):
-                if 'User-Agent:' in element.split(':'):
-                    try:
-                        user_agent = element.split('User-Agent:')[1].replace('\n', '')
-                    except IndexError:
-                        pass
-
-            print '[*] %s wants to create an account' % client_addr[0]
-            client.send('HTTP 200 OK\r\n'+open(html_engine.display_information(client_addr[0], user_agent), 'rb').read())
-            try:
-                os.remove('info.html')
-            except OSError:
-                pass
-        elif 'GET /favicon.ico HTTP/1.1' in request.split('\r\n'):
-            time.sleep(0.1)
-
-        # Login attempts
-        if len(request.split('username=')) > 1:
-            uname = request.split('username=')[1].split('&')[0]
-            passwd = request.split('password=')[1].split('%')[0]
-            if users[uname] == passwd:
-                print '\033[1m[*] %s Has Logged in Successfully \033[0m' % uname
-                open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (client_addr[0], uname))
-                success_page = html_engine.generate_success(uname)
-                client.send(open(success_page, 'rb').read())
-                os.remove(success_page)
-            else:
-                open(log_file_name, 'a').write('[!] %s FAILED to login as %s\n' % (client_addr[0], uname))
-                print '[*] Login failure or %s' % uname
+            # Serve login page to new connections, and handle logins
+            if 'GET / HTTP/1.1' in request.split('\r\n'):
                 client.send(open('login.html', 'rb').read())
+            elif 'GET /assets/img/logo.png HTTP/1.1' in request.split('\r\n'):
+                user_agent = ''
+                for element in request.split('\r\n'):
+                    if 'User-Agent:' in element.split(':'):
+                        try:
+                            user_agent = element.split('User-Agent:')[1].replace('\n', '')
+                        except IndexError:
+                            pass
 
-        client.close()
-        # HTTP 100 Continue: The server has received the request headers,
-        # and the client should proceed to send the request body
-        #
-        # HTTP 200 OK: The request is OK (this is the standard response for successful HTTP requests)
+                print '[*] %s wants to create an account' % client_addr[0]
+                client.send(
+                    'HTTP 200 OK\r\n' + open(html_engine.display_information(client_addr[0], user_agent), 'rb').read())
+                try:
+                    os.remove('info.html')
+                except OSError:
+                    pass
+            elif 'GET /favicon.ico HTTP/1.1' in request.split('\r\n'):
+                time.sleep(0.1)
 
-except KeyboardInterrupt:
-    print '[!!] Server Killed'
-    running = False
-    pass
-handler.close()
+            # Login attempts
+            if len(request.split('username=')) > 1:
+                uname = request.split('username=')[1].split('&')[0]
+                passwd = request.split('password=')[1].split('%')[0]
+                if users[uname] == passwd:
+                    print '\033[1m[*] %s Has Logged in Successfully \033[0m' % uname
+                    open(log_file_name, 'a').write(
+                        '[*] %s has logged in SUCCESSFULLY as %s\n' % (client_addr[0], uname))
+                    success_page = html_engine.generate_success(uname)
+                    client.send(open(success_page, 'rb').read())
+                    os.remove(success_page)
+                else:
+                    open(log_file_name, 'a').write('[!] %s FAILED to login as %s\n' % (client_addr[0], uname))
+                    print '[*] Login failure or %s' % uname
+                    client.send(open('login.html', 'rb').read())
+
+            client.close()
+            # HTTP 100 Continue: The server has received the request headers,
+            # and the client should proceed to send the request body
+            #
+            # HTTP 200 OK: The request is OK (this is the standard response for successful HTTP requests)
+
+    except KeyboardInterrupt:
+        print '[!!] Server Killed'
+        running = False
+        pass
+    handler.close()
+
+
+if __name__ == '__main__':
+    # Create Log File
+    date, localtime = create_timestamp()
+    log_file_name = date.replace('/', '') + '_' + localtime.split(':')[0] + localtime.split(':')[1] + '.log'
+    open(log_file_name, 'wb').write('[*] Server Started %s -%s\n' % (date, localtime))
+    # Load Known Users
+    users = {}
+    os.system('ls ../*.pass >> passwords.txt')
+    for name in open('passwords.txt', 'rb').readlines():
+        try:
+            username = name.split('../')[1].split('.pass')[0].replace('\n', '')
+            users[username] = open(name.replace('\n', '')).read()
+        except IndexError:
+            pass
+    print users
+
+    # Start Server
+    runtime = 3600;
+    tic = time.time()
+    # Start a listening socket on port 80
+    run(create_listener())
 
