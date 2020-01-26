@@ -19,7 +19,7 @@ def listen_alt_channel(timeout):
             raw_data = client.recv(1028)
             print raw_data
             # Check for api_key exchange command
-            if len(raw_data.split(' !!!!  ')) == 2:
+            if len(raw_data.split(' !!!!  ')) >= 2:
                 print '[*] API_KEY Received from %s' % client_addr[0]
                 try:
                     username = raw_data.split(' !!!! ')[0]
@@ -28,7 +28,7 @@ def listen_alt_channel(timeout):
                 except IndexError:
                     print '[!!] Error during key exchange with %s' % client_addr[0]
             # Check for check peer names command
-            if len(raw_data.split(' ???? ')) == 2 and raw_data.split(' ???? ')[0] in clients.keys():
+            if len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 try:
                     decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
