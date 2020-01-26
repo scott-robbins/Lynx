@@ -48,6 +48,7 @@ def run(handler):
             # Serve login page to new connections, and handle logins
             if 'GET / HTTP/1.1' in request.split('\r\n'):
                 client.send(open('login.html', 'rb').read())
+            # Display information about how to download the 'client'
             elif 'GET /assets/img/logo.png HTTP/1.1' in request.split('\r\n'):
                 user_agent = ''
                 for element in request.split('\r\n'):
@@ -67,7 +68,7 @@ def run(handler):
             elif 'GET /favicon.ico HTTP/1.1' in request.split('\r\n'):
                 time.sleep(0.1)
 
-            # Login attempts
+            # Login attempts TODO: Encrypt how credentials are sent over the wire
             if len(request.split('username=')) > 1:
                 uname = request.split('username=')[1].split('&')[0]
                 passwd = request.split('password=')[1].split('%')[0]
