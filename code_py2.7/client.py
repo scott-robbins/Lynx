@@ -68,7 +68,9 @@ if __name__ == '__main__':
         # Register With Main Cloud Server
         network.connect_send(cloud_gateway, 54123, '../' + username + ' :::: ' + open(username + '.pass', 'rb').read(), 10)
     else:
-        pass_file = utils.cmd('ls *.pass').pop()
+        pass_file_list = utils.cmd('ls *.pass')
+        if len(pass_file_list)>=1:
+            pass_file = pass_file_list.pop()
         login_data = open(pass_file, 'rb').read()
         username = pass_file.split('.pass')[0]
 
