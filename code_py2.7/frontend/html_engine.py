@@ -28,13 +28,15 @@ def generate_success(uname):
 
 def display_information(client_addr, user_agent):
     header = '<!DOCTYPE html>\n<html>\n <body>\n'
-    box = '<div style="background-color:DarkGreen;color:white;paddding:20px;">\n' \
+    box = '<div style="background-color:MediumSeaGreen;color:white;paddding:20px;">\n' \
           '<title>Information</title>\n<h2> How to Join Lynx</h2>\n' \
-          '<p> Lynx is a experimental peer to peer network. Many attempts have been made, and forms of' \
-          'peer to peer file sharing are successful, but most have either been plagued with inherent <br>\n' \
-          'centrality, or are difficult to trust because the protocol/code is not made public. <br>\n' \
-          'In addition to research, the mission of Lynx is to return to roots of what peer to peer designs have' \
-          'to offer.<p>\n'
+          '<section>' \
+          '<p> Thus far Lynx has been a pet project in my evenings after work and on the weekends. It started<br\n' \
+          'as a LAN based system for executing commands on my Raspberry Pis to do different things... One was<br\n' \
+          'a stick up cam aimed at the front steps, one was crawling the web and tracking the price of bitcoin, <br>\n' \
+          'And then I started experimenting with virtual hosting... A few months later I discovered DynamicDNS, <br>\n' \
+          'and well here we are...' \
+          '</section>'
     l = 'Visit "https://github.com/scott-robbins/Lynx" to download the latest client (Linux Only).'
     link = hyperlink('https://github.com/scott-robbins/Lynx', l)
     footer = '<body>\n</html>'
