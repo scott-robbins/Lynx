@@ -38,8 +38,7 @@ def display_information(client_addr, user_agent):
           'and well here we are...' \
           '</section>'
     l = 'Visit "https://github.com/scott-robbins/Lynx" to download the latest client (Linux Only).'
-    link = hyperlink('https://github.com/scott-robbins/Lynx', l)
     footer = '<body>\n</html>'
-    content = header + box + link + footer
+    content = header + box + footer
     open('info.html', 'wb').write(content)
     return 'info.html'
