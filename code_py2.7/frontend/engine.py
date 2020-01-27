@@ -50,6 +50,18 @@ def listen_alt_channel(timeout):
                         clear_reply = utils.arr2lines(utils.swap('files.txt', True))
                         client.send(utils.EncodeAES(cipher, clear_reply))
                 except IndexError:
+                    pass
+                # Check for direct message command
+                try:
+                    if decrypted_query.split(';;')[0] == 'send_message':
+                        try:
+                            clear_message = decrypted_query.split(';;')[1]
+                            recipient = decrypted_query.split(';;')[2]
+                            print '[*] Routing Message from %s to %s' % (client_addr[0], recipient)
+                        except IndexError:
+                            pass
+
+                except IndexError:
                     print
 
             # Check for Add User Command
