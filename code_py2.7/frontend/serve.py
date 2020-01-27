@@ -86,7 +86,9 @@ def run(handler):
                 print '[*] Serving %s their inbox' % client_addr[0]
             elif 'GET /info HTTP/1.1' in request.split('\r\n'):
                 print '[*] Serving %s information' % client_addr[0]
-                client.send(html_engine.display_information(client_addr[0], user_agent))
+                html_engine.display_information(client_addr[0], user_agent)
+                client.send(open('info.html', 'rb').read())
+                os.remove('info.html')
             elif 'GET /FAQ HTTP/1.1' in request.split('\r\n'):
                 print '[*] Serving %s the FAQ page' % client_addr[0]
             # Login attempts TODO: Encrypt how credentials are sent over the wire
