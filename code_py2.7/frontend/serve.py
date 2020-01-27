@@ -51,6 +51,7 @@ def refresh_users():
 
 def run(handler):
     clients = []
+    active_clients = {}
     running = True
     # Accept incoming requests
     try:
@@ -84,6 +85,7 @@ def run(handler):
                                                (client_addr[0], user_agent))
             elif 'GET /inbox HTTP/1.1' in request.split('\r\n'):
                 print '[*] Serving %s their inbox' % client_addr[0]
+
             elif 'GET /info HTTP/1.1' in request.split('\r\n'):
                 print '[*] Serving %s information' % client_addr[0]
                 html_engine.display_information(client_addr[0], user_agent)
@@ -91,6 +93,7 @@ def run(handler):
                 os.remove('info.html')
             elif 'GET /FAQ HTTP/1.1' in request.split('\r\n'):
                 print '[*] Serving %s the FAQ page' % client_addr[0]
+                client.send(open('assets/faq.html', 'rb').read())
             # Login attempts TODO: Encrypt how credentials are sent over the wire
             if len(request.split('username=')) > 1:
                 uname = request.split('username=')[1].split('&')[0]
@@ -98,6 +101,8 @@ def run(handler):
                 if uname in registered_users.keys() and registered_users[uname] == passwd:
                     print '\033[1m[*] %s Has Logged in Successfully from %s\033[0m' % (uname, client_addr[0])
                     open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (client_addr[0], uname))
+                    active_clients[uname] = [passwd]
+                    clients.append(uname)
                     success_page = html_engine.generate_success(uname)
                     client.send(open(success_page, 'rb').read())
                     os.remove(success_page)
