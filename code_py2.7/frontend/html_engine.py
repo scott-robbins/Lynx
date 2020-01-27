@@ -29,15 +29,15 @@ def generate_success(uname):
 def display_information(client_addr, user_agent):
     header = '<!DOCTYPE html>\n<html>\n <body>\n'
     box = '<div style="background-color:MediumSeaGreen;color:white;paddding:20px;">\n' \
-          '<title>Information</title>\n<h2> How to Join Lynx</h2>\n' \
+          '<title>Information</title>\n<h2> About Lynx</h2>\n' \
           '<section>' \
           '<p> Thus far Lynx has been a pet project in my evenings after work and on the weekends. It started<br>\n' \
-          'as a LAN based system for executing commands on my Raspberry Pis to do different things... One was<br>\n' \
+          'as a LAN based system for executing commands on my Raspberry Pis to do different things. One was<br>\n' \
           'a stick up cam aimed at the front steps, one was crawling the web and tracking the price of bitcoin, <br>\n' \
-          'And then I started experimenting with virtual hosting... A few months later I discovered DynamicDNS, <br>\n' \
+          'You get the picture.<br>\n' \
+          'Then I started experimenting with virtual hosting, a few months later I discovered DynamicDNS, <br>\n' \
           'and well here we are...' \
           '</section>'
-    l = 'Visit "https://github.com/scott-robbins/Lynx" to download the latest client (Linux Only).'
     footer = '<body>\n</html>'
     content = header + box + footer
     open('info.html', 'wb').write(content)
