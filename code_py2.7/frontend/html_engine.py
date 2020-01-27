@@ -15,16 +15,20 @@ def generate_success(uname):
           'a exciting peer to peer experiment. By Reaching this page you have demonstrated that you have <br>\n' \
           'downloaded the client and created a password.<p>\n' \
           '</div>' % (uname, )
-
+    opt_bar = '<nav>\n' \
+              '<a href="/inbox"> Inbox </a> \n' \
+              '<a href="/info"> Information </a>\n' \
+              '<a href="/FAQ"> FAQ </a>\n' \
+              '</nav>'
     footer = '<body>\n</html>'
-    content = header+box+footer
+    content = header+opt_bar+box+footer
     open(page_name, 'wb').write(content)
     return page_name
 
 
 def display_information(client_addr, user_agent):
     header = '<!DOCTYPE html>\n<html>\n <body>\n'
-    box = '<div style="background-color:DarkGreen;color:white;paddding:30px;">\n' \
+    box = '<div style="background-color:DarkGreen;color:white;paddding:20px;">\n' \
           '<title>Information</title>\n<h2> How to Join Lynx</h2>\n' \
           '<p> Lynx is a experimental peer to peer network. Many attempts have been made, and forms of' \
           'peer to peer file sharing are successful, but most have either been plagued with inherent <br>\n' \
