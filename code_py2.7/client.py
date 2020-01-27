@@ -98,5 +98,5 @@ if __name__ == '__main__':
         peer = sys.argv[2]
         msg = utils.arr2str(sys.argv[3:])
         clear_query = my_api_key+' ???? send_message;;%s;;%s' % (peer, msg)
-        enc_q = utils.EncodeAES(AES.new(my_api_key), clear_query)
+        enc_q = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), clear_query)
         enc_ack = network.connect_send(cloud_gateway, 54123, enc_q, 10)
