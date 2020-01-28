@@ -130,7 +130,7 @@ def run(handler):
 
 
 if __name__ == '__main__':
-    runtime = 3600
+    runtime = 3600 * 24  # While under development the server(s) only run for 1 day each trial
     # Create Log File
     date, localtime = create_timestamp()
     log_file_name = date.replace('/', '') + '_' + localtime.split(':')[0] + localtime.split(':')[1] + '.log'
