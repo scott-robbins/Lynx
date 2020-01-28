@@ -1,3 +1,4 @@
+import utils
 import time
 import sys
 import os
@@ -42,3 +43,42 @@ def display_information(client_addr, user_agent):
     content = header + box + footer
     open('info.html', 'wb').write(content)
     return 'info.html'
+
+
+def render_file_structure(file_path):
+    """
+    RENDER_FILE_STRUCTURE - given a dictionary of files and a list of directories
+    build a tree of nested lists in html to render on screen.
+    :param directory:
+    :return html_content:
+    """
+    content = ''
+    '''
+    <h2>A Nested List</h2>
+    <p>List can be nested (lists inside lists):</p>
+    
+    <ul>
+      <li>Coffee</li>
+      <li>Tea
+        <ul>
+          <li>Black tea</li>
+          <li>Green tea</li>
+        </ul>
+      </li>
+      <li>Milk</li>
+    </ul>
+    '''
+    directory, empty = utils.crawl_dir(file_path, False, False)
+    print '%d dir(s)' % len(directory['dir'])
+    print '%d files' % len(directory['file'])
+    for f in directory['file']:
+        element = f.split(file_path)[1:]
+
+    return content
+
+
+if '-t' in sys.argv:
+    test_dir = '../'
+    content = render_file_structure(test_dir)
+    print content
+

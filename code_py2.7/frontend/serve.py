@@ -58,7 +58,11 @@ def run(handler):
         while running and (time.time() - tic) < runtime:
             client, client_addr = handler.accept()
             clients.append(client_addr[0])
-            request = client.recv(2048)
+            try:
+                request = client.recv(2048)
+            except socket.error:
+                print '[*] %s disconnected unexpectedly' % client_addr[0]
+                pass
             registered_users = refresh_users()
             user_agent = ''
             for ln in request.split('\r\n'):
