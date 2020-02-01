@@ -86,7 +86,12 @@ def listen_alt_channel(timeout):
                             raw_data = client.recv(size)
                             print '[*] %d Encrypted Bytes Received' % len(raw_data)
                             if len(raw_data) > 0:
-                                open('../SHARED/%s' % name, 'wb').write(utils.DecodeAES(cipher, raw_data))
+                                try:
+                                    dec_data = utils.DecodeAES(cipher, raw_data)
+                                    open('../SHARED/%s' % name, 'wb').write(dec_data)
+                                except ValueError:
+                                    print '[!!] Failed to decrypt data'
+                                    pass
                         else:
                             client.send(utils.EncodeAES(cipher, 'NO'))
                 except IndexError:
