@@ -25,6 +25,7 @@ def listen_alt_channel(timeout):
                 try:
                     api_key = raw_data.split(' !!!! ')[1]
                     clients[api_key] = username
+                    print clients
                 except IndexError:
                     print '[!!] Error during key exchange with %s' % client_addr[0]
             # Encrypted API Queries
