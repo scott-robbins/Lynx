@@ -57,7 +57,7 @@ def connect_receive(remote_address, remote_port, query, timeout):
     tic = time.time(); unacknowledged = True; reply = ''
     while unacknowledged and (time.time() - tic) < timeout:
         try:
-            reply = s.recv(125000)
+            reply = s.recv(1250000)
             unacknowledged = False
             print '[*] %d Bytes Received' % len(reply)
         except socket.error:

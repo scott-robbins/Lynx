@@ -45,6 +45,46 @@ def initialize_keys(private_ip):
     return priv, pub, shares
 
 
+def get_file(fname, mykey):
+    query = 'GET_%s' % fname
+    encq = utils.EncodeAES(cipher, query)
+    print '[*] Requesting Lynx Cloud for file %s' % fname
+    encr = network.connect_receive(cloud_gateway, 54123, mykey + ' ???? ' + encq, 10)
+    open('SHARED/%s' % fname, 'wb').write(utils.DecodeAES(cipher, encr))
+    return len(encr)
+
+
+def put_file(fname, mykey):
+    enc_data = utils.EncodeAES(cipher, open(fname, 'rb').read())
+    size = len(enc_data)
+    query = 'PUT_%s_%s' % (fname, size)
+    print '[*] Querying %s...' % query
+    encq = utils.EncodeAES(cipher, query)
+    qstr = mykey + ' ???? ' + encq
+    result = network.connect_receive_send(cloud_gateway, 54123, qstr, enc_data, cipher)
+    return result
+
+
+def show_peers(mykey):
+    enc_query = utils.EncodeAES(cipher, 'show_peers')
+    enc_reply = network.connect_receive(cloud_gateway, 54123, mykey + ' ???? ' + enc_query, 10)
+    peer_list = utils.DecodeAES(cipher, enc_reply).split('\n')
+    peer_list.remove('')
+    print '[*] Remote Peer Has Provided A List of %d Peers:' % len(peer_list)
+    for name in peer_list:
+        print '  -> ' + name.replace('../', '').split('.pass')[0]
+    return peer_list
+
+
+def show_shared(mykey):
+    enc_shares_request = utils.EncodeAES(AES.new(base64.b64decode(mykey)), 'show_shares')
+    enc_shares_query = mykey + ' ???? ' + enc_shares_request
+    enc_shares = network.connect_receive(cloud_gateway, 54123, enc_shares_query, 10)
+    remote_shares = utils.DecodeAES(AES.new(base64.b64decode(mykey)), enc_shares)
+    print '[*] Remote Peer has following data in SHARED/ folder:\n%s' % remote_shares
+    return remote_shares
+
+
 if __name__ == '__main__':
     verbose = True  # TODO: DEBUG setting
     date, localtime = utils.create_timestamp()
@@ -81,40 +121,17 @@ if __name__ == '__main__':
     cipher = AES.new(base64.b64decode(my_api_key))
 
     if 'peers' in sys.argv:  # show registed peers using api key
-        enc_query = utils.EncodeAES(cipher, 'show_peers')
-        enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key + ' ???? ' + enc_query, 10)
-        peer_list = utils.DecodeAES(cipher, enc_reply).split('\n')
-        peer_list.remove('')
-        print '[*] Remote Peer Has Provided A List of %d Peers:' % len(peer_list)
-        for name in peer_list:
-            print '  -> '+name.replace('../', '').split('.pass')[0]
+        show_peers(my_api_key)
 
     if 'shares' in sys.argv:
-        enc_shares_request = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), 'show_shares')
-        enc_shares_query = my_api_key + ' ???? ' + enc_shares_request
-        enc_shares = network.connect_receive(cloud_gateway, 54123, enc_shares_query, 10)
-        print '[*] Remote Peer has following data in SHARED/ folder:'
-        remote_shares = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_shares)
-        print remote_shares
+        show_shared(my_api_key)
 
     if 'put' in sys.argv and len(sys.argv) >= 3:
         if not os.path.isfile(sys.argv[2]):
             print '[!!] Cannot find file %s' % sys.argv[2]
-        name = sys.argv[2]
-        enc_data = utils.EncodeAES(cipher, open(name, 'rb').read())
-        size = len(enc_data)
-        query = 'PUT_%s_%s' % (name, size)
-        print '[*] Querying %s...' % query
-        enc_query = utils.EncodeAES(cipher, query)
-        network.connect_receive_send(cloud_gateway, 54123, my_api_key+' ???? '+enc_query, enc_data, cipher)
-        # TODO: This breaking for some reason after about 1.5kB
+        n = sys.argv[2]
+        put_file(n,my_api_key)     # TODO: This breaking for some reason after about 1.5kB
 
     if 'get' in sys.argv and len(sys.argv) >= 3:
-        name = sys.argv[2]
-        query = 'GET_%s' % name
-        enc_query = utils.EncodeAES(cipher, query)
-        print '[*] Requesting Lynx Cloud for file %s' % name
-        enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key+' ???? '+enc_query, 10)
-        open('SHARED/%s' % name, 'wb').write(utils.DecodeAES(cipher, enc_reply))
-        print '[*] %d bytes received ' % len(enc_reply)
-
+        n = sys.argv[2]
+        get_file(n,my_api_key)     # TODO: This breaking for some reason after about 2.5kB
