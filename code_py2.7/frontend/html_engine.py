@@ -103,7 +103,7 @@ def render_file_structure(file_path):
         m += '</ul>\n'
         content += m
     page = header + content + footer
-    # open('local.html','wb').write(page)
+    open('local.html','wb').write(page)
     return page
 
 
