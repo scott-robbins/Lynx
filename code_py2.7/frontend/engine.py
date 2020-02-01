@@ -28,7 +28,7 @@ def listen_alt_channel(timeout):
                     clients[api_key] = username
                 except IndexError:
                     print '[!!] Error during key exchange with %s' % client_addr[0]
-            # Encypted API Queries
+            # Encrypted API Queries
             if len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
 
@@ -53,6 +53,7 @@ def listen_alt_channel(timeout):
                     pass
                 # Check for direct message command
                 try:
+                    decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
                     if decrypted_query.split(';;')[0] == 'send_message':
                         try:
                             clear_message = decrypted_query.split(';;')[1]
@@ -60,10 +61,13 @@ def listen_alt_channel(timeout):
                             print '[*] Routing Message from %s to %s' % (client_addr[0], recipient)
                         except IndexError:
                             pass
-
                 except IndexError:
                     print
-
+                # Upload file
+                try:
+                    decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
+                except IndexError:
+                    pass
             # Check for Add User Command
             query_user = raw_data.split(' :::: ')[0]
             query_pass = ''
