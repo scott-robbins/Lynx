@@ -84,24 +84,31 @@ def render_file_structure(file_path):
         else:
             where[f] = ''
     top_dirs = list(set(top_dirs))
-    for folder in top_dirs:
-        content += '<li> %s </li>\n' % folder
-        more = '<ul>\n'
+    if len(top_dirs) > 1:
+        print '!'
+        for folder in top_dirs:
+            content += '<li> %s </li>\n' % folder
+            more = '<ul>\n'
+            for fname in directory['file']:
+                dloc = where[fname]
+                if dloc == folder:
+                    more += '<li> %s </li>\n' % fname.replace('//','/')
+            more += '</ul>\n'
+            if len(more):
+                content += more
+    elif len(top_dirs) <= 1:
+        m = '<ul>\n'
         for fname in directory['file']:
-            dloc = where[fname]
-            if dloc == folder:
-                more += '<li> %s </li>\n' % fname.replace('//','/')
-        more += '</ul>\n'
-        if len(more):
-            content += more
-    content += '</ul>\n'
+            m +='<li> %s </li>\n' % fname.replace('//','/')
+        m += '</ul>\n'
+        content += m
     page = header + content + footer
-    open('local.html','wb').write(page)
+    # open('local.html','wb').write(page)
     return page
 
 
 if '-t' in sys.argv:
-    test_dir = '../'
+    test_dir = '../SHARED'
     content = render_file_structure(test_dir)
     print content
 
