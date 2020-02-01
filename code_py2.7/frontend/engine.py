@@ -77,7 +77,7 @@ def listen_alt_channel(timeout):
                 # Upload file
                 try:
                     if 'PUT' in decrypted_query.split('_'):
-                        max_size = 3000000
+                        max_size = 2000
                         name = decrypted_query.split('_')[1]
                         size = int(decrypted_query.split('_')[2])
                         if size < max_size:

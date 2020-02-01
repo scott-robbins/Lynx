@@ -101,11 +101,10 @@ if __name__ == '__main__':
         if not os.path.isfile(sys.argv[2]):
             print '[!!] Cannot find file %s' % sys.argv[2]
         name = sys.argv[2]
-        # size = os.path.getsize(name)
         enc_data = utils.EncodeAES(cipher, open(name, 'rb').read())
         size = len(enc_data)
         query = 'PUT_%s_%s' % (name, size)
         print '[*] Querying %s...' % query
         enc_query = utils.EncodeAES(cipher, query)
-        # enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key+' ???? '+enc_query, 10)
         network.connect_receive_send(cloud_gateway, 54123, my_api_key+' ???? '+enc_query, enc_data, cipher)
+        # TODO: This breaking for some reason after about 1.5kB
