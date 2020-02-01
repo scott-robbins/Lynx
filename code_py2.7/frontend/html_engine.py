@@ -108,7 +108,7 @@ def render_file_structure(file_path):
 
 
 if '-t' in sys.argv:
-    test_dir = '../SHARED'
+    test_dir = '/home/Lynx/code_py2.7/SHARED'
     content = render_file_structure(test_dir)
     print content
 
