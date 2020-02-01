@@ -1,5 +1,6 @@
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
+import socket
 import base64
 import network
 import utils
@@ -77,11 +78,12 @@ if __name__ == '__main__':
     # Update/Sync with the P2P Cloud
     my_api_key = base64.b64encode(get_random_bytes(32))  # set api key
     network.connect_send(cloud_gateway, 54123, username+' !!!! '+my_api_key, 10)
+    cipher = AES.new(base64.b64decode(my_api_key))
 
     if 'peers' in sys.argv:  # show registed peers using api key
-        enc_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), 'show_peers')
+        enc_query = utils.EncodeAES(cipher, 'show_peers')
         enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key + ' ???? ' + enc_query, 10)
-        peer_list = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_reply).split('\n')
+        peer_list = utils.DecodeAES(cipher, enc_reply).split('\n')
         peer_list.remove('')
         print '[*] Remote Peer Has Provided A List of %d Peers:' % len(peer_list)
         for name in peer_list:
@@ -95,14 +97,6 @@ if __name__ == '__main__':
         remote_shares = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_shares)
         print remote_shares
 
-    # Send a direct message to another peer
-    if 'send' in sys.argv and len(sys.argv) >= 4:
-        peer = sys.argv[2]
-        msg = utils.arr2str(sys.argv[3:])
-        clear_query = my_api_key+' ???? send_message;;%s;;%s' % (peer, msg)
-        enc_q = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), clear_query)
-        enc_ack = network.connect_receive(cloud_gateway, 54123, enc_q, 10)
-
     if 'put' in sys.argv and len(sys.argv) >= 3:
         if not os.path.isfile(sys.argv[2]):
             print '[!!] Cannot find file %s' % sys.argv[2]
@@ -110,11 +104,14 @@ if __name__ == '__main__':
         size = os.path.getsize(name)
         query = 'PUT_%s_%s' % (name, size)
         print '[*] Querying %s...' % query
-
-        # encrypted_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), query)
-        # enc_ack = network.connect_receive(cloud_gateway, 54123, encrypted_query, 10)
-        # reply = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_ack)
-        # print reply
-        enc_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), my_api_key + ' ???? '+query)
-        enc_dat = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), open(name).read())
-        network.connect_recieve_send(cloud_gateway,54123,enc_query,enc_dat,20)
+        enc_query = utils.EncodeAES(cipher, query)
+        request = my_api_key + ' ???? ' + enc_query
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((cloud_gateway, 54123))
+            s.send(enc_query)
+            enc_reply = s.recv(2048)
+            print '[*] Reply: %s' % utils.DecodeAES(cipher, enc_reply)
+        except socket.error:
+            print '[!!] Connection broken'
+        s.close()

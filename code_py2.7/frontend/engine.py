@@ -18,6 +18,24 @@ def exchange_keys(raw_query, cls, c):
     return cls
 
 
+def check_for_add_user_cmd(data, addr, existing):
+    # Check for Add User Command
+    query_user = data.split(' :::: ')[0]
+    query_pass = ''
+    legit_pass = False
+    print '[*] Client Connected %s' % addr[0]
+    try:
+        query_pass = data.split(' :::: ')[1]
+        print query_user
+        print query_pass
+        legit_pass = True
+    except IndexError:
+        pass
+    if legit_pass and query_user not in existing:
+        print '[*] Adding User: %s' % query_user
+        open(query_user + '.pass', 'wb').write(query_pass)
+
+
 def listen_alt_channel(timeout):
     clients = {}
     # TODO: Create a log file for this alternate channel
@@ -56,17 +74,6 @@ def listen_alt_channel(timeout):
                         client.send(utils.EncodeAES(cipher, clear_reply))
                 except IndexError:
                     pass
-                # Check for direct message command
-                try:
-                    if decrypted_query.split(';;')[0] == 'send_message':
-                        try:
-                            clear_message = decrypted_query.split(';;')[1]
-                            recipient = decrypted_query.split(';;')[2]
-                            print '[*] Routing Message from %s to %s' % (client_addr[0], recipient)
-                        except IndexError:
-                            pass
-                except IndexError:
-                    print
                 # Upload file
                 try:
                     if 'PUT' in decrypted_query.split('_'):
@@ -83,22 +90,10 @@ def listen_alt_channel(timeout):
                             client.send(utils.EncodeAES(cipher, 'NO'))
                 except IndexError:
                     pass
+            # Check for add user command
+            check_for_add_user_cmd(raw_data,client_addr, existing_users)
 
-            # Check for Add User Command
-            query_user = raw_data.split(' :::: ')[0]
-            query_pass = ''
-            legit_pass = False
-            print '[*] Client Connected %s' % client_addr[0]
-            try:
-                query_pass = raw_data.split(' :::: ')[1]
-                print query_user
-                print query_pass
-                legit_pass = True
-            except IndexError:
-                pass
-            if legit_pass and query_user not in existing_users:
-                print '[*] Adding User: %s' % query_user
-                open(query_user+'.pass','wb').write(query_pass)
+            ''' CLOSE CONNECTION WITH REMOTE CLIENT '''
             client.close()
         except socket.error:
             print '[!!] Connection Error'
