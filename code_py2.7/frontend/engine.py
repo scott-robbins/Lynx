@@ -23,7 +23,6 @@ def listen_alt_channel(timeout):
                 username = raw_data.split(' !!!! ')[0]
                 print '[*] API_KEY Received from %s' % client_addr[0]
                 try:
-
                     api_key = raw_data.split(' !!!! ')[1]
                     clients[api_key] = username
                 except IndexError:
@@ -73,6 +72,23 @@ def listen_alt_channel(timeout):
                             client.send(utils.EncodeAES(cipher, 'YES'))
                             raw_data = client.recv(max_size)
                             open('../SHARED/%s' % name, 'wb').write(utils.DecodeAES(cipher,raw_data))
+                        else:
+                            client.send(utils.EncodeAES(cipher, 'NO'))
+                except IndexError:
+                    pass
+            elif len(raw_data.split(' ?!?! ')) > 1 and raw_data.split(' ???? ')[0] in clients.keys():
+                cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
+                decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
+                print '[*] Decrypted Query: %s' % decrypted_query
+                try:
+                    if 'PUT' in decrypted_query.split('_'):
+                        max_size = 3000000
+                        name = decrypted_query.split('_')[1]
+                        size = int(decrypted_query.split('_')[2])
+                        if size < max_size:
+                            client.send(utils.EncodeAES(cipher, 'YES'))
+                            raw_data = client.recv(max_size)
+                            open('../SHARED/%s' % name, 'wb').write(utils.DecodeAES(cipher, raw_data))
                         else:
                             client.send(utils.EncodeAES(cipher, 'NO'))
                 except IndexError:
