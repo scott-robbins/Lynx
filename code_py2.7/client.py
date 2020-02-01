@@ -77,9 +77,9 @@ if __name__ == '__main__':
     # Update/Sync with the P2P Cloud
     my_api_key = base64.b64encode(get_random_bytes(32))  # set api key
     network.connect_send(cloud_gateway, 54123, username+' !!!! '+my_api_key, 10)
-    enc_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), 'show_peers')
-    if 'peers' in sys.argv:
-        # show registed peers using api key
+
+    if 'peers' in sys.argv:  # show registed peers using api key
+        enc_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), 'show_peers')
         enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key + ' ???? ' + enc_query, 10)
         peer_list = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_reply).split('\n')
         peer_list.remove('')
@@ -108,12 +108,16 @@ if __name__ == '__main__':
             print '[!!] Cannot find file %s' % sys.argv[2]
         name = sys.argv[2]
         size = os.path.getsize(name)
-        query = my_api_key+' ?!?! PUT_%s_%s' % (name, size)
+        query = 'PUT_%s_%s' % (name, size)
         print '[*] Querying %s...' % query
-        encrypted_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), query)
-        enc_ack = network.connect_receive(cloud_gateway, 54123, encrypted_query, 10)
-        reply = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_ack)
-        print reply
+
+        # encrypted_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), query)
+        # enc_ack = network.connect_receive(cloud_gateway, 54123, encrypted_query, 10)
+        # reply = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_ack)
+        # print reply
+        enc_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), query)
+        enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key + ' ???? ' + enc_query, 10)
+        reply = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_reply)
         if reply == 'YES':
             cipher = AES.new(base64.b64decode(my_api_key))
             print '[*] Remote host accepted put_file request [%d bytes]' % size
