@@ -101,4 +101,21 @@ if __name__ == '__main__':
         msg = utils.arr2str(sys.argv[3:])
         clear_query = my_api_key+' ???? send_message;;%s;;%s' % (peer, msg)
         enc_q = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), clear_query)
-        enc_ack = network.connect_send(cloud_gateway, 54123, enc_q, 10)
+        enc_ack = network.connect_receive(cloud_gateway, 54123, enc_q, 10)
+
+    if 'put' in sys.argv and len(sys.argv) >= 3:
+        if not os.path.isfile(sys.argv[2]):
+            print '[!!] Cannot find file %s' % sys.argv[2]
+        name = sys.argv[2]
+        size = os.path.getsize(name)
+        query = my_api_key+' ???? %s_%s' % (name, size)
+        encrypted_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), query)
+        enc_ack = network.connect_receive(cloud_gateway, 54123, encrypted_query, 10)
+        reply = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_ack)
+        if enc_ack == 'YES':
+            cipher = AES.new(base64.b64decode(my_api_key))
+            print '[*] Remote host accepted put_file request [%d bytes]' % size
+            encrypted_data = utils.EncodeAES(cipher, open(name, 'rb').read())
+            network.connect_send(cloud_gateway,54123,encrypted_data,20)
+        else:
+            print '[*] Remote host declined put_file request'

@@ -31,10 +31,10 @@ def listen_alt_channel(timeout):
             # Encrypted API Queries
             if len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
-
+                decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
                 # Check for check peer names command
                 try:
-                    decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
+
                     if decrypted_query == 'show_peers':
                         reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
                         encrypted_content = utils.EncodeAES(cipher, reply)
@@ -53,7 +53,6 @@ def listen_alt_channel(timeout):
                     pass
                 # Check for direct message command
                 try:
-                    decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
                     if decrypted_query.split(';;')[0] == 'send_message':
                         try:
                             clear_message = decrypted_query.split(';;')[1]
@@ -65,7 +64,16 @@ def listen_alt_channel(timeout):
                     print
                 # Upload file
                 try:
-                    decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
+                    if 'PUT' in decrypted_query.split('_'):
+                        max_size = 3000000
+                        name = decrypted_query.split('_')[1]
+                        size = int(decrypted_query.split('_')[2])
+                        if size < max_size:
+                            client.send(utils.EncodeAES(cipher, 'YES'))
+                            raw_data = client.recv(max_size)
+                            open('../SHARED/%s' % name, 'wb').write(utils.DecodeAES(cipher,raw_data))
+                        else:
+                            client.send(utils.EncodeAES(cipher, 'NO'))
                 except IndexError:
                     pass
             # Check for Add User Command
