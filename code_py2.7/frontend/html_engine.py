@@ -17,8 +17,7 @@ def generate_success(uname):
           'downloaded the client and created a password.<p>\n' \
           '</div>' % (uname, )
     opt_bar = '<nav>\n' \
-              '<a href="/RemoteShares"> Remote Files </a> \n' \
-              '<a href="/LocalShares"> My Shared Files</a>'\
+              '<a href="/Shares"> Shared Files</a>'\
               '<a href="/info"> Information </a>\n' \
               '<a href="/FAQ"> FAQ </a>\n' \
               '</nav>'
@@ -55,21 +54,6 @@ def render_file_structure(file_path):
     """
     header = '<!DOCTYPE html>\n<html>\n <body>\n'
     footer = '<body>\n</html>'
-    '''
-    <h2>A Nested List</h2>
-    <p>List can be nested (lists inside lists):</p>
-    
-    <ul>
-      <li>Coffee</li>
-      <li>Tea
-        <ul>
-          <li>Black tea</li>
-          <li>Green tea</li>
-        </ul>
-      </li>
-      <li>Milk</li>
-    </ul>
-    '''
     content = '<h2> %s </h2>\n<ul>\n' % file_path
     directory, empty = utils.crawl_dir(file_path, False, False)
     print '[*] %d Files found ' % len(directory['file'])
