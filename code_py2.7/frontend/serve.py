@@ -101,8 +101,7 @@ def run(handler):
                 os.remove('info.html')
             elif 'GET /LocalShares HTTP/1.1' in request.split('\r\n'):
                 print '[*] Serving %s html rendering of their local share folder' % client_addr[0]
-                html_engine.render_file_structure('../SHARED')
-                client.send(open('local.html','rb').read())
+                client.send(html_engine.render_file_structure('SHARED'))
                 os.remove('local.html')
 
             elif 'GET /FAQ HTTP/1.1' in request.split('\r\n'):
