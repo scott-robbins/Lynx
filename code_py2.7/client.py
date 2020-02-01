@@ -108,11 +108,12 @@ if __name__ == '__main__':
             print '[!!] Cannot find file %s' % sys.argv[2]
         name = sys.argv[2]
         size = os.path.getsize(name)
-        query = my_api_key+' ???? PUT_%s_%s' % (name, size)
+        query = my_api_key+' ?!?! PUT_%s_%s' % (name, size)
         print '[*] Querying %s...' % query
         encrypted_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), query)
         enc_ack = network.connect_receive(cloud_gateway, 54123, encrypted_query, 10)
         reply = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_ack)
+        print reply
         if reply == 'YES':
             cipher = AES.new(base64.b64decode(my_api_key))
             print '[*] Remote host accepted put_file request [%d bytes]' % size

