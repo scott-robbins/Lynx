@@ -114,7 +114,7 @@ def run(handler):
                     print '\033[1m[*] %s Has Logged in Successfully from %s\033[0m' % (uname, client_addr[0])
                     open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (client_addr[0], uname))
                     active_clients[uname] = [passwd]
-                    clients.append(uname)
+                    clients.append(client_addr[0])
                     success_page = html_engine.generate_success(uname)
                     client.send(open(success_page, 'rb').read())
                     os.remove(success_page)
