@@ -105,13 +105,6 @@ if __name__ == '__main__':
         query = 'PUT_%s_%s' % (name, size)
         print '[*] Querying %s...' % query
         enc_query = utils.EncodeAES(cipher, query)
-        request = my_api_key + ' ???? ' + enc_query
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((cloud_gateway, 54123))
-            s.send(enc_query)
-            enc_reply = s.recv(2048)
-            print '[*] Reply: %s' % utils.DecodeAES(cipher, enc_reply)
-        except socket.error:
-            print '[!!] Connection broken'
-        s.close()
+        enc_data = utils.EncodeAES(cipher, open(name, 'rb').read())
+        # enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key+' ???? '+enc_query, 10)
+        network.connect_receive_send(cloud_gateway, 54123, my_api_key+' ???? '+enc_query, enc_data, cipher)

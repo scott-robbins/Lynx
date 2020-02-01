@@ -67,7 +67,7 @@ def connect_receive(remote_address, remote_port, query, timeout):
     return reply
 
 
-def connect_recieve_send(remote_address, remote_port, query, data, timeout):
+def connect_receive_send(remote_address, remote_port, query, data, cipher):
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     except socket.error:
@@ -80,7 +80,8 @@ def connect_recieve_send(remote_address, remote_port, query, data, timeout):
         print '[!!] Unable to connect to %s' % remote_address
         return ''
     # Now Get a Reply
-    reply = s.recv(2048)
+    reply = utils.DecodeAES(cipher, s.recv(2048))
+    print reply
     if reply == 'YES':
         s.send(data)
     s.close()
