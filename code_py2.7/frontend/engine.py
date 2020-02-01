@@ -71,7 +71,7 @@ def listen_alt_channel(timeout):
                         size = int(decrypted_query.split('_')[2])
                         if size < max_size:
                             print '[*] %s is uploading %d bytes' % (client_addr[0], size)
-                            client.send(utils.EncodeAES(cipher, 'YES'))
+                            client.send('YES')
                             raw_data = client.recv(max_size)
                             print '[*] %d Encrypted Bytes Received' % len(raw_data)
                             open('../SHARED/%s' % name, 'wb').write(utils.DecodeAES(cipher,raw_data))

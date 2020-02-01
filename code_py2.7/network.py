@@ -67,4 +67,31 @@ def connect_receive(remote_address, remote_port, query, timeout):
     return reply
 
 
+def connect_recieve_send(remote_address, remote_port, query, data, timeout):
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    except socket.error:
+        print '[!!] Error Creating Socket...'
+        return ''
+    try:
+        s.connect((remote_address, remote_port))
+        s.send(query)
+    except socket.error:
+        print '[!!] Unable to connect to %s' % remote_address
+        return ''
+    # Now Get a Reply
+    tic = time.time(); unacknowledged = True; reply = ''
+    while unacknowledged and (time.time() - tic) < timeout:
+        try:
+            reply = s.recv(125000)
+            unacknowledged = False
+            print '[*] %d Bytes Received' % len(reply)
+        except socket.error:
+            print '[!!] Connection Broken'
+            break
+    if reply == 'YES':
+        s.send(data)
+    s.close()
+    return reply
+
 
