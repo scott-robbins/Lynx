@@ -81,7 +81,6 @@ def connect_receive_send(remote_address, remote_port, query, data, cipher):
         return ''
     # Now Get a Reply
     reply = utils.DecodeAES(cipher, s.recv(2048))
-    print reply
     if reply == 'YES':
         s.send(data)
     s.close()
