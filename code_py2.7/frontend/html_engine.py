@@ -71,6 +71,7 @@ def render_file_structure(file_path):
     '''
     content = '<h2> %s </h2>\n<ul>\n' % file_path
     directory, empty = utils.crawl_dir(file_path, False, False)
+    print '[*] %d Files found ' % len(directory['file'])
     top_dirs = []
     where = {}
     for f in directory['file']:
