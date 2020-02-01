@@ -95,8 +95,9 @@ def render_file_structure(file_path):
         if len(more):
             content += more
     content += '</ul>\n'
-    # open('local.html','wb').write(content)
-    return header + content + footer
+    page = header + content + footer
+    open('local.html','wb').write(page)
+    return page
 
 
 if '-t' in sys.argv:
