@@ -115,6 +115,6 @@ if __name__ == '__main__':
         # enc_ack = network.connect_receive(cloud_gateway, 54123, encrypted_query, 10)
         # reply = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_ack)
         # print reply
-        enc_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), query)
+        enc_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), my_api_key + ' ???? '+query)
         enc_dat = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), open(name).read())
         network.connect_recieve_send(cloud_gateway,54123,enc_query,enc_dat,20)

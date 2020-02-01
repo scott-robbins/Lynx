@@ -80,15 +80,7 @@ def connect_recieve_send(remote_address, remote_port, query, data, timeout):
         print '[!!] Unable to connect to %s' % remote_address
         return ''
     # Now Get a Reply
-    tic = time.time(); unacknowledged = True; reply = ''
-    while unacknowledged and (time.time() - tic) < timeout:
-        try:
-            reply = s.recv(125000)
-            unacknowledged = False
-            print '[*] %d Bytes Received' % len(reply)
-        except socket.error:
-            print '[!!] Connection Broken'
-            break
+    reply = s.recv(2048)
     if reply == 'YES':
         s.send(data)
     s.close()
