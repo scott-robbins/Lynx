@@ -57,7 +57,10 @@ def run(handler):
     try:
         while running and (time.time() - tic) < runtime:
             client, client_addr = handler.accept()
-            # clients.append(client_addr[0])
+            if client_addr[0] not in list(set(clients)):
+                new_client = True
+            else:
+                new_client = False
             try:
                 request = client.recv(2048)
             except socket.error:
@@ -71,10 +74,7 @@ def run(handler):
                         user_agent = ln.split('User-Agent:')[1].replace('\n', '')
                     except IndexError:
                         pass
-            if client_addr[0] not in list(set(clients)):
-                new_client = True
-            else:
-                new_client = False
+
             # Serve login page to new connections, and handle logins
             if 'GET / HTTP/1.1' in request.split('\r\n'):
                 client.send(open('login.html', 'rb').read())
