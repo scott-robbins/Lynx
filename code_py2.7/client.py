@@ -2,6 +2,7 @@ from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
 import base64
 import network
+import socket
 import utils
 import time
 import sys
@@ -42,6 +43,29 @@ def initialize_keys(private_ip):
         shares = os.listdir('SHARED')
     print '[*] %d files in SHARED/ Folder' % len(shares)
     return priv, pub, shares
+
+
+def upload(fname, api_key, remote):
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((remote, 54123))
+    except socket.error:
+        print '[!!] Unable to create socket'
+        return False
+    query = 'PUT_%s_%s' % (name, size)
+    print '[*] Querying %s...' % query
+    encq = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), query)
+    s.send(encq)
+    encr = s.recv(2046)
+    reply = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), encr)
+    if reply == 'YES':
+        cipher = AES.new(base64.b64decode(my_api_key))
+        print '[*] Remote host accepted put_file request [%d bytes]' % size
+        encrypted_data = utils.EncodeAES(cipher, open(name, 'rb').read())
+        s.send(encrypted_data)
+    else:
+        print '[*] Remote host declined put_file request'
+    s.close()
 
 
 if __name__ == '__main__':
@@ -108,20 +132,4 @@ if __name__ == '__main__':
             print '[!!] Cannot find file %s' % sys.argv[2]
         name = sys.argv[2]
         size = os.path.getsize(name)
-        query = 'PUT_%s_%s' % (name, size)
-        print '[*] Querying %s...' % query
-
-        # encrypted_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), query)
-        # enc_ack = network.connect_receive(cloud_gateway, 54123, encrypted_query, 10)
-        # reply = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_ack)
-        # print reply
-        enc_query = utils.EncodeAES(AES.new(base64.b64decode(my_api_key)), query)
-        enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key + ' ???? ' + enc_query, 10)
-        reply = utils.DecodeAES(AES.new(base64.b64decode(my_api_key)), enc_reply)
-        if reply == 'YES':
-            cipher = AES.new(base64.b64decode(my_api_key))
-            print '[*] Remote host accepted put_file request [%d bytes]' % size
-            encrypted_data = utils.EncodeAES(cipher, open(name, 'rb').read())
-            network.connect_send(cloud_gateway,54123,encrypted_data,20)
-        else:
-            print '[*] Remote host declined put_file request'
+        upload(name,my_api_key,cloud_gateway)
