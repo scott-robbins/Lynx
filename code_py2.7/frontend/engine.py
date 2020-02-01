@@ -7,6 +7,17 @@ import sys
 import os
 
 
+def exchange_keys(raw_query, cls, c):
+    username = raw_query.split(' !!!! ')[0]
+    print '[*] API_KEY Received from %s' % c[0]
+    try:
+        api_key = raw_query.split(' !!!! ')[1]
+        cls[api_key] = username
+    except IndexError:
+        print '[!!] Error during key exchange with %s' % c[0]
+    return cls
+
+
 def listen_alt_channel(timeout):
     clients = {}
     # TODO: Create a log file for this alternate channel
@@ -20,14 +31,7 @@ def listen_alt_channel(timeout):
             raw_data = client.recv(1028).replace('\n','')
             # Check for api_key exchange command
             if len(raw_data.split(' !!!! ')) == 2:
-                username = raw_data.split(' !!!! ')[0]
-                print '[*] API_KEY Received from %s' % client_addr[0]
-                try:
-                    api_key = raw_data.split(' !!!! ')[1]
-                    clients[api_key] = username
-                    print clients
-                except IndexError:
-                    print '[!!] Error during key exchange with %s' % client_addr[0]
+                clients = exchange_keys(raw_data, clients, client_addr)
             # Encrypted API Queries
             if len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
