@@ -130,8 +130,14 @@ if __name__ == '__main__':
         if not os.path.isfile(sys.argv[2]):
             print '[!!] Cannot find file %s' % sys.argv[2]
         n = sys.argv[2]
+        sz = os.path.getsize(n)
+        if sz > 1500:
+            print '[*] File is %d bytes (over 1.5kB)' % sz
         put_file(n,my_api_key)     # TODO: This breaking for some reason after about 1.5kB
 
     if 'get' in sys.argv and len(sys.argv) >= 3:
         n = sys.argv[2]
         get_file(n,my_api_key)     # TODO: This breaking for some reason after about 2.5kB
+
+    # TODO: make utility fcn that tests up/down breakpoint on file size
+    #  (until I can figure out how to prevent it)

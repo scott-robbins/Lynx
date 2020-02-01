@@ -99,6 +99,11 @@ def run(handler):
                 html_engine.display_information(client_addr[0], user_agent)
                 client.send(open('info.html', 'rb').read())
                 os.remove('info.html')
+            elif 'GET /LocalFiles HTTP/1.1' in request.split('\r\n'):
+                print '[*] Serving %s html rendering of their local share folder' % client_addr[0]
+                structure = html_engine.render_file_structure('../SHARED')
+                client.send(structure)
+
             elif 'GET /FAQ HTTP/1.1' in request.split('\r\n'):
                 print '[*] Serving %s the FAQ page' % client_addr[0]
                 client.send(open('assets/faq.html', 'rb').read())

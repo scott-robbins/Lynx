@@ -17,7 +17,8 @@ def generate_success(uname):
           'downloaded the client and created a password.<p>\n' \
           '</div>' % (uname, )
     opt_bar = '<nav>\n' \
-              '<a href="/inbox"> Inbox </a> \n' \
+              '<a href="/RemoteShares"> Remote Files </a> \n' \
+              '<a href="/LocalShares"> My Shared Files</a>'\
               '<a href="/info"> Information </a>\n' \
               '<a href="/FAQ"> FAQ </a>\n' \
               '</nav>'
@@ -52,7 +53,7 @@ def render_file_structure(file_path):
     :param directory:
     :return html_content:
     """
-    content = ''
+
     '''
     <h2>A Nested List</h2>
     <p>List can be nested (lists inside lists):</p>
@@ -68,12 +69,30 @@ def render_file_structure(file_path):
       <li>Milk</li>
     </ul>
     '''
+    content = '<h2> %s </h2>\n<ul>\n' % file_path
     directory, empty = utils.crawl_dir(file_path, False, False)
-    print '%d dir(s)' % len(directory['dir'])
-    print '%d files' % len(directory['file'])
+    top_dirs = []
+    where = {}
     for f in directory['file']:
-        element = f.split(file_path)[1:]
-
+        element = f.split(file_path).pop()
+        if len(element.split('/')) > 2:
+            d = element.split('/')[1].split('/')[0]
+            top_dirs.append(d)
+            where[f] = d
+        else:
+            where[f] = ''
+    top_dirs = list(set(top_dirs))
+    for folder in top_dirs:
+        content += '<li> %s </li>\n' % folder
+        more = '<ul>\n'
+        for fname in directory['file']:
+            dloc = where[fname]
+            if dloc == folder:
+                more += '<li> %s </li>\n' % fname.replace('//','/')
+        more += '</ul>\n'
+        if len(more):
+            content += more
+    content += '</ul>'
     return content
 
 

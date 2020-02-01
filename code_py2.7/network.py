@@ -88,3 +88,23 @@ def connect_receive_send(remote_address, remote_port, query, data, cipher):
     return reply
 
 
+def fragmented(fname, frag_size):
+    if not os.path.isfile(fname):
+        print "[!] Cannot find %s" % fname
+    else:
+        n_files = os.path.getsize(fname)/frag_size
+        print '[*] Fragmenting %s into %d files' % (fname, n_files)
+        os.system('mkdir chunks/')
+        raw_data = open(fname,'rb').read()
+        block_ind = 0
+        blocks = range(0,len(raw_data), frag_size)
+        fragments = {'name': fname,
+                     'frags': []}
+        for ii in blocks:
+            if block_ind > 0:
+                chunk = raw_data[blocks[block_ind-1:ii]]
+                fname = 'chunk%d.frag' % block_ind
+                open('chunks/'+fname, 'wb').write(chunk)
+                fragments['frags'].append('chunks/'+fname)
+            block_ind += 1
+        return fragments
