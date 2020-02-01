@@ -95,7 +95,7 @@ def listen_alt_channel(timeout):
                         else:
                             client.send(utils.EncodeAES(cipher, 'NO'))
                     elif 'GET' in decrypted_query.split('_'):
-                        name = decrypted_query.split('_')[1]
+                        name = '../SHARED/'+decrypted_query.split('_')[1]
                         if os.path.isfile(name):
                             size = os.path.isfile(name)
                             print '[*] %s is requesting %s [%d bytes]' % (client_addr[0],

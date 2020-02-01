@@ -115,6 +115,6 @@ if __name__ == '__main__':
         enc_query = utils.EncodeAES(cipher, query)
         print '[*] Requesting Lynx Cloud for file %s' % name
         enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key+' ???? '+enc_query, 10)
-        open('SHARES/%s' % name, 'wb').write(utils.DecodeAES(cipher, enc_reply))
+        open('SHARED/%s' % name, 'wb').write(utils.DecodeAES(cipher, enc_reply))
         print '[*] %d bytes received ' % len(enc_reply)
 
