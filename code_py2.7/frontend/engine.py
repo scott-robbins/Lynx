@@ -32,6 +32,7 @@ def listen_alt_channel(timeout):
             if len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
+                print '[*] Decrypted Query: %s' % decrypted_query
                 # Check for check peer names command
                 try:
 
