@@ -53,7 +53,8 @@ def render_file_structure(file_path):
     :param directory:
     :return html_content:
     """
-
+    header = '<!DOCTYPE html>\n<html>\n <body>\n'
+    footer = '<body>\n</html>'
     '''
     <h2>A Nested List</h2>
     <p>List can be nested (lists inside lists):</p>
@@ -93,8 +94,9 @@ def render_file_structure(file_path):
         more += '</ul>\n'
         if len(more):
             content += more
-    content += '</ul>'
-    return content
+    content += '</ul>\n'
+    # open('local.html','wb').write(content)
+    return header + content + footer
 
 
 if '-t' in sys.argv:
