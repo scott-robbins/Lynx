@@ -108,3 +108,13 @@ if __name__ == '__main__':
         enc_query = utils.EncodeAES(cipher, query)
         network.connect_receive_send(cloud_gateway, 54123, my_api_key+' ???? '+enc_query, enc_data, cipher)
         # TODO: This breaking for some reason after about 1.5kB
+
+    if 'get' in sys.argv and len(sys.argv) >= 3:
+        name = sys.argv[2]
+        query = 'GET_%s' % name
+        enc_query = utils.EncodeAES(cipher, query)
+        print '[*] Requesting Lynx Cloud for file %s' % name
+        enc_reply = network.connect_receive(cloud_gateway, 54123, my_api_key+' ???? '+enc_query, 10)
+        open('SHARES/%s' % name, 'wb').write(utils.DecodeAES(cipher, enc_reply))
+        print '[*] %d bytes received ' % len(enc_reply)
+
