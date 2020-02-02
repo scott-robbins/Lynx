@@ -17,7 +17,8 @@ def generate_success(uname):
           'downloaded the client and created a password.<p>\n' \
           '</div>' % (uname, )
     opt_bar = '<nav>\n' \
-              '<a href="/Shares"> Shared Files</a>'\
+              '<a href="/Upload> File Upload </a>' \
+              '<a href="/Shares"> Shared Files </a>'\
               '<a href="/info"> Information </a>\n' \
               '<a href="/FAQ"> FAQ </a>\n' \
               '</nav>'
@@ -43,6 +44,10 @@ def display_information(client_addr, user_agent):
     content = header + box + footer
     open('info.html', 'wb').write(content)
     return 'info.html'
+
+
+def display_upload_page(client_addr):
+    return open('assets/upload.html', 'wb').read()
 
 
 def render_file_structure(file_path):
@@ -91,7 +96,7 @@ def render_file_structure(file_path):
 
 
 if '-t' in sys.argv:
-    test_dir = '/home/Lynx/code_py2.7/SHARED'
+    test_dir = '../SHARED'
     content = render_file_structure(test_dir)
     print content
 
