@@ -48,7 +48,6 @@ def display_information(client_addr, user_agent):
 
 def display_upload_page(client):
     client.send(open('assets/upload.html', 'rb').read())
-    print client.recv(1024)
     return client
 
 
