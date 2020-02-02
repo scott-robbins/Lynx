@@ -43,6 +43,7 @@ def defragment(n_frags, name):
         print '[!!] %d Fragments found (not %d)' % (len(frag_files), n_frags)
     for f in frag_files:
         raw_data += open(f, 'rb').read()
+        os.remove('../SHARED/chunk/'+f)
     open('../SHARED/'+name, 'wb').write(raw_data)
 
 
