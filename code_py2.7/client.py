@@ -132,8 +132,19 @@ if __name__ == '__main__':
         n = sys.argv[2]
         sz = os.path.getsize(n)
         if sz > 1500:
+            # TODO: Alert remote host about fragments coming
             print '[*] File is %d bytes (over 1.5kB)' % sz
-        put_file(n,my_api_key)     # TODO: This breaking for some reason after about 1.5kB
+            fragments = network.fragmented(n, 1000)
+            N = 0
+            for file_name in os.listdir('chunks'):
+                os.system('mv chunks/%s $PWD' % file_name)
+                put_file(file_name, my_api_key)
+                os.remove(file_name)
+                N += 1
+            os.system('rm -r chunks/')
+            # TODO: Let remote host they can reassemble now
+            network.connect_send(cloud_gateway,54123,my_api_key+' ???? fragments:%d' % N)
+        put_file(n, my_api_key)     # TODO: This breaking for some reason after about 1.5kB
 
     if 'get' in sys.argv and len(sys.argv) >= 3:
         n = sys.argv[2]

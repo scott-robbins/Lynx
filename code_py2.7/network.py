@@ -96,15 +96,28 @@ def fragmented(fname, frag_size):
         print '[*] Fragmenting %s into %d files' % (fname, n_files)
         os.system('mkdir chunks/')
         raw_data = open(fname,'rb').read()
-        block_ind = 0
+        block_ind = 1
         blocks = range(0,len(raw_data), frag_size)
         fragments = {'name': fname,
                      'frags': []}
+
         for ii in blocks:
-            if block_ind > 0:
-                chunk = raw_data[blocks[block_ind-1:ii]]
+            try:
+                a = blocks[block_ind - 1]
+                b = blocks[block_ind]
+                print 'data[%d:%d]' % (a, b)
+                chunk = raw_data[a:b]
                 fname = 'chunk%d.frag' % block_ind
-                open('chunks/'+fname, 'wb').write(chunk)
-                fragments['frags'].append('chunks/'+fname)
-            block_ind += 1
+                open('chunks/' + fname, 'wb').write(chunk)
+                fragments['frags'].append('chunks/' + fname)
+                block_ind += 1
+            except IndexError:
+                pass
+        if blocks[len(blocks)-1] < len(raw_data):
+            db = len(raw_data) - blocks[len(blocks)-1]
+            chunk = raw_data[blocks[len(blocks)-1]:(blocks[len(blocks)-1]+db)]
+            print 'Adding %d bytes' % db
+            fname = 'chunk%d.frag' % (block_ind+1)
+            fragments['frags'].append('chunks/' + fname)
+            open('chunks/' + fname, 'wb').write(chunk)
         return fragments
