@@ -76,7 +76,7 @@ def listen_alt_channel(timeout):
                     pass
                 if 'fragments' in decrypted_query.split(':'):
                     N = decrypted_query.split(':')[1]
-                    print '[*] %s is requesting fragmented file re-assembly of %d fragments' %\
+                    print '[*] %s is requesting fragmented file re-assembly of %s fragments' %\
                           (client_addr[0], N)
                 # Upload file
                 try:
