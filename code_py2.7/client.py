@@ -144,7 +144,8 @@ if __name__ == '__main__':
             os.system('rm -r chunks/')
             # TODO: Let remote host they can reassemble now
             network.connect_send(cloud_gateway,54123,my_api_key+' ???? fragments:%d' % N,10)
-        put_file(n, my_api_key)     # TODO: This breaking for some reason after about 1.5kB
+        else:
+            put_file(n, my_api_key)     # TODO: This breaking for some reason after about 1.5kB
 
     if 'get' in sys.argv and len(sys.argv) >= 3:
         n = sys.argv[2]
