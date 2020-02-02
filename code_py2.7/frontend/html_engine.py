@@ -47,7 +47,7 @@ def display_information(client_addr, user_agent):
 
 
 def display_upload_page(client_addr):
-    return open('assets/upload.html', 'wb').read()
+    return open('assets/upload.html', 'rb').read()
 
 
 def render_file_structure(file_path):
