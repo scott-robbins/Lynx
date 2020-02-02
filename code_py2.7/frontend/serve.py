@@ -102,7 +102,9 @@ def run(handler):
             elif 'GET /Shares HTTP/1.1' in request.split('\r\n') and not new_client:
                 print '[*] Serving %s html rendering of their local share folder' % client_addr[0]
                 client.send(html_engine.render_file_structure('../SHARED/'))
-
+            elif 'GET /Upload HTTP/1.1' in request.split('\r\n') and not new_client:
+                print '[*] %s is uploading a file to the server' % client_addr[0]
+                client.send(html_engine.display_upload_page(client_addr))
             elif 'GET /FAQ HTTP/1.1' in request.split('\r\n'):
                 print '[*] Serving %s the FAQ page' % client_addr[0]
                 client.send(open('assets/faq.html', 'rb').read())
