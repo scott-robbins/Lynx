@@ -37,6 +37,16 @@ def check_for_add_user_cmd(data, addr, existing):
         open(query_user + '.pass', 'wb').write(query_pass)
 
 
+def defragment(n_frags, name):
+    raw_data = ''
+    frag_files = utils.cmd('ls ../SHARED/chunk*')
+    if len(frag_files) != n_frags:
+        print '[!!] %d Fragments found (not %d)' % (len(frag_files), n_frags)
+    for f in frag_files:
+        raw_data += open(f, 'rb').read()
+    open('../SHARED/'+name, 'wb').write(raw_data)
+
+
 def listen_alt_channel(timeout):
     clients = {}
     # TODO: Create a log file for this alternate channel
@@ -80,7 +90,7 @@ def listen_alt_channel(timeout):
                     name_out = decrypted_query.split(' = ')[1]
                     print '[*] %s is requesting fragmented file re-assembly of %s fragments' %\
                           (client_addr[0], N)
-                    network.defragment(int(N), name_out)
+                    defragment(int(N), name_out)
                 # Upload file
                 try:
                     if 'PUT' in decrypted_query.split('_'):

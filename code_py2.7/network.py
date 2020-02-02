@@ -123,12 +123,5 @@ def fragmented(fname, frag_size):
         return fragments
 
 
-def defragment(n_frags, name):
-    raw_data = ''
-    frag_files = utils.cmd('ls ../SHARED/chunk*')
-    if len(frag_files) != n_frags:
-        print '[!!] %d Fragments found (not %d)' % (len(frag_files), n_frags)
-    for f in frag_files:
-        raw_data += open(f, 'rb').read()
-    open('../SHARED/'+name, 'wb').write(raw_data)
+
 
