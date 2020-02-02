@@ -17,7 +17,7 @@ def generate_success(uname):
           'downloaded the client and created a password.<p>\n' \
           '</div>' % (uname, )
     opt_bar = '<nav>\n' \
-              '<a href="/Upload> File Upload </a>' \
+              '<a href="/Upload"> File Upload </a>' \
               '<a href="/Shares"> Shared Files </a>'\
               '<a href="/info"> Information </a>\n' \
               '<a href="/FAQ"> FAQ </a>\n' \
