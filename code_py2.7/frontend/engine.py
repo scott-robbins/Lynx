@@ -1,5 +1,4 @@
 from Crypto.Cipher import AES
-import network
 import base64
 import socket
 import utils
