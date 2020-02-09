@@ -32,6 +32,7 @@ def create_listener():
             created = True
         except socket.error:
             print '[!!] Error Creating Listener...'
+            os.system('sh ../kill_listeners.sh >> /dev/null 2>&1')
             time.sleep(12)
     print '[*] Listener Started'
     return s
@@ -73,9 +74,9 @@ def run(handler):
             if query[0] in server.actions.keys():
                 client = server.actions[query[0]](client, query, query[0], client_addr)
 
-            elif 'GET /inbox HTTP/1.1' in query and not new_client:
-                print '[*] Serving %s their inbox' % client_addr[0]
-
+            elif 'GET /inbox HTTP/1.1' in query and not new_client and not os.path.isfile('messages.txt'):
+                print '[*] %s is creating their inbox' % client_addr[0]
+                client.send(open('assets/empty_inbox.html','rb').read())
             # elif 'GET /info HTTP/1.1' in query:
             #     print '[*] Serving %s information' % client_addr[0]
             #     html_engine.display_information(client_addr[0], user_agent)
