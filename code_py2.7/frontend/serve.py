@@ -58,7 +58,9 @@ def run(handler):
         while running and (time.time() - tic) < runtime:
             client, client_addr = handler.accept()
             if client_addr[0] not in list(set(clients)):
+                d, l = create_timestamp()
                 new_client = True
+                open(log_file_name,'a').write('[*] %s has connected [%s]\n' % (client_addr[0], l))
             else:
                 new_client = False
             try:
@@ -111,6 +113,8 @@ def run(handler):
                 client.send(open('assets/faq.html', 'rb').read())
             # Login attempts TODO: Encrypt how credentials are sent over the wire
             if len(request.split('username=')) > 1:
+                d, l = create_timestamp()
+                open(log_file_name, 'a').write('[*] %s is attempting to login [%s]\n' % (client_addr[0], l))
                 uname = request.split('username=')[1].split('&')[0]
                 passwd = request.split('password=')[1].split('%')[0]
                 if uname in registered_users.keys() and registered_users[uname] == passwd:
@@ -125,7 +129,7 @@ def run(handler):
                     open(log_file_name, 'a').write('[!] %s FAILED to login as %s\n' % (client_addr[0], uname))
                     print '[*] Login failure for %s' % uname
                     client.send(open('login.html', 'rb').read())
-
+                    # open(log_file_name, 'a').write('[*] %s failed to login as %s [%s]\n' % (client_addr[0],uname,l))
             client.close()
             # HTTP 100 Continue: The server has received the request headers,
             # and the client should proceed to send the request body
