@@ -51,6 +51,13 @@ def defragment(n_frags, name):
     open('../SHARED/'+name, 'wb').write(raw_data)
 
 
+def check_active():
+    if not os.path.isfile('registered.txt'):
+        for u in utils.swap('registered.txt', False):
+            user = u.split('@')[0]
+            ip = u.split('@')[1].split('=')[0]
+            print 'checking if %s is active' % ip
+
 class QueryApi:
     t0 = 0
 
@@ -134,6 +141,10 @@ def listen_alt_channel(timeout):
     existing_users = utils.cmd('ls ../*.pass')
     print '[*] %d existing users' % len(existing_users)
     while running and (time.time()-tic) < timeout:
+
+        if int(time.time()-tic) % 5 == 0:
+            check_active()
+
         try:
             client, client_addr = listener.accept()
             raw_data = client.recv(1028).replace('\n','')
