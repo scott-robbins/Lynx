@@ -34,11 +34,7 @@ def show_active():
     peers = []
     if os.path.isfile('registered.txt'):
         peers = utils.swap('registered.txt', False)
-    if len(peers) >= 1:
-        n_peers = len(peers)
-    header = '<!DOCTYPE html>\n<html>\n <body>\n' \
-             '<div style="background-color:PowderBlue;color:white;padding:30px;">\n' \
-             '<h2> %d Active Nodes </h2>\n<ul>\n' % n_peers
+
     lines = {}
     for p in peers:
         try:
@@ -48,6 +44,10 @@ def show_active():
         except IndexError:
             break
             pass
+    n_peers = len(list(set(lines.keys())))
+    header = '<!DOCTYPE html>\n<html>\n <body>\n' \
+             '<div style="background-color:PowderBlue;color:white;padding:30px;">\n' \
+             '<h2> %d Active Nodes </h2>\n<ul>\n' % n_peers
     for name in list(set(lines.keys())):
         header += lines[name]
     header += '</ul>\n'
