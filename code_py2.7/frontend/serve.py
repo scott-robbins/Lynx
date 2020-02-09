@@ -139,7 +139,7 @@ class HttpServer:
         return c
 
     def display_peers(self, c, f, q, ci):
-        if ci in self.known:
+        if ci[0] in self.known:
             print '[*] Showing %s active peer list' % ci[0]
             content = html_engine.show_active()
             c.send(content)
