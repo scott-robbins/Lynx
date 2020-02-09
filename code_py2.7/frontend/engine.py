@@ -17,17 +17,16 @@ def refresh_registered_nodes():
         try:
             user = line.split('@')[0]
             ip   = line.split('@')[1].split('=')[0]
-            creds[ip] = line.split('=')[1]
+            creds[user] = line.split('=')[1]
             unames.append(user)
-            nodes[ip] = user
+            nodes[user] = ip
         except IndexError:
             pass
-    # nodes = list(set(nodes.keys()))
 
     os.remove('registered.txt')
     content = ''
     for n in nodes.keys():
-        content += '%s@%s=%s\n' % (nodes[n],n,creds[n])
+        content += '%s@%s=%s\n' % (n,nodes[n],creds[n])
     open('registered.txt', 'wb').write(content)
 
 
