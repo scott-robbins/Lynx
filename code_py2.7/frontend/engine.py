@@ -23,11 +23,7 @@ def refresh_registered_nodes():
         except IndexError:
             pass
     nodes = list(set(nodes))
-    unames = list(set(unames))
-    if len(nodes) != unames:
-        print '[!!] Error: Number of usernames and IP addresses is unequal...Shenanigans!'
-        print unames
-        print nodes
+
     os.remove('registered.txt')
     content = ''
     for n in nodes.keys():
@@ -100,7 +96,7 @@ def check_active():
             if online:
                 active.append(ip)
     print '[*] %d Peers are active' % len(active)
-    # refresh_registered_nodes()
+    refresh_registered_nodes()
     return active
 
 

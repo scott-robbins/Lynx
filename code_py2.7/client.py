@@ -119,8 +119,20 @@ if __name__ == '__main__':
 
     # Update/Sync with the P2P Cloud
     my_api_key = base64.b64encode(get_random_bytes(32))  # set api key
-    network.connect_send(cloud_gateway, 54123, username+' !!!! '+my_api_key, 10)
     cipher = AES.new(base64.b64decode(my_api_key))
+
+    if '-peer' not in sys.argv:
+        network.connect_send(cloud_gateway, 54123, username+' !!!! '+my_api_key, 10)
+    else:
+        ii = 0
+        for e in sys.argv:
+            if e != '-peer':
+                ii += 1
+            else:
+                ii = ii + 1
+                break
+        print 'synchronizing with PEER %s' % sys.argv[ii]
+        network.connect_send(sys.argv[ii],54123, username + ' !!!! ' + my_api_key, 10)
 
     if 'peers' in sys.argv:  # show registed peers using api key
         show_peers(my_api_key)
