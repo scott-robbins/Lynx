@@ -142,8 +142,7 @@ def listen_alt_channel(timeout):
     print '[*] %d existing users' % len(existing_users)
     while running and (time.time()-tic) < timeout:
 
-        if int(time.time()-tic) % 5 == 0:
-            check_active()
+        check_active()
 
         try:
             client, client_addr = listener.accept()
