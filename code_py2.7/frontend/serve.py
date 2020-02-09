@@ -74,24 +74,9 @@ def run(handler):
             if query[0] in server.actions.keys():
                 client = server.actions[query[0]](client, query, query[0], client_addr)
 
-            elif 'GET /inbox HTTP/1.1' in query and not new_client and not os.path.isfile('messages.txt'):
+            elif 'GET /Inbox HTTP/1.1' in query and not new_client and not os.path.isfile('messages.txt'):
                 print '[*] %s is creating their inbox' % client_addr[0]
                 client.send(open('assets/empty_inbox.html','rb').read())
-            # elif 'GET /info HTTP/1.1' in query:
-            #     print '[*] Serving %s information' % client_addr[0]
-            #     html_engine.display_information(client_addr[0], user_agent)
-            #     client.send(open('info.html', 'rb').read())
-            #     os.remove('info.html')
-            # elif 'GET /Shares HTTP/1.1' in query and not new_client:
-            #     print '[*] Serving %s html rendering of their local share folder' % client_addr[0]
-            #     client.send(html_engine.render_file_structure('../SHARED/'))
-            # elif 'GET /Upload HTTP/1.1' in query and not new_client:
-            #     print '[*] %s is uploading a file to the server' % client_addr[0]
-            #     client = html_engine.display_upload_page(client)
-            #     time.sleep(0.1)
-            # elif 'GET /FAQ HTTP/1.1' in query:
-            #     print '[*] Serving %s the FAQ page' % client_addr[0]
-            #     client.send(open('assets/faq.html', 'rb').read())
 
             # Login attempts
             if len(request.split('username=')) > 1:
@@ -122,7 +107,8 @@ class HttpServer:
                         'GET /Shares HTTP/1.1': self.get_shares,
                         'GET /FAQ HTTP/1.1': self.serve_faq,
                         'GET /Upload HTTP/1.1': self.upload_page,
-                        'GET /Peers HTTP/1.1': self.display_peers}
+                        'GET /Peers HTTP/1.1': self.display_peers,
+                        'GET /Inbox HTTP/1.1': self.show_mailbox}
 
     @staticmethod
     def get_user_agent(query):
@@ -148,6 +134,11 @@ class HttpServer:
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
             c.send(forbidden)
+        return c
+
+    @staticmethod
+    def show_mailbox(c,f,g,ci):
+        c.send(html_engine.show_inbox_in())
         return c
 
     @staticmethod

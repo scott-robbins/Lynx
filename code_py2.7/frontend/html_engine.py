@@ -24,6 +24,7 @@ def generate_success(uname):
               '<a href="/info"> Information </a>\n' \
               '<a href="/FAQ"> FAQ </a>\n' \
               '<a href="/Peers"> Active Peers </a>\n'\
+              '<a href="/Inbox"> Messages </a>\n'\
               '</nav>'
     footer = '<body>\n</html>'
     content = header+opt_bar+box+footer
