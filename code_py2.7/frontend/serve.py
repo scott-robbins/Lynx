@@ -216,11 +216,14 @@ class HttpServer:
             pass
         return c
 
-    @staticmethod
-    def upload_page(c, f, q, c_addr):
-        print '[*] %s is uploading a file to the server' % c_addr[0]
-        c = html_engine.display_upload_page(c)
-        time.sleep(0.1)
+    def upload_page(self, c, f, q, c_addr):
+        if c_addr[0] in self.known:
+            print '[*] %s is uploading a file to the server' % c_addr[0]
+            c = html_engine.display_upload_page(c)
+            time.sleep(0.1)
+        else:
+            forbidden = open('assets/forbidden.html', 'rb').read()
+            c.send(forbidden)
         return c
 
 
