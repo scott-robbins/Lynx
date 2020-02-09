@@ -47,6 +47,81 @@ def defragment(n_frags, name):
     open('../SHARED/'+name, 'wb').write(raw_data)
 
 
+class QueryApi:
+    t0 = 0
+
+    def __init__(self, start):
+        self.t0 = start
+
+    @staticmethod
+    def show_peers(client, clients, raw, decrypted_query):
+        # TODO: socket error handling
+        cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
+        print '[*] Decrypted Query: %s' % decrypted_query
+        try:
+            if decrypted_query == 'show_peers':
+                reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
+                encrypted_content = utils.EncodeAES(cipher, reply)
+                client.send(encrypted_content)
+            else:
+                return client
+        except IndexError:
+            print '[!!] Error Decrypting Check Peers Command from %s' % clients[raw.split(' ???? ')[0]]
+        return client
+
+    @staticmethod
+    def show_shared_files(client, raw, decrypted_query):
+        # TODO: socket error handling
+        cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
+        get_shares = 'ls ../SHARED | while read n; do sha256sum ../SHARED/$n >> files.txt; done'
+        try:
+            if decrypted_query == 'show_shares':
+                os.system(get_shares)
+                client.send(utils.EncodeAES(cipher, utils.arr2lines(utils.swap('files.txt', True))))
+            else:
+                return client
+        except IndexError:
+            pass
+        return client
+
+    @staticmethod
+    def file_upload(client, client_ip,raw, decrypted_query):
+        # TODO: socket error handling
+        cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
+        try:
+            if 'PUT' in decrypted_query.split('_'):
+                max_size = 2000
+                name = decrypted_query.split('_')[1]
+                size = int(decrypted_query.split('_')[2])
+                if size < max_size:
+                    print '[*] %s is uploading %d bytes' % (client_ip, size)
+                    client.send(utils.EncodeAES(cipher, 'YES'))
+                    raw_data = client.recv(size)
+                    print '[*] %d Encrypted Bytes Received' % len(raw_data)
+                    if len(raw_data) > 0:
+                        try:
+                            dec_data = utils.DecodeAES(cipher, raw_data)
+                            open('../SHARED/%s' % name, 'wb').write(dec_data)
+                        except ValueError:
+                            print '[!!] Failed to decrypt data'
+                            pass
+                else:
+                    client.send(utils.EncodeAES(cipher, 'NO'))
+            elif 'GET' in decrypted_query.split('_'):
+                name = '../SHARED/' + decrypted_query.split('_')[1]
+                if os.path.isfile(name):
+                    size = os.path.isfile(name)
+                    print '[*] %s is requesting %s [%d bytes]' % (client_ip,
+                                                                  name, size)
+                    enc_data = utils.EncodeAES(cipher, open(name, 'rb').read())
+                    client.send(enc_data)
+            else:
+                return client
+        except IndexError:
+            pass
+        return client
+
+
 def listen_alt_channel(timeout):
     clients = {}
     # TODO: Create a log file for this alternate channel
@@ -65,62 +140,23 @@ def listen_alt_channel(timeout):
             if len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
-                print '[*] Decrypted Query: %s' % decrypted_query
-                # Check for check peer names command
-                try:
 
-                    if decrypted_query == 'show_peers':
-                        reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
-                        encrypted_content = utils.EncodeAES(cipher, reply)
-                        client.send(encrypted_content)
-                except IndexError:
-                    print '[!!] Error Decrypting Check Peers Command from %s' % clients[raw_data.split(' ???? ')[0]]
+                # Display peer names command
+                client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 
                 # Check for show shares command
-                try:
-                    if decrypted_query == 'show_shares':
-                        get_shares = 'ls ../SHARED | while read n; do sha256sum ../SHARED/$n >> files.txt; done'
-                        os.system(get_shares)
-                        clear_reply = utils.arr2lines(utils.swap('files.txt', True))
-                        client.send(utils.EncodeAES(cipher, clear_reply))
-                except IndexError:
-                    pass
+                client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
+
                 if 'fragments' in decrypted_query.split(':'):
                     N = decrypted_query.split(':')[1].split(' = ')[0]
                     name_out = decrypted_query.split(' = ')[1]
                     print '[*] %s is requesting fragmented file re-assembly of %s fragments' %\
                           (client_addr[0], N)
                     defragment(int(N), name_out)
+
                 # Upload file
-                try:
-                    if 'PUT' in decrypted_query.split('_'):
-                        max_size = 2000
-                        name = decrypted_query.split('_')[1]
-                        size = int(decrypted_query.split('_')[2])
-                        if size < max_size:
-                            print '[*] %s is uploading %d bytes' % (client_addr[0], size)
-                            client.send(utils.EncodeAES(cipher, 'YES'))
-                            raw_data = client.recv(size)
-                            print '[*] %d Encrypted Bytes Received' % len(raw_data)
-                            if len(raw_data) > 0:
-                                try:
-                                    dec_data = utils.DecodeAES(cipher, raw_data)
-                                    open('../SHARED/%s' % name, 'wb').write(dec_data)
-                                except ValueError:
-                                    print '[!!] Failed to decrypt data'
-                                    pass
-                        else:
-                            client.send(utils.EncodeAES(cipher, 'NO'))
-                    elif 'GET' in decrypted_query.split('_'):
-                        name = '../SHARED/'+decrypted_query.split('_')[1]
-                        if os.path.isfile(name):
-                            size = os.path.isfile(name)
-                            print '[*] %s is requesting %s [%d bytes]' % (client_addr[0],
-                                                                          name, size)
-                            enc_data = utils.EncodeAES(cipher, open(name, 'rb').read())
-                            client.send(enc_data)
-                except IndexError:
-                    pass
+                client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
+
             # Check for add user command
             check_for_add_user_cmd(raw_data,client_addr, existing_users)
 
