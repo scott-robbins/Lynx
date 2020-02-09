@@ -39,7 +39,7 @@ def show_active():
     header = '<!DOCTYPE html>\n<html>\n <body>\n' \
              '<div style="background-color:PowderBlue;color:white;padding:30px;">\n' \
              '<h2> %d Active Nodes </h2>\n<ul>\n' % n_peers
-    for p in peers:
+    for p in list(set(peers)):
         try:
             uname = p.split('@')[0]
             addrs = p.split('@')[1].split('=')[0]

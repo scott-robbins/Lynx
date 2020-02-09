@@ -180,6 +180,7 @@ class QueryApi:
 
 def listen_alt_channel(timeout):
     clients = {}
+    refresh_registered_nodes()
     # TODO: Create a log file for this alternate channel
     tic = time.time(); running = True
     listener = utils.start_listener(54123, timeout)
