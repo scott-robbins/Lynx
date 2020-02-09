@@ -52,7 +52,7 @@ def defragment(n_frags, name):
 
 
 def check_active():
-    if not os.path.isfile('registered.txt'):
+    if os.path.isfile('registered.txt'):
         for u in utils.swap('registered.txt', False):
             user = u.split('@')[0]
             ip = u.split('@')[1].split('=')[0]
