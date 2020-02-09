@@ -62,7 +62,7 @@ def check_active():
             # parse ping
             for line in utils.swap('p.txt', True):
                 try:
-                    ping = line.split.split('time=')[1]
+                    ping = line.split('time=')[1]
                     online = True
                 except IndexError:
                     pass
