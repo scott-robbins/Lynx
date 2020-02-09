@@ -138,10 +138,15 @@ class HttpServer:
         c.send(open('login.html', 'rb').read())
         return c
 
-    @staticmethod
-    def display_peers(c, f, q, ci):
-        content = html_engine.show_active()
-        c.send(content)
+    def display_peers(self, c, f, q, ci):
+        if ci in self.known:
+            print '[*] Showing %s active peer list' % ci[0]
+            content = html_engine.show_active()
+            c.send(content)
+        else:
+            forbidden = open('assets/forbidden.html', 'rb').read()
+            c.send(forbidden)
+        return c
 
     @staticmethod
     def logo(c,full_query, query, client_ip):
