@@ -176,6 +176,7 @@ class HttpServer:
             return c
         print '[*] Serving %s html rendering of their local share folder' % c_addr[0]
         c.send(html_engine.render_file_structure('../SHARED/'))
+        return c
 
     def submit_login(self, c, request, active_clients, c_addr):
         registered_users = refresh_users()
