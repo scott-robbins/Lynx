@@ -30,7 +30,7 @@ def refresh_registered_nodes():
         print nodes
     os.remove('registered.txt')
     content = ''
-    for n in nodes.exchange_keys():
+    for n in nodes.keys():
         content += '%s@%s=%s\n' % (nodes[n],n,creds[n])
     open('registered.txt', 'wb').write(content)
 
