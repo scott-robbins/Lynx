@@ -26,7 +26,8 @@ def refresh_registered_nodes():
     unames = list(set(unames))
     if len(nodes) != unames:
         print '[!!] Error: Number of usernames and IP addresses is unequal...Shenanigans!'
-        exit()
+        print unames
+        print nodes
     os.remove('registered.txt')
     content = ''
     for n in nodes.exchange_keys():
