@@ -128,7 +128,7 @@ def render_file_structure(file_path):
 def show_inbox_in():
     if not os.path.isfile('inbox.txt'):
         os.system('touch inbox.txt')
-        return open('empty_inbox', 'rb').read()
+        return open('assets/empty_inbox.html', 'rb').read()
     else:
         head = '<! DOCTYPE html>\n<html lang="en">\n<head>\n' \
                '\t<meta charset="UTF-8">\n' \
