@@ -21,11 +21,35 @@ def generate_success(uname):
               '<a href="/Shares"> Shared Files </a>'\
               '<a href="/info"> Information </a>\n' \
               '<a href="/FAQ"> FAQ </a>\n' \
+              '<a href="/Peers"> Active Peers </a>\n'\
               '</nav>'
     footer = '<body>\n</html>'
     content = header+opt_bar+box+footer
     open(page_name, 'wb').write(content)
     return page_name
+
+
+def show_active():
+    n_peers = 0
+    peers = []
+    if os.path.isfile('registered.txt'):
+        peers = utils.swap('registered.txt', False)
+    if len(peers) >= 1:
+        n_peers = len(peers)
+    header = '<!DOCTYPE html>\n<html>\n <body>\n' \
+             '<div style="background-color:PowderBlue;color:white;padding:30px;">\n' \
+             '<h2> %d Active Nodes </h2>\n<ul>\n' % n_peers
+    for p in peers:
+        try:
+            uname = p.split('@')[0]
+            addrs = p.split('@')[1].split('=')[0]
+            header += '<li> User: %s    IP: %s</li>\n' % (uname, addrs)
+        except IndexError:
+            break
+            pass
+    header += '</ul>\n'
+    footer = '<body>\n</html>'
+    return header + footer
 
 
 def display_information(client_addr, user_agent):

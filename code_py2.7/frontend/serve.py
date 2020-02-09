@@ -119,7 +119,8 @@ class HttpServer:
                         'GET /info HTTP/1.1': self.show_info,
                         'GET /Shares HTTP/1.1': self.get_shares,
                         'GET /FAQ HTTP/1.1': self.serve_faq,
-                        'GET /Upload HTTP/1.1': self.upload_page}
+                        'GET /Upload HTTP/1.1': self.upload_page,
+                        'GET /Peers HTTP/1.1': self.display_peers}
 
     @staticmethod
     def get_user_agent(query):
@@ -138,6 +139,11 @@ class HttpServer:
         return c
 
     @staticmethod
+    def display_peers(c, f, q, ci):
+        content = html_engine.show_active()
+        c.send(content)
+
+    @staticmethod
     def logo(c,full_query, query, client_ip):
         c.send(open('assets/img/logo.png', 'rb').read())
         try:
@@ -154,7 +160,7 @@ class HttpServer:
         return c
 
     @staticmethod
-    def pause(a,b,c,d):
+    def pause(a, b, c, d):
         time.sleep(0.1)
         return a
 
@@ -197,7 +203,7 @@ class HttpServer:
         return c
 
     @staticmethod
-    def serve_faq(c,f,q,c_addr):
+    def serve_faq(c, f, q, c_addr):
         print '[*] Serving %s the FAQ page' % c_addr[0]
         try:
             c.send(open('assets/faq.html', 'rb').read())
@@ -206,11 +212,12 @@ class HttpServer:
         return c
 
     @staticmethod
-    def upload_page(c,f,q,c_addr):
+    def upload_page(c, f, q, c_addr):
         print '[*] %s is uploading a file to the server' % c_addr[0]
         c = html_engine.display_upload_page(c)
         time.sleep(0.1)
         return c
+
 
 if __name__ == '__main__':
     runtime = 3600 * 24  # While under development the server(s) only run for 1 day each trial
