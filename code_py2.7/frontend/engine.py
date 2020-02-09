@@ -15,6 +15,10 @@ def exchange_keys(raw_query, cls, c):
         cls[api_key] = username
     except IndexError:
         print '[!!] Error during key exchange with %s' % c[0]
+        return cls
+    # Log this
+    msg = '%s@%s=%s\n' % (username, c[0], api_key)
+    open('registered.txt', 'wb').write(msg)
     return cls
 
 
