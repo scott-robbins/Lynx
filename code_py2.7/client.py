@@ -32,6 +32,7 @@ def get_cloud_ip():
 
 
 def initialize_keys(private_ip):
+    print private_ip
     key_file_name = private_ip.replace('.', '-') + '.pem' # TODO: Should this be public or private ip?
     priv = utils.load_private_key(key_file_name)
     pub = priv.publickey()
@@ -102,10 +103,11 @@ if __name__ == '__main__':
     # Register locally
     cloud_gateway = get_cloud_ip()
     # - [1] Create/Load Local Private Key
-    private_key, public_key, shared_files = initialize_keys(private)
+    private_key, public_key, shared_files = initialize_keys(public)
     # - [3] Create Key and Credentials
     if not utils.cmd('ls *.pass'):
-        login_data, username = create_username(private.replace('.','-')+'.pem')
+        print private
+        login_data, username = create_username(public.replace('.','-')+'.pem')
         # Register With Main Cloud Server
         network.connect_send(cloud_gateway, 54123, '../' + username + ' :::: ' + open(username + '.pass', 'rb').read(), 10)
     else:
@@ -157,3 +159,14 @@ if __name__ == '__main__':
 
     # TODO: make utility fcn that tests up/down breakpoint on file size
     #  (until I can figure out how to prevent it)
+
+    if 'register' in sys.argv:
+        public, private, nic_name = utils.get_nx_info(verbose=False)
+        # Register locally
+        cloud_gateway = get_cloud_ip()
+        # - [1] Create/Load Local Private Key
+        private_key, public_key, shared_files = initialize_keys(private)
+        login_data, username = create_username(private.replace('.', '-') + '.pem')
+        # Register With Main Cloud Server
+        network.connect_send(cloud_gateway, 54123, '../' + username + ' :::: ' + open(username + '.pass', 'rb').read(),
+                             10)

@@ -52,11 +52,25 @@ def defragment(n_frags, name):
 
 
 def check_active():
+    active = []
     if os.path.isfile('registered.txt'):
         for u in utils.swap('registered.txt', False):
             user = u.split('@')[0]
             ip = u.split('@')[1].split('=')[0]
-            print 'checking if %s is active' % ip
+            os.system('ping -c 1 %s >> p.txt' % ip)
+            online = False
+            # parse ping
+            for line in utils.swap('p.txt', True):
+                try:
+                    ping = line.split.split('time=')[1]
+                    online = True
+                except IndexError:
+                    pass
+            if online:
+                active.append(ip)
+    print '[*] %d Peers are active' % len(active)
+    return active
+
 
 class QueryApi:
     t0 = 0
