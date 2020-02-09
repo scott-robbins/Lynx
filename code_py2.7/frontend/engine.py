@@ -22,7 +22,7 @@ def refresh_registered_nodes():
             nodes[ip] = user
         except IndexError:
             pass
-    nodes = list(set(nodes))
+    # nodes = list(set(nodes.keys()))
 
     os.remove('registered.txt')
     content = ''
