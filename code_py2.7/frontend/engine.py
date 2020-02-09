@@ -18,7 +18,10 @@ def exchange_keys(raw_query, cls, c):
         return cls
     # Log this
     msg = '%s@%s=%s\n' % (username, c[0], api_key)
-    open('registered.txt', 'wb').write(msg)
+    if not os.path.isfile('registered.txt'):
+        open('registered.txt', 'wb').write(msg)
+    else:
+        open('registered.txt', 'a').write(msg)
     return cls
 
 
