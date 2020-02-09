@@ -115,7 +115,8 @@ class HttpServer:
         self.tic = time.time()
         self.actions = {'GET / HTTP/1.1': self.home_page,
                         'GET /assets/img/logo.png HTTP/1.1': self.logo,
-                        'GET /favicon.ico HTTP/1.1': self.pause,
+                        'GET img/logo.png HTTP/1.1': self.logo,
+                        'GET /favicon.ico HTTP/1.1': self.logo,
                         'POST / HTTP/1.1': self.login,
                         'GET /info HTTP/1.1': self.show_info,
                         'GET /Shares HTTP/1.1': self.get_shares,
