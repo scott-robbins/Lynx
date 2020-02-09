@@ -7,6 +7,33 @@ import sys
 import os
 
 
+def refresh_registered_nodes():
+    if not os.path.isfile('registered.txt'):
+        return
+    nodes = {}
+    unames = []
+    creds = {}
+    for line in utils.swap('registered.txt', False):
+        try:
+            user = line.split('@')[0]
+            ip   = line.split('@')[1].split('=')[0]
+            creds[ip] = line.split('=')[1]
+            unames.append(user)
+            nodes[ip] = user
+        except IndexError:
+            pass
+    nodes = list(set(nodes))
+    unames = list(set(unames))
+    if len(nodes) != unames:
+        print '[!!] Error: Number of usernames and IP addresses is unequal...Shenanigans!'
+        exit()
+    os.remove('registered.txt')
+    content = ''
+    for n in nodes.exchange_keys():
+        content += '%s@%s=%s\n' % (nodes[n],n,creds[n])
+    open('registered.txt', 'wb').write(content)
+
+
 def exchange_keys(raw_query, cls, c):
     username = raw_query.split(' !!!! ')[0]
     print '[*] API_KEY Received from %s' % c[0]
@@ -72,6 +99,7 @@ def check_active():
             if online:
                 active.append(ip)
     print '[*] %d Peers are active' % len(active)
+    refresh_registered_nodes()
     return active
 
 
