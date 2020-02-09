@@ -39,14 +39,17 @@ def show_active():
     header = '<!DOCTYPE html>\n<html>\n <body>\n' \
              '<div style="background-color:PowderBlue;color:white;padding:30px;">\n' \
              '<h2> %d Active Nodes </h2>\n<ul>\n' % n_peers
-    for p in list(set(peers)):
+    lines = {}
+    for p in peers:
         try:
             uname = p.split('@')[0]
             addrs = p.split('@')[1].split('=')[0]
-            header += '<li> User: %s    IP: %s</li>\n' % (uname, addrs)
+            lines[uname] = '<li> User: %s    IP: %s</li>\n' % (uname, addrs)
         except IndexError:
             break
             pass
+    for name in list(set(lines.keys())):
+        header += lines[name]
     header += '</ul>\n'
     footer = '<body>\n</html>'
     return header + footer
