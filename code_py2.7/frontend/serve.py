@@ -32,7 +32,7 @@ def create_listener():
             created = True
         except socket.error:
             print '[!!] Error Creating Listener...'
-            time.sleep(10)
+            time.sleep(12)
     print '[*] Listener Started'
     return s
 
@@ -50,12 +50,14 @@ def refresh_users():
 
 
 def run(handler):
+    # Start HTTP Server
+    server = HttpServer()
     clients = []
     active_clients = {}
     running = True
     # Accept incoming requests
     try:
-        while running and (time.time() - tic) < runtime:
+        while running and (time.time() - server.tic) < runtime:
             client, client_addr = handler.accept()
             if client_addr[0] not in list(set(clients)):
                 new_client = True
@@ -66,79 +68,148 @@ def run(handler):
             except socket.error:
                 print '[*] %s disconnected unexpectedly' % client_addr[0]
                 continue
-            registered_users = refresh_users()
-            user_agent = ''
-            for ln in request.split('\r\n'):
-                if 'User-Agent:' in ln.split(' '):
-                    try:
-                        user_agent = ln.split('User-Agent:')[1].replace('\n', '')
-                    except IndexError:
-                        pass
 
-            # Serve login page to new connections, and handle logins
-            if 'GET / HTTP/1.1' in request.split('\r\n'):
-                client.send(open('login.html', 'rb').read())
-            # Display logo
-            elif 'GET /assets/img/logo.png HTTP/1.1' in request.split('\r\n'):
-                client.send(open('assets/img/logo.png', 'rb').read())
-                try:
-                    os.remove('info.html')
-                except OSError:
-                    continue
-            # Display information about downloading the client
-            elif 'GET /favicon.ico HTTP/1.1' in request.split('\r\n'):
-                time.sleep(0.1)
-            elif 'POST / HTTP/1.1' in request.split('\r\n'):
-                open(log_file_name, 'a').write('[*] %s is submitting login information.\nUser Agent: %s\n' %
-                                               (client_addr[0], user_agent))
-            elif 'GET /inbox HTTP/1.1' in request.split('\r\n') and not new_client:
+            query = request.split('\r\n')
+            if query[0] in server.actions.keys():
+                client = server.actions[query[0]](client, query, query[0], client_addr)
+
+            elif 'GET /inbox HTTP/1.1' in query and not new_client:
                 print '[*] Serving %s their inbox' % client_addr[0]
 
-            elif 'GET /info HTTP/1.1' in request.split('\r\n'):
-                print '[*] Serving %s information' % client_addr[0]
-                html_engine.display_information(client_addr[0], user_agent)
-                client.send(open('info.html', 'rb').read())
-                os.remove('info.html')
-            elif 'GET /Shares HTTP/1.1' in request.split('\r\n') and not new_client:
-                print '[*] Serving %s html rendering of their local share folder' % client_addr[0]
-                client.send(html_engine.render_file_structure('../SHARED/'))
-            elif 'GET /Upload HTTP/1.1' in request.split('\r\n') and not new_client:
-                print '[*] %s is uploading a file to the server' % client_addr[0]
-                client = html_engine.display_upload_page(client)
-                time.sleep(0.1)
-            elif 'GET /FAQ HTTP/1.1' in request.split('\r\n'):
-                print '[*] Serving %s the FAQ page' % client_addr[0]
-                client.send(open('assets/faq.html', 'rb').read())
-            # Login attempts TODO: Encrypt how credentials are sent over the wire
-            if len(request.split('username=')) > 1:
-                uname = request.split('username=')[1].split('&')[0]
-                passwd = request.split('password=')[1].split('%')[0]
-                if uname in registered_users.keys() and registered_users[uname] == passwd:
-                    print '\033[1m[*] %s Has Logged in Successfully from %s\033[0m' % (uname, client_addr[0])
-                    open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (client_addr[0], uname))
-                    active_clients[uname] = [passwd]
-                    clients.append(client_addr[0])
-                    success_page = html_engine.generate_success(uname)
-                    client.send(open(success_page, 'rb').read())
-                    os.remove(success_page)
-                else:
-                    open(log_file_name, 'a').write('[!] %s FAILED to login as %s\n' % (client_addr[0], uname))
-                    print '[*] Login failure for %s' % uname
-                    client.send(open('login.html', 'rb').read())
+            # elif 'GET /info HTTP/1.1' in query:
+            #     print '[*] Serving %s information' % client_addr[0]
+            #     html_engine.display_information(client_addr[0], user_agent)
+            #     client.send(open('info.html', 'rb').read())
+            #     os.remove('info.html')
+            # elif 'GET /Shares HTTP/1.1' in query and not new_client:
+            #     print '[*] Serving %s html rendering of their local share folder' % client_addr[0]
+            #     client.send(html_engine.render_file_structure('../SHARED/'))
+            # elif 'GET /Upload HTTP/1.1' in query and not new_client:
+            #     print '[*] %s is uploading a file to the server' % client_addr[0]
+            #     client = html_engine.display_upload_page(client)
+            #     time.sleep(0.1)
+            # elif 'GET /FAQ HTTP/1.1' in query:
+            #     print '[*] Serving %s the FAQ page' % client_addr[0]
+            #     client.send(open('assets/faq.html', 'rb').read())
 
+            # Login attempts
+            if len(request.split('username=')) > 1:
+                server.submit_login(client,request,active_clients,client_addr)
+
+            # Close client connection
             client.close()
-            # HTTP 100 Continue: The server has received the request headers,
-            # and the client should proceed to send the request body
-            #
-            # HTTP 200 OK: The request is OK (this is the standard response for successful HTTP requests)
 
     except KeyboardInterrupt:
         print '[!!] Server Killed'
         os.system('sh ../kill_listeners.sh >> /dev/null 2>&1')
-        running = False
         pass
     handler.close()
 
+
+class HttpServer:
+    tic = 0
+    known = []
+
+    def __init__(self):
+        self.tic = time.time()
+        self.actions = {'GET / HTTP/1.1': self.home_page,
+                        'GET /assets/img/logo.png HTTP/1.1': self.logo,
+                        'GET /favicon.ico HTTP/1.1': self.pause,
+                        'POST / HTTP/1.1': self.login,
+                        'GET /info HTTP/1.1': self.show_info,
+                        'GET /Shares HTTP/1.1': self.get_shares,
+                        'GET /FAQ HTTP/1.1': self.serve_faq,
+                        'GET /Upload HTTP/1.1': self.upload_page}
+
+    @staticmethod
+    def get_user_agent(query):
+        user_agent = ''
+        for ln in query:
+            if 'User-Agent:' in ln.split(' '):
+                try:
+                    user_agent = ln.split('User-Agent:')[1].replace('\n', '')
+                except IndexError:
+                    pass
+        return user_agent
+
+    def home_page(self, c, full_query, query, client_ip):
+        print '[*] Serving homepage to %s' % client_ip[0]
+        c.send(open('login.html', 'rb').read())
+        return c
+
+    @staticmethod
+    def logo(c,full_query, query, client_ip):
+        c.send(open('assets/img/logo.png', 'rb').read())
+        try:
+            os.remove('info.html')
+        except OSError:
+            pass
+        return c
+
+    @staticmethod
+    def login(c, full_query, query, client_ip):
+        user_agent = ''.join(full_query[1:3])
+        open(log_file_name, 'a').write('[*] %s is submitting login information.\nUser Agent: %s\n' %
+                                       (client_ip[0], user_agent))
+        return c
+
+    @staticmethod
+    def pause(a,b,c,d):
+        time.sleep(0.1)
+        return a
+
+    @staticmethod
+    def show_info(c, f, q, client_addr):
+        user_agent = ''.join(q[1:3])
+        print '[*] Serving %s information' % client_addr[0]
+        html_engine.display_information(client_addr[0], user_agent)
+        c.send(open('info.html', 'rb').read())
+        os.remove('info.html')
+        return c
+
+    def get_shares(self, c, f, q, c_addr):
+        if c_addr[0] not in self.known:
+            print self.known
+            msg = '[!!] %s Has NOT LOGGED IN and tried to access Shared/ Files page\n' % c_addr[0]
+            print msg
+            open(log_file_name, 'a').write(msg)
+            return c
+        print '[*] Serving %s html rendering of their local share folder' % c_addr[0]
+        c.send(html_engine.render_file_structure('../SHARED/'))
+
+    def submit_login(self, c, request, active_clients, c_addr):
+        registered_users = refresh_users()
+        uname = request.split('username=')[1].split('&')[0]
+        passwd = request.split('password=')[1].split('%')[0]
+        if uname in registered_users.keys() and registered_users[uname] == passwd:
+            print '\033[1m[*] %s Has Logged in Successfully from %s\033[0m' % (uname, c_addr[0])
+            open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (c_addr[0], uname))
+            active_clients[uname] = [passwd]
+            self.known.append(c_addr[0])
+            success_page = html_engine.generate_success(uname)
+            c.send(open(success_page, 'rb').read())
+            os.remove(success_page)
+        else:
+            open(log_file_name, 'a').write('[!] %s FAILED to login as %s\n' % (c_addr[0], uname))
+            print '[*] Login failure for %s' % uname
+            c.send(open('login.html', 'rb').read())
+        return c
+
+    @staticmethod
+    def serve_faq(c,f,q,c_addr):
+        print '[*] Serving %s the FAQ page' % c_addr[0]
+        try:
+            c.send(open('assets/faq.html', 'rb').read())
+        except socket.error:
+            pass
+        return c
+
+    @staticmethod
+    def upload_page(c,f,q,c_addr):
+        print '[*] %s is uploading a file to the server' % c_addr[0]
+        c = html_engine.display_upload_page(c)
+        time.sleep(0.1)
+        return c
 
 if __name__ == '__main__':
     runtime = 3600 * 24  # While under development the server(s) only run for 1 day each trial
@@ -153,8 +224,6 @@ if __name__ == '__main__':
     # Start listener daemon for new user credential uploads
     os.system('$(python engine.py -l %d) & ' % runtime)
 
-    # Start HTTP Server
-    tic = time.time()
     # Start a listening socket on port 80
     run(create_listener())
 
