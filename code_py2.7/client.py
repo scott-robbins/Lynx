@@ -92,7 +92,15 @@ def send_message(mykey, sender, receiver, data):
     enc_send_query = mykey+' ???? '+enc_send_request
     clear_content = '%s->%s: %s' % (sender, receiver, data)
     enc_content = utils.EncodeAES(c, clear_content)
-    network.connect_receive_send(cloud_gateway,54123,enc_send_query,enc_content, c)
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((cloud_gateway, 54123))
+        s.send(enc_send_query)
+        s.send(enc_content)
+    except socket.error:
+        print '[!!] Connection Error: Unable to Send Message to %s' % receiver
+        pass
+    s.close()
 
 
 if __name__ == '__main__':
