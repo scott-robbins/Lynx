@@ -132,6 +132,7 @@ class QueryApi:
                 enc_data = client.recv(1500000)
                 print ' [*] Message Received!'
                 decrypted_data = utils.DecodeAES(cipher, enc_data)
+                print decrypted_data
                 open('messages.txt', 'a').write(decrypted_data)
         except IndexError:
             print '[!!] Message Handler Error'
