@@ -94,6 +94,7 @@ def send_message(mykey, sender, receiver, data):
     if utils.DecodeAES(c, enc_status) == 'READY':
         clear_content = '%s->%s: %s' % (sender, receiver, data)
         enc_content = utils.EncodeAES(c, clear_content)
+        network.connect_send(cloud_gateway, 54123, enc_content, 10)
 
 
 if __name__ == '__main__':
