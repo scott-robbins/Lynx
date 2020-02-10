@@ -86,6 +86,16 @@ def show_shared(mykey):
     return remote_shares
 
 
+def send_message(mykey, sender, receiver, data):
+    c = AES.new(base64.b64decode(mykey))
+    enc_send_request = utils.EncodeAES(c, 'send_message')
+    enc_send_query = mykey+' ???? '+enc_send_request
+    enc_status = network.connect_receive(cloud_gateway, 54123, enc_send_query, 10)
+    if utils.DecodeAES(c, enc_status) == 'READY':
+        clear_content = '%s->%s: %s' % (sender, receiver, data)
+        enc_content = utils.EncodeAES(c, clear_content)
+
+
 if __name__ == '__main__':
     verbose = True  # TODO: DEBUG setting
     date, localtime = utils.create_timestamp()
@@ -167,10 +177,7 @@ if __name__ == '__main__':
 
     if 'get' in sys.argv and len(sys.argv) >= 3:
         n = sys.argv[2]
-        get_file(n,my_api_key)     # TODO: This breaking for some reason after about 2.5kB
-
-    # TODO: make utility fcn that tests up/down breakpoint on file size
-    #  (until I can figure out how to prevent it)
+        get_file(n,my_api_key)
 
     if 'register' in sys.argv:
         public, private, nic_name = utils.get_nx_info(verbose=False)
@@ -180,5 +187,17 @@ if __name__ == '__main__':
         private_key, public_key, shared_files = initialize_keys(private)
         login_data, username = create_username(private.replace('.', '-') + '.pem')
         # Register With Main Cloud Server
-        network.connect_send(cloud_gateway, 54123, '../' + username + ' :::: ' + open(username + '.pass', 'rb').read(),
-                             10)
+        network.connect_send(cloud_gateway, 54123, '../'+username+' :::: '+open(username+'.pass', 'rb').read(), 10)
+
+    if 'send' in sys.argv:
+        sender = raw_input('Enter Username: \n')
+        receiver = raw_input('Enter Recipient: \n')
+        msg = False; file_transfer = False
+        if raw_input('Do you want to send a message? (Y/N):\n').upper()=='Y':
+            msg = True
+        if not msg:
+            if raw_input('Do you want to send a file (Y/N)?:\n')=='Y':
+                file_transfer = True
+        if not msg and not file_transfer:
+            print '** Incorrect Usage!! **'
+            exit()
