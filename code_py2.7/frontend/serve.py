@@ -94,7 +94,7 @@ def run(handler):
 
 class HttpServer:
     tic = 0
-    known = []
+    known = {}
 
     def __init__(self):
         self.tic = time.time()
@@ -109,7 +109,8 @@ class HttpServer:
                         'GET /Upload HTTP/1.1': self.upload_page,
                         'GET /Peers HTTP/1.1': self.display_peers,
                         'GET /Inbox HTTP/1.1': self.show_mailbox,
-                        'GET /Mailbox HTTP/1.1': self.show_mailbox}
+                        'GET /Mailbox HTTP/1.1': self.show_mailbox,
+                        'GET /index.html HTTP/1.1': self.home_page}
 
     @staticmethod
     def get_user_agent(query):
@@ -124,11 +125,16 @@ class HttpServer:
 
     def home_page(self, c, full_query, query, client_ip):
         print '[*] Serving homepage to %s' % client_ip[0]
-        c.send(open('login.html', 'rb').read())
+        if client_ip in self.known.values():
+            success_page = html_engine.generate_success(self.known[client_ip])
+            c.send(open(success_page, 'rb').read())
+            os.remove(success_page)
+        else:
+            c.send(open('login.html', 'rb').read())
         return c
 
     def display_peers(self, c, f, q, ci):
-        if ci[0] in self.known:
+        if ci[0] in self.known.keys():
             print '[*] Showing %s active peer list' % ci[0]
             content = html_engine.show_active()
             c.send(content)
@@ -173,7 +179,7 @@ class HttpServer:
         return c
 
     def get_shares(self, c, f, q, c_addr):
-        if c_addr[0] not in self.known:
+        if c_addr[0] not in self.known.keys():
             print self.known
             msg = '[!!] %s Has NOT LOGGED IN and tried to access Shared/ Files page\n' % c_addr[0]
             print msg
@@ -191,7 +197,7 @@ class HttpServer:
             print '\033[1m[*] %s Has Logged in Successfully from %s\033[0m' % (uname, c_addr[0])
             open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (c_addr[0], uname))
             active_clients[uname] = [passwd]
-            self.known.append(c_addr[0])
+            self.known.append[c_addr[0]] = uname
             success_page = html_engine.generate_success(uname)
             c.send(open(success_page, 'rb').read())
             os.remove(success_page)
@@ -211,7 +217,7 @@ class HttpServer:
         return c
 
     def upload_page(self, c, f, q, c_addr):
-        if c_addr[0] in self.known:
+        if c_addr[0] in self.known.keys():
             print '[*] %s is uploading a file to the server' % c_addr[0]
             c = html_engine.display_upload_page(c)
             time.sleep(0.1)
