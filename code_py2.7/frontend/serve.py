@@ -108,7 +108,8 @@ class HttpServer:
                         'GET /FAQ HTTP/1.1': self.serve_faq,
                         'GET /Upload HTTP/1.1': self.upload_page,
                         'GET /Peers HTTP/1.1': self.display_peers,
-                        'GET /Inbox HTTP/1.1': self.show_mailbox}
+                        'GET /Inbox HTTP/1.1': self.show_mailbox,
+                        'GET /Mailbox HTTP/1.1': self.show_mailbox}
 
     @staticmethod
     def get_user_agent(query):

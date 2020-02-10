@@ -48,8 +48,8 @@ def generate_success(uname):
            '\t\t\t<li> <a href="/info"> Information </a></li>\n\n' \
            '\t\t\t<li> <a href="/FAQ"> FAQ </a></li>\n\n' \
            '\t\t\t<li> <a href="/Peers"> Active Peers </a></li>\n\n'\
-           '\t\t\t<li> <a href="/Inbox"> Messages </a></li>\n\n'\
-           '</nav>\n\t<article>\n\t\t<h1> Activity Log> </h1>\n\t\t<p> %d Messages Received </p>\n' \
+           '\t\t\t<li> <a href="/Mailbox"> Messages </a></li>\n\n'\
+           '</nav>\n\t<article>\n\t\t<h1> Activity Log </h1>\n\t\t<p> %d Messages Received </p>\n' \
            '\t\t<p> %d Messages Sent </p>\n\t</article>\n</section>\n\n' % (n_received, n_sent)
     footer = '<footer>\n\t<p> Lynx Mail </p>\n</footer>\n</body>\n</html>'
     content = header+style+body+footer

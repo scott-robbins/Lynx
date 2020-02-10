@@ -121,6 +121,21 @@ class QueryApi:
             print '[!!] Error Decrypting Check Peers Command from %s' % clients[raw.split(' ???? ')[0]]
         return client
 
+    def message_handler(self, client, clients, raw, decrypted_query):
+        cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
+        print '[o] Incoming Message... '
+        try:
+            if decrypted_query == 'send_message':
+                reply = utils.EncodeAES(cipher, 'READY!')
+                client.send(reply)
+                enc_data = client.recv(1500000)
+                print ' [*] Message Received!'
+                decrypted_data = utils.DecodeAES(cipher, enc_data)
+                open('messages.txt', 'a').write(decrypted_data)
+        except IndexError:
+            print '[!!] Message Handler Error'
+        return client
+
     @staticmethod
     def show_shared_files(client, raw, decrypted_query):
         # TODO: socket error handling
