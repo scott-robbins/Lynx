@@ -42,7 +42,7 @@ def generate_success(uname):
             'footer {\n\tbackground-color: #777;\n\tpadding: 10px;\n\ttext-align: center;\n\tcolor: white;\n}\n' \
             '@media (max-width: 600px) {\n\tnav, article {\n\twidth: 100%\n\theight: auto;\n\t}\n}\n</style>\n</head>\n'
 
-    body = '<body>\n\n<header>\n\t<h2> Mailbox </h2>\n</header>\n\n<section>\n\t<nav>\n\t\t<ul>\n\n' \
+    body = '<body>\n\n<header>\n\t<h2> Home </h2>\n</header>\n\n<section>\n\t<nav>\n\t\t<ul>\n\n' \
            '\t\t\t<li> <a href="/Upload"> File Upload </a></li>\n' \
            '\t\t\t<li> <a href="/Shares"> Shared Files </a></li>\n'\
            '\t\t\t<li> <a href="/info"> Information </a></li>\n\n' \
