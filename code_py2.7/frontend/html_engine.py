@@ -9,25 +9,50 @@ def hyperlink(url, label):
 
 
 def generate_success(uname):
+    # Load messages for username
+    n_sent = 0
+    n_received = 0
+    if os.path.isfile('messages.txt'):
+        msgs = {}
+        for line in utils.swap('messages.txt', False):
+            try:
+                sender = line.split('->')[0]
+                receiver = line.split('->')[1].split(':')[0]
+                message = line.split(receiver)[1]
+                msgs[message] = [sender, receiver]
+                if sender == uname:
+                    n_sent += 1
+                if receiver == uname:
+                    n_received += 1
+            except IndexError:
+                pass
+    else:
+        os.system('touch messages.txt')
+
     page_name = uname+'_success.html'
-    header = '<!DOCTYPE html>\n<html>\n <body>\n'
-    box = '<div style="background-color:DodgerBlue;color:white;padding:30px;">\n' \
-          '<p><img src="img/logo.png" alt="Lynx" style="float:right;width:162px;height:102px;">' \
-          'Login Successful</p>' \
-          '\n<p>Welcome to Lynx, %s. You are one of a few peers participating in<br>' \
-          'a exciting peer to peer experiment. By Reaching this page you have demonstrated that you have <br>\n' \
-          'downloaded the client and created a password.<p>\n' \
-          '</div>' % (uname, )
-    opt_bar = '<nav>\n' \
-              '<a href="/Upload"> File Upload </a>' \
-              '<a href="/Shares"> Shared Files </a>'\
-              '<a href="/info"> Information </a>\n' \
-              '<a href="/FAQ"> FAQ </a>\n' \
-              '<a href="/Peers"> Active Peers </a>\n'\
-              '<a href="/Inbox"> Messages </a>\n'\
-              '</nav>'
-    footer = '<body>\n</html>'
-    content = header+opt_bar+box+footer
+    header = '<!DOCTYPE html>\n<html>\n <head>\n<title> Inbox </title>\n<meta charset="utf-8">\n' \
+             '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+
+    style = '<style>*{\n\tbox-sizing:border-box;\n}\nbody{\n\tfont-family: Arial, Helvetica, sans-serif;\n}\n' \
+            '\nheader{\n\tbackground-color: #666;\n\tpadding: 10px;\n\ttext-align:center;\n\tfont-size: 10px;\n' \
+            '\tcolor: white;\n}\n\nnav {\n\tfloat: left;\n\twidth: 30%;\n\theight: 500px;\n\tbackground: #ccc;\n' \
+            '\tpadding: 20px;\n}\n\nnav ul {\n\tlist-style-type: square;\n\tpadding: 0;\n}\n' \
+            'article {\n\tfloat: left;\n\tpadding: 20px;\n\twidth: 70%;\n\tbackground-color: #f1f1f1;' \
+            '\n\theight: 500px;\n}\n\nsection:after{\n\tcontent: "",\n\tdisplat: table;\n\tclear: both\n}\n' \
+            'footer {\n\tbackground-color: #777;\n\tpadding: 10px;\n\ttext-align: center;\n\tcolor: white;\n}\n' \
+            '@media (max-width: 600px) {\n\tnav, article {\n\twidth: 100%\n\theight: auto;\n\t}\n}\n</style>\n</head>\n'
+
+    body = '<body>\n\n<header>\n\t<h2> Mailbox </h2>\n</header>\n\n<section>\n\t<nav>\n\t\t<ul>\n\n' \
+           '\t\t\t<li> <a href="/Upload"> File Upload </a></li>\n' \
+           '\t\t\t<li> <a href="/Shares"> Shared Files </a></li>\n'\
+           '\t\t\t<li> <a href="/info"> Information </a></li>\n\n' \
+           '\t\t\t<li> <a href="/FAQ"> FAQ </a></li>\n\n' \
+           '\t\t\t<li> <a href="/Peers"> Active Peers </a></li>\n\n'\
+           '\t\t\t<li> <a href="/Inbox"> Messages </a></li>\n\n'\
+           '</nav>\n\t<article>\n\t\t<h1> Activity Log> </h1>\n\t\t<p> %d Messages Received </p>\n' \
+           '\t\t<p> %d Messages Sent </p>\n\t</article>\n</section>\n\n' % (n_received, n_sent)
+    footer = '<footer>\n\t<p> Lynx Mail </p>\n</footer>\n</body>\n</html>'
+    content = header+style+body+footer
     open(page_name, 'wb').write(content)
     return page_name
 
