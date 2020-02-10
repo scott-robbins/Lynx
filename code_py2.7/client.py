@@ -90,11 +90,9 @@ def send_message(mykey, sender, receiver, data):
     c = AES.new(base64.b64decode(mykey))
     enc_send_request = utils.EncodeAES(c, 'send_message')
     enc_send_query = mykey+' ???? '+enc_send_request
-    enc_status = network.connect_receive(cloud_gateway, 54123, enc_send_query, 10)
-    if utils.DecodeAES(c, enc_status) == 'READY':
-        clear_content = '%s->%s: %s' % (sender, receiver, data)
-        enc_content = utils.EncodeAES(c, clear_content)
-        network.connect_send(cloud_gateway, 54123, enc_content, 10)
+    clear_content = '%s->%s: %s' % (sender, receiver, data)
+    enc_content = utils.EncodeAES(c, clear_content)
+    network.connect_receive_send(cloud_gateway,54123,enc_send_query,enc_content, c)
 
 
 if __name__ == '__main__':
