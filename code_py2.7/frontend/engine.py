@@ -121,7 +121,8 @@ class QueryApi:
             print '[!!] Error Decrypting Check Peers Command from %s' % clients[raw.split(' ???? ')[0]]
         return client
 
-    def message_handler(self, client, clients, raw, decrypted_query):
+    @staticmethod
+    def message_handler(client, clients, raw, decrypted_query):
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         print '[o] Incoming Message... '
         try:
@@ -219,6 +220,9 @@ def listen_alt_channel(timeout):
 
                 # Check for show shares command
                 client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
+
+                # check for encrypted p2p messages
+                client = QueryApi.message_handler(client, clients, raw_data, decrypted_query)
 
                 if 'fragments' in decrypted_query.split(':'):
                     N = decrypted_query.split(':')[1].split(' = ')[0]

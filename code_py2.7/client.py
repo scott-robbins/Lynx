@@ -201,3 +201,6 @@ if __name__ == '__main__':
         if not msg and not file_transfer:
             print '** Incorrect Usage!! **'
             exit()
+        if msg:
+            data = raw_input('> ')
+            send_message(my_api_key, sender, receiver, data)
