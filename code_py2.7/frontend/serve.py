@@ -197,7 +197,7 @@ class HttpServer:
             print '\033[1m[*] %s Has Logged in Successfully from %s\033[0m' % (uname, c_addr[0])
             open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (c_addr[0], uname))
             active_clients[uname] = [passwd]
-            self.known.append[c_addr[0]] = uname
+            self.known[c_addr[0]] = uname
             success_page = html_engine.generate_success(uname)
             c.send(open(success_page, 'rb').read())
             os.remove(success_page)
