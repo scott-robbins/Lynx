@@ -127,6 +127,7 @@ class QueryApi:
         print '[o] Incoming Message... '
         try:
             if decrypted_query == 'send_message':
+                client.send('OK')
                 enc_data = client.recv(1500000)
                 print ' [*] Message Received!'
                 decrypted_data = utils.DecodeAES(cipher, enc_data)

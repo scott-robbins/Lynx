@@ -96,6 +96,8 @@ def send_message(mykey, sender, receiver, data):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((cloud_gateway, 54123))
         s.send(enc_send_query)
+        wait = s.recv(100)
+        print wait
         s.send(enc_content)
     except socket.error:
         print '[!!] Connection Error: Unable to Send Message to %s' % receiver
