@@ -236,6 +236,7 @@ if __name__ == '__main__':
     open(log_file_name, 'wb').write('[*] Server Started %s -%s\n' % (date, localtime))
     # Load Known Users
     users = refresh_users()
+    print '[*] Server Started %s -%s\n' % (date, localtime)
     print '[*] %d Registered Users ' % len(users.keys())
 
     # Start listener daemon for new user credential uploads
