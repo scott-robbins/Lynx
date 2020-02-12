@@ -86,7 +86,8 @@ def run(handler):
             client.close()
 
     except KeyboardInterrupt:
-        print '[!!] Server Killed'
+        d, l = create_timestamp()
+        print '[!!] Server Killed [%s - %s]' % (d, l)
         os.system('sh ../kill_listeners.sh >> /dev/null 2>&1')
         pass
     handler.close()
@@ -228,7 +229,7 @@ class HttpServer:
 
 
 if __name__ == '__main__':
-    runtime = 3600 * 24  # While under development the server(s) only run for 1 day each trial
+    runtime = 3600 * 72  # While under development the server(s) only run for 3 day each trial
     # Create Log File
     date, localtime = create_timestamp()
     log_file_name = date.replace('/', '') + '_' + localtime.split(':')[0] + localtime.split(':')[1] + '.log'
@@ -243,3 +244,6 @@ if __name__ == '__main__':
     # Start a listening socket on port 80
     run(create_listener())
 
+    # Display Date/timestamp on shutdown
+    d, l = create_timestamp()
+    print '[!!] Shutting down Server [%s - %s]' % (d, l)
