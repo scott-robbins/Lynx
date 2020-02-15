@@ -201,7 +201,7 @@ def btc_price_tracking():
 
     '''     Build the HTML for webpage          '''
     header = '<!DOCTYPE html>\n<html>\n' \
-             '<meta charset="UTF-8" http-equiv="refresh" content="30;url=btc_usd.html">\n'
+             '<meta charset="UTF-8" http-equiv="refresh" content="30;url=BTC">\n'
     title = '<head>\n<title> BTC Price </title>\n</head>\n' \
             '<h2> BTC Price Tracking </h2>'
     ticker = '<p> $%f </p>\t' % current_usd_price
