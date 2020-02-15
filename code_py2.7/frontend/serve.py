@@ -232,6 +232,8 @@ class HttpServer:
     def serve_btc_price_watch(c,f,g,c_addr):
         user_agent = ''.join(q[1:3])
         print '[*] Serving %s BTC Price Watch page' % c_addr[0]
+        c.send(html_engine.btc_price_tracking())
+        return c
 
 
 if __name__ == '__main__':
