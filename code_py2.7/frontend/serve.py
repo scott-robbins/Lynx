@@ -231,7 +231,7 @@ class HttpServer:
         return c
 
     def serve_btc_price_watch(self,c,f,g,c_addr):
-        user_agent = ''.join(q[1:3])
+        user_agent = ''.join(g[1:3])
         if c_addr[0] not in self.known.keys():
             print self.known
             msg = '[!!] %s Has NOT LOGGED IN and tried to access Shared/ Files page\n' \
