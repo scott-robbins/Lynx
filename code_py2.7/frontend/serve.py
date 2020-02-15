@@ -112,7 +112,7 @@ class HttpServer:
                         'GET /Inbox HTTP/1.1': self.show_mailbox,
                         'GET /Mailbox HTTP/1.1': self.show_mailbox,
                         'GET /index.html HTTP/1.1': self.home_page,
-                        }
+                        'GET /BTC HTTP/1.1': self.serve_btc_price_watch}
 
     @staticmethod
     def get_user_agent(query):
@@ -181,9 +181,11 @@ class HttpServer:
         return c
 
     def get_shares(self, c, f, q, c_addr):
+        user_agent = ''.join(q[1:3])
         if c_addr[0] not in self.known.keys():
             print self.known
-            msg = '[!!] %s Has NOT LOGGED IN and tried to access Shared/ Files page\n' % c_addr[0]
+            msg = '[!!] %s Has NOT LOGGED IN and tried to access Shared/ Files page\n' \
+                  '[*] UserAgent:\n%s' % (c_addr[0], user_agent)
             print msg
             open(log_file_name, 'a').write(msg)
             return c
@@ -228,9 +230,16 @@ class HttpServer:
             c.send(forbidden)
         return c
 
-    @staticmethod
-    def serve_btc_price_watch(c,f,g,c_addr):
+    def serve_btc_price_watch(self,c,f,g,c_addr):
         user_agent = ''.join(q[1:3])
+        if c_addr[0] not in self.known.keys():
+            print self.known
+            msg = '[!!] %s Has NOT LOGGED IN and tried to access Shared/ Files page\n' \
+                  '[*] UserAgent:\n%s' % (c_addr[0], user_agent)
+            print msg
+            open(log_file_name, 'a').write(msg)
+            return c
+
         print '[*] Serving %s BTC Price Watch page' % c_addr[0]
         c.send(html_engine.btc_price_tracking())
         return c
