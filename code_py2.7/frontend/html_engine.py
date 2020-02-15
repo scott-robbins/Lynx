@@ -1,3 +1,4 @@
+import numpy as np
 import utils
 import time
 import sys
@@ -163,8 +164,59 @@ def show_inbox_in():
         return head + body + footer
 
 
+def parse_data(file_path):
+    raw_data = utils.swap(file_path, False)
+    usd_data = []
+    eur_data = []
+    gbp_data = []
+    header = raw_data.pop(0)
+    for entry in raw_data:
+        usd = float(entry.split('USD: ')[1].split('\tEUR')[0])
+        eur = float(entry.split('EUR: ')[1].split('\tGBP')[0])
+        gbp = float(entry.split('GBP: ')[1].replace('\n', ''))
+        usd_data.append(usd)
+        eur_data.append(eur)
+        gbp_data.append(gbp)
+    parsed_data = {'usd': usd_data, 'eur': eur_data, 'gbp': gbp_data}
+    return parsed_data
+
+
+def btc_price_tracking():
+    name = 'btc_usd.html'
+    if os.path.isfile(name):
+        os.remove(name)
+
+    '''      Find BTC/code/price_data.txt       '''
+    if utils.cmd('find ~/BTC/code/price_log.txt'):
+        print 'Exists'
+        data_loc = utils.cmd('find ~/BTC/code/price_log.txt').pop()
+    else:
+        data_loc = utils.cmd('find /home/BTC/code/price*').pop()
+
+    price_data = parse_data(data_loc)
+    n_points = len(price_data['usd'])-1
+    current_usd_price = price_data['usd'][n_points]
+    current_gbp_price = price_data['gbp'][n_points]
+    current_eur_price = price_data['eur'][n_points]
+
+    '''     Build the HTML for webpage          '''
+    header = '<!DOCTYPE html>\n<html>\n' \
+             '<meta charset="UTF-8" http-equiv="refresh" content="30;url=btc_usd.html">\n'
+    title = '<head>\n<title> BTC Price </title>\n</head>\n' \
+            '<h2> BTC Price Tracking </h2>'
+    ticker = '<p> $%f </p>\t' % current_usd_price
+    ticker += '<p> %s%f </p>\n' % (u"\N{euro sign}".encode('utf-8'),  current_eur_price)
+    ticker += '<p> %s%f </p>\n' % (u"\N{pound sign}".encode('utf-8'), current_gbp_price)
+    title += ticker
+    footer = '</html>\n'
+    content = header + title + footer
+    open(name, 'wb').write(content)
+    return content
+
+
 if '-t' in sys.argv:
     test_dir = '../SHARED'
-    content = render_file_structure(test_dir)
+    content = btc_price_tracking()
     print content
+
 

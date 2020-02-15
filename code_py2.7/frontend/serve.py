@@ -111,7 +111,8 @@ class HttpServer:
                         'GET /Peers HTTP/1.1': self.display_peers,
                         'GET /Inbox HTTP/1.1': self.show_mailbox,
                         'GET /Mailbox HTTP/1.1': self.show_mailbox,
-                        'GET /index.html HTTP/1.1': self.home_page}
+                        'GET /index.html HTTP/1.1': self.home_page,
+                        }
 
     @staticmethod
     def get_user_agent(query):
@@ -227,13 +228,18 @@ class HttpServer:
             c.send(forbidden)
         return c
 
+    @staticmethod
+    def serve_btc_price_watch(c,f,g,c_addr):
+        user_agent = ''.join(q[1:3])
+        print '[*] Serving %s BTC Price Watch page' % c_addr[0]
+
 
 if __name__ == '__main__':
     runtime = 3600 * 72  # While under development the server(s) only run for 3 day each trial
     # Create Log File
     date, localtime = create_timestamp()
     log_file_name = date.replace('/', '') + '_' + localtime.split(':')[0] + localtime.split(':')[1] + '.log'
-    open(log_file_name, 'wb').write('[*] Server Started %s -%s\n' % (date, localtime))
+    open(log_file_name, 'wb').write('[*] Server Started %s -%s\n====================' % (date, localtime))
     # Load Known Users
     users = refresh_users()
     print '[*] Server Started %s -%s\n' % (date, localtime)
