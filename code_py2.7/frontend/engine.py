@@ -68,12 +68,13 @@ def check_for_add_user_cmd(data, addr, existing):
 
 def defragment(n_frags, name):
     raw_data = ''
-    frag_files = utils.cmd('ls ../SHARED/chunk*')
+    frag_files = utils.cmd('ls ../SHARED/chunk*') # TODO: This might not return in order for large files
     if len(frag_files) != n_frags:
         print '[!!] %d Fragments found (not %d)' % (len(frag_files), n_frags)
-    for f in frag_files:
+    for ii in range(1,n_frags):
+        f = '../SHARED/chunk%d.frag' % ii
         raw_data += open(f, 'rb').read()
-        os.remove('../SHARED/'+f)
+        os.remove(f)
     open('../SHARED/'+name, 'wb').write(raw_data)
 
 
@@ -167,14 +168,14 @@ class QueryApi:
     @staticmethod
     def message_handler(client, clients, raw, decrypted_query):
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
-        print '[o] Incoming Message... '
+        # print '[o] Incoming Message... '
         try:
             if decrypted_query == 'send_message':
                 client.send(utils.EncodeAES(cipher, 'YES'))
                 enc_data = client.recv(1500000)
-                print ' [*] Message Received!'
+                # print ' [*] Message Received!'
                 decrypted_data = utils.DecodeAES(cipher, enc_data)
-                print decrypted_data
+                # print decrypted_data
                 open('messages.txt', 'a').write(decrypted_data)
         except IndexError:
             print '[!!] Message Handler Error'
@@ -206,10 +207,10 @@ class QueryApi:
                 name = decrypted_query.split('_')[1]
                 size = int(decrypted_query.split('_')[2])
                 if size < max_size:
-                    print '[*] %s is uploading %d bytes' % (client_ip, size)
+                    # print '[*] %s is uploading %d bytes' % (client_ip, size)
                     client.send(utils.EncodeAES(cipher, 'YES'))
                     raw_data = client.recv(size)
-                    print '[*] %d Encrypted Bytes Received' % len(raw_data)
+                    # print '[*] %d Encrypted Bytes Received' % len(raw_data)
                     if len(raw_data) > 0:
                         try:
                             dec_data = utils.DecodeAES(cipher, raw_data)

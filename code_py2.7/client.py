@@ -101,7 +101,7 @@ def put_file(fname, mykey):
     enc_data = utils.EncodeAES(cipher, open(fname, 'rb').read())
     size = len(enc_data)
     query = 'PUT_%s_%s' % (fname, size)
-    print '[*] Querying %s...' % query
+    # print '[*] Querying %s...' % query
     encq = utils.EncodeAES(cipher, query)
     qstr = mykey + ' ???? ' + encq
     result = network.connect_receive_send(cloud_gateway, 54123, qstr, enc_data, cipher)
@@ -204,7 +204,7 @@ if __name__ == '__main__':
             print '[*] File is %d bytes (over 1.5kB)' % sz
 
             N = 0
-            for file_name in os.listdir('chunks'):
+            for file_name in fragments['frags']:
                 os.system('mv chunks/%s $PWD' % file_name)
                 put_file(file_name, my_api_key)
                 os.remove(file_name)
