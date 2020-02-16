@@ -37,8 +37,7 @@ def generate_success(uname):
 
     page_name = uname+'_success.html'
     header = '<!DOCTYPE html>\n<html>\n <head>\n<title> Dashboard </title>\n<meta charset="utf-8">\n' \
-             '<meta name="viewport" content="width=device-width, initial-scale=1">\n' \
-             '<script>\n\tdocument.cookie = "username=%s";\n</script>\n' % uname
+             '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
 
     style = '<style>*{\n\tbox-sizing:border-box;\n}\nbody{\n\tfont-family: Arial, Helvetica, sans-serif;\n}\n' \
             '\nheader{\n\tbackground-color: #666;\n\tpadding: 10px;\n\ttext-align:center;\n\tfont-size: 10px;\n' \
