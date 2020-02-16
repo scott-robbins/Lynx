@@ -225,13 +225,17 @@ class QueryApi:
                         chunks_sent = 0
                         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         s.bind(('0.0.0.0', 54124))
-                        s.listen()
+                        s.listen(5)
+                        bytes_sent = 0
                         for file_name in os.listdir('chunks'):
                             os.system('mv chunks/%s $PWD' % file_name)
                             raw_data = open(file_name,'rb').read()
                             enc_data = utils.EncodeAES(cipher, raw_data)
                             rmt, rmt_addr = s.accept()
-
+                            rmt.send(enc_data)
+                            bytes_sent += int(rmt.recv(256).split(':')[1])
+                            rmt.close()
+                            print '[o] %d bytes sent' % bytes_sent
 
                         os.system('rm -rf chunks/')
                     else:
