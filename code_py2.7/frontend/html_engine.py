@@ -48,17 +48,15 @@ def generate_success(uname):
             'footer {\n\tbackground-color: #777;\n\tpadding: 10px;\n\ttext-align: center;\n\tcolor: white;\n}\n' \
             '@media (max-width: 600px) {\n\tnav, article {\n\twidth: 100%\n\theight: auto;\n\t}\n}\n</style>\n</head>\n'
 
-    body = '<body>\n\n<header>\n\t<h2> %s Homepage </h2>\n</header>\n\n<section>\n\t<nav>\n\t\t<ul>\n\n' \
+    body = '<body>\n\n<header>\n\t<h2> Home </h2>\n</header>\n\n<section>\n\t<nav>\n\t\t<ul>\n\n' \
            '\t\t\t<li> <a href="/Shares"> Shared Files </a></li>\n'\
            '\t\t\t<li> <a href="/BTC"> Bitcoin Price </a></li>\n'\
            '\t\t\t<li> <a href="/info"> Information </a></li>\n\n' \
            '\t\t\t<li> <a href="/FAQ"> FAQ </a></li>\n\n' \
            '\t\t\t<li> <a href="/Peers"> Active Peers </a></li>\n\n'\
            '\t\t\t<li> <a href="/Mailbox"> Messages </a></li>\n\n'\
-           '</nav>\n\t<article>\n\t\t<h1> Activity Log </h1>\n' \
-           '\t\t<p> %d Shared Files </p>\n' \
-           '\t\t<p> %d Messages Received </p>\n' \
-           '\t\t<p> %d Messages Sent </p>\n\t</article>\n</section>\n\n' % (uname, n_shared, n_received, n_sent)
+           '</nav>\n\t<article>\n\t\t<h1> Activity Log </h1>\n\t\t<p> %d Messages Received </p>\n' \
+           '\t\t<p> %d Messages Sent </p>\n\t</article>\n</section>\n\n' % (n_received, n_sent)
     footer = '<footer>\n\t<p> {Lynx} - %s -  Homepage </p>\n</footer>\n</body>\n</html>' % uname
     content = header+style+body+footer
     open(page_name, 'wb').write(content)
@@ -288,9 +286,9 @@ def btc_price_tracking():
               (gbp_c1, gbp_c2, pound, current_gbp_price, pound, gbp_maxima, pound, gbp_mean, gbpd,pound, meandiff_gbp)
     title += ticker
     body = '</body>\n' \
-           '<canvas id="price_data" width="800" height="%d" style="border:1px solid #d3d3d3;">\n' \
-           'This browser does not support the HTML5 canvas tag</canvas>\n<scriptMessages Received>\n' \
-           % (height)
+           '<canvas id="price_data" width="%d" height="%d" style="border:1px solid #d3d3d3;">\n' \
+           'This browser does not support the HTML5 canvas tag</canvas>\n<script>\n' \
+           % (height, height)
     graph_data = 'var c = document.getElementById("price_data");\n' \
                  'var ctx = c.getContext("2d");\n' \
                  'ctx.moveTo(0,300);\nctx.stroke();\n'
