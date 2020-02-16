@@ -49,7 +49,6 @@ def generate_success(uname):
             '@media (max-width: 600px) {\n\tnav, article {\n\twidth: 100%\n\theight: auto;\n\t}\n}\n</style>\n</head>\n'
 
     body = '<body>\n\n<header>\n\t<h2> %s Homepage </h2>\n</header>\n\n<section>\n\t<nav>\n\t\t<ul>\n\n' \
-           '\t\t\t<li> <a href="/Upload"> File Upload </a></li>\n' \
            '\t\t\t<li> <a href="/Shares"> Shared Files </a></li>\n'\
            '\t\t\t<li> <a href="/BTC"> Bitcoin Price </a></li>\n'\
            '\t\t\t<li> <a href="/info"> Information </a></li>\n\n' \
