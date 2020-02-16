@@ -227,12 +227,10 @@ class QueryApi:
                         s.listen(5)
                         bytes_sent = 0
                         for frag in fragments['frags']:
-<<<<<<< HEAD
                             # print 'Sending framgent %s' % frag
                             # os.system('mv chunks/chunk%d.frag $PWD' % n)
-=======
                             print 'Sending framgent %s' % frag
->>>>>>> 48b9c616632eb83c99b6602f32ac8c8e96ad8dd3
+
                             raw_data = open(frag, 'rb').read()
                             enc_data = utils.EncodeAES(cipher, raw_data)
                             rmt, rmt_addr = s.accept()
