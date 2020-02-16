@@ -37,7 +37,8 @@ def generate_success(uname):
 
     page_name = uname+'_success.html'
     header = '<!DOCTYPE html>\n<html>\n <head>\n<title> Dashboard </title>\n<meta charset="utf-8">\n' \
-             '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+             '<meta name="viewport" content="width=device-width, initial-scale=1">\n' \
+             '<script>\n\tdocument.cookie = "username=%s";\n</script>\n' % uname
 
     style = '<style>*{\n\tbox-sizing:border-box;\n}\nbody{\n\tfont-family: Arial, Helvetica, sans-serif;\n}\n' \
             '\nheader{\n\tbackground-color: #666;\n\tpadding: 10px;\n\ttext-align:center;\n\tfont-size: 10px;\n' \
@@ -285,18 +286,20 @@ def btc_price_tracking():
               '<p> %s%f  - Maximum: %s%f - Mean: %s%f  [%s%s%d]</p>\n\n</div>\n' % \
               (gbp_c1, gbp_c2, pound, current_gbp_price, pound, gbp_maxima, pound, gbp_mean, gbpd,pound, meandiff_gbp)
     title += ticker
+
+    # Data must come in as vector of line data as f(x)
+    graph_data = 'var c = document.getElementById("price_data");\n' \
+                 'var ctx = c.getContext("2d");\n'
+    p = np.array(price_data['usd'])
+    scaled_y = (p /p.max())* 300.
+    height = np.array(scaled_y).max() + 20
+    for x in range(len(points) - 1):
+        graph_data += 'ctx.lineTo(%d,%d);\nctx.stroke();\n' % (x, scaled_y[x])
+
     body = '</body>\n' \
            '<canvas id="price_data" width="%d" height="%d" style="border:1px solid #d3d3d3;">\n' \
            'This browser does not support the HTML5 canvas tag</canvas>\n<script>\n' \
            % (height, height)
-    graph_data = 'var c = document.getElementById("price_data");\n' \
-                 'var ctx = c.getContext("2d");\n' \
-                 'ctx.moveTo(0,300);\nctx.stroke();\n'
-
-    # Data must come in as vector of line data as f(x)
-    scaled_y = points/points.max()*300.
-    for x in range(len(points) - 1):
-        graph_data += 'ctx.lineTo(%d,%d);\nctx.stroke();\n' % (x, scaled_y[x])
     body += graph_data
 
     footer = '</script>\n</html>\n'
@@ -308,10 +311,4 @@ def btc_price_tracking():
 if '-t' in sys.argv:
     test_dir = '../SHARED'
     content, dat = btc_price_tracking()
-
-    # import matplotlib.pyplot as plt
-    # prices = np.array(dat)
-    # s = prices/np.array(prices).max() * 300.
-    # plt.plot(s)
-    # plt.show()
 
