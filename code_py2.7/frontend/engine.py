@@ -221,15 +221,18 @@ class QueryApi:
                         n_frags = len(fragments['frags'])
                         msg_head = utils.EncodeAES(cipher, 'incoming_file:%s-%d-%d' % (name, size,n_frags))
                         client.send(msg_head, 10)
-                        # TODO: SEND FRAGMENTS
                         chunks_sent = 0
                         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         s.bind(('0.0.0.0', 54124))
                         s.listen(5)
-                        bytes_sent = 0; n = 0
+                        bytes_sent = 0
                         for frag in fragments['frags']:
+<<<<<<< HEAD
                             # print 'Sending framgent %s' % frag
                             # os.system('mv chunks/chunk%d.frag $PWD' % n)
+=======
+                            print 'Sending framgent %s' % frag
+>>>>>>> 48b9c616632eb83c99b6602f32ac8c8e96ad8dd3
                             raw_data = open(frag, 'rb').read()
                             enc_data = utils.EncodeAES(cipher, raw_data)
                             rmt, rmt_addr = s.accept()
@@ -237,7 +240,6 @@ class QueryApi:
                             bytes_sent += int(rmt.recv(256).split(':')[1])
                             chunks_sent += 1
                             rmt.close()
-                            print '[o] %d bytes sent' % bytes_sent
 
                         os.system('rm -rf chunks/')
                         s.close()
