@@ -74,8 +74,9 @@ def run(handler):
             print query
             # Login attempts
             for field in query:
-            if len(field.split('username=')) > 1:
-                server.submit_login(client,field,active_clients,client_addr)
+                if len(field.split('username=')) > 1:
+                    server.submit_login(client,field,active_clients,client_addr)
+                    break
 
             if query[0] in server.actions.keys():
                 client = server.actions[query[0]](client, query, query[0], client_addr)
