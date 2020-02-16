@@ -206,11 +206,8 @@ def btc_price_tracking():
     current_eur_price = price_data['eur'][n_points]
 
     start_time = stamp.split(' - ')[1].replace('\n', '')
-    print date
-    print start_time
     mo = date.split('/')[0]
     day = int(date.split('/')[1].split('/')[0])
-
     this_mo = current_date.split('/')[0]
     today = int(current_date.split('/')[1].split('/')[0])
 
@@ -223,10 +220,7 @@ def btc_price_tracking():
 
     # if mo == this_mo:
     #     d_days = today - day
-    #
     #     print 'N Days Diff: %d' % d_days
-
-
 
     meandiff_usd = current_usd_price - usd_mean
     meandiff_eur = current_eur_price - eur_mean
