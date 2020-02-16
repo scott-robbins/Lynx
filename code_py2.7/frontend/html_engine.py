@@ -290,7 +290,7 @@ def btc_price_tracking():
     body = '</body>\n' \
            '<canvas id="price_data" width="800" height="%d" style="border:1px solid #d3d3d3;">\n' \
            'This browser does not support the HTML5 canvas tag</canvas>\n<scriptMessages Received>\n' \
-           % (height, height)
+           % (height)
     graph_data = 'var c = document.getElementById("price_data");\n' \
                  'var ctx = c.getContext("2d");\n' \
                  'ctx.moveTo(0,300);\nctx.stroke();\n'
