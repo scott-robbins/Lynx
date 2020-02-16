@@ -178,37 +178,61 @@ def parse_data(file_path):
         eur_data.append(eur)
         gbp_data.append(gbp)
     parsed_data = {'usd': usd_data, 'eur': eur_data, 'gbp': gbp_data}
-    return parsed_data
+    return parsed_data, header
 
 
 def btc_price_tracking():
     name = 'btc_usd.html'
     if os.path.isfile(name):
         os.remove(name)
+    current_date, current_time = utils.create_timestamp()
 
     '''      Find BTC/code/price_data.txt       '''
+    # TODO: Block erroneous output on failed command
     if utils.cmd('find ~/BTC/code/price_log.txt'):
-        print 'Exists'
         data_loc = utils.cmd('find ~/BTC/code/price_log.txt').pop()
     else:
         print 'Searching again...'
         os.system('find /home/BTC/code/price*')
         data_loc = utils.cmd('find /home/BTC/code/price*').pop()
 
-    price_data = parse_data(data_loc)
+    price_data, stamp = parse_data(data_loc)
+    date = stamp.split(' - ')[0].split(' ')[2]
+
     n_points = len(price_data['usd'])-1
     current_usd_price = price_data['usd'][n_points]
     current_gbp_price = price_data['gbp'][n_points]
     current_eur_price = price_data['eur'][n_points]
 
+    start_time = stamp.split(' - ')[1].replace('\n', '')
+    print date
+    print start_time
+    mo = date.split('/')[0]
+    day = int(date.split('/')[1].split('/')[0])
+
+    this_mo = current_date.split('/')[0]
+    today = int(current_date.split('/')[1].split('/')[0])
+    if mo == this_mo:
+        d_days = today - day
+
+        print 'N Days Diff: %d' % d_days
+        if d_days == 0:
+            usd_maxima = np.array(price_data['usd']).max()
+            eur_maxima = np.array(price_data['eur']).max()
+            gbp_maxima = np.array(price_data['gbp']).max()
+
     '''     Build the HTML for webpage          '''
+    euro = u"\N{euro sign}".encode('utf-8')
+    pound = u"\N{pound sign}".encode('utf-8')
     header = '<!DOCTYPE html>\n<html>\n' \
              '<meta charset="UTF-8" http-equiv="refresh" content="30;url=BTC">\n'
     title = '<head>\n<title> BTC Price </title>\n</head>\n' \
             '<h2> BTC Price Tracking </h2>'
-    ticker = '<p> $%f </p>\t' % current_usd_price
-    ticker += '<p> %s%f </p>\n' % (u"\N{euro sign}".encode('utf-8'),  current_eur_price)
-    ticker += '<p> %s%f </p>\n' % (u"\N{pound sign}".encode('utf-8'), current_gbp_price)
+    ticker = '<p> $%f  - 24 Hr. Maximum: $%f</p>\t' % (current_usd_price,usd_maxima)
+    ticker += '<p> %s%f  - 24 Hr. Maximum: %s%f </p>\n' % \
+              (euro,  current_eur_price, euro, eur_maxima)
+    ticker += '<p> %s%f  - 24 Hr. Maximum: %s%f</p>\n' % \
+              (pound, current_gbp_price, pound, gbp_maxima)
     title += ticker
     footer = '</html>\n'
     content = header + title + footer
