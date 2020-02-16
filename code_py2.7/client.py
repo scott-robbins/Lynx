@@ -63,14 +63,14 @@ def get_file(fname, mykey):
               '[o] Download will be in %d fragments...' % (file_size, n_fragments)
         # Now Download those fragments, and recombine
         recombined = False
-        n_recv = 1; n_throw = 10
+        n_recv = 1; n_throw = 3
         while not recombined or n_throw < 0:
             print '*Debug: %d fragments receieved' % n_recv
             if n_recv == n_fragments:
-                target = 'SHARED/%s' % fname
-                cmb = 'ls *.frag | while read n; do cat $n >> %s;rm $n; done' % target
-                os.system(cmb)
+
+                break
                 recombined = True
+                n_throw = 0
             try:
                 time.sleep(0.2)
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -85,7 +85,14 @@ def get_file(fname, mykey):
                 n_throw -= 1
                 pass
                 print '[!!] Failed to create socket... Are you running as root?'
-                exit()
+        print '[*] Recombining %d fragments' % n_recv
+        target = 'SHARED/%s' % fname
+        content = ''
+        for i in range(1, n_fragments):
+            content += open('chunk%d.frag' % i, 'rb').read()
+        os.system('rm *.frag')
+        open(target, 'wb').write(content)
+        os.system('sha256 %s' % target)
         print '[*] %d Fragments Received and Recombined into %s [%d bytes]' % \
               (n_fragments, fname, file_size)
 

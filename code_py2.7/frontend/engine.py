@@ -131,6 +131,7 @@ def fragmented(fname, frag_size):
             fname = 'chunk%d.frag' % (len(blocks))
             fragments['frags'].append('chunks/' + fname)
             open('chunks/' + fname, 'wb').write(chunk)
+        print '*DEBUG: Fragments: \n%' + fragments['frags']
         return fragments
 
 
