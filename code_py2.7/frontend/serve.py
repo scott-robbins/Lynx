@@ -199,7 +199,7 @@ class HttpServer:
         try:
             registered_users = refresh_users()
             uname = request.split('username=')[1].split('&')[0]
-            passwd = request.split('password=')[1].split('%')[0]
+            passwd = request.split('password=')[1]
             if uname in registered_users.keys() and registered_users[uname] == passwd:
                 print '\033[1m[*] %s Has Logged in Successfully from %s\033[0m' % (uname, c_addr[0])
                 open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (c_addr[0], uname))
