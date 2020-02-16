@@ -179,10 +179,8 @@ class QueryApi:
             elif 'GET' in decrypted_query.split('_'):
                 name = '../SHARED/' + decrypted_query.split('_')[1]
                 if os.path.isfile(name):
-                    print name
-                    os.system('ls -la %s' % name)
-                    size = os.path.isfile(name)
-                    if size > 1500:
+                    size = os.path.getsize(name)
+                    if size > 1200:
                         print '[*] Fragmenting download'
                         msg_head = utils.EncodeAES(cipher, 'incoming_file:%s-%d' % (name, size))
                         client.send(api_key + '??? '+msg_head, 10)
