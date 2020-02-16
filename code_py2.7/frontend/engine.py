@@ -227,12 +227,11 @@ class QueryApi:
                         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         s.bind(('0.0.0.0', 54124))
                         s.listen(5)
-                        bytes_sent = 0
-                        for n in range(1, n_frags):
-                            frag = 'chunk%d.frag' % n
+                        bytes_sent = 0; n = 0
+                        for frag in fragments['frags']:
                             print 'Sending framgent %s' % frag
                             # os.system('mv chunks/chunk%d.frag $PWD' % n)
-                            raw_data = open('chunks/'+frag, 'rb').read()
+                            raw_data = open(frag, 'rb').read()
                             enc_data = utils.EncodeAES(cipher, raw_data)
                             rmt, rmt_addr = s.accept()
                             rmt.send(enc_data)
