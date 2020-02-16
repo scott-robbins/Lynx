@@ -227,7 +227,7 @@ class QueryApi:
                         s.bind(('0.0.0.0', 54124))
                         s.listen(5)
                         bytes_sent = 0
-                        for n in range(n_frags):
+                        for n in range(1, n_frags):
                             frag = 'chunk%d.frag' % n
                             print 'Sending framgent %s' % frag
                             # os.system('mv chunks/chunk%d.frag $PWD' % n)
@@ -240,6 +240,7 @@ class QueryApi:
                             print '[o] %d bytes sent' % bytes_sent
 
                         os.system('rm -rf chunks/')
+                        s.close()
                     else:
                         print '[*] %s is requesting %s [%d bytes]' % (client_ip,
                                                                   name, size)
