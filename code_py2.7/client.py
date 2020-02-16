@@ -92,7 +92,7 @@ def get_file(fname, mykey):
             content += open('chunk%d.frag' % i, 'rb').read()
         os.system('rm *.frag')
         open(target, 'wb').write(content)
-        os.system('sha256 %s' % target)
+        os.system('sha256sum %s' % target)
         print '[*] %d Fragments Received and Recombined into %s [%d bytes]' % \
               (n_fragments, fname, file_size)
 
