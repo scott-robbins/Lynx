@@ -282,7 +282,6 @@ def btc_price_tracking():
               (gbp_c1, gbp_c2, pound, current_gbp_price, pound, gbp_maxima, pound, gbp_mean, gbpd,pound, meandiff_gbp)
     title += ticker
     body = '</body>\n' \
-           '<meta http-equiv="refresh" content="30;url=%s">\n' \
            '<canvas id="price_data" width="%d" height="%d" style="border:1px solid #d3d3d3;">\n' \
            'This browser does not support the HTML5 canvas tag</canvas>\n<script>\n' \
            % (name, height, height)
