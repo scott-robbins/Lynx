@@ -65,12 +65,14 @@ def get_file(fname, mykey):
         recombined = False
         n_recv = 0
         while not recombined:
+            print '*Debug: %d fragments receieved' % n_recv
             if n_recv == n_fragments:
                 target = 'SHARED/%s' % fname
                 cmb = 'ls *.frag | while read n; do cat $n >> %s;rm $n; done' % target
                 os.system(cmb)
                 recombined = True
             try:
+                time.sleep(0.2)
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.connect((cloud_gateway, 54123))
                 raw_chunk = s.recv(2048)

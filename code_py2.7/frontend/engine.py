@@ -227,9 +227,11 @@ class QueryApi:
                         s.bind(('0.0.0.0', 54124))
                         s.listen(5)
                         bytes_sent = 0
-                        for file_name in os.listdir('chunks'):
-                            os.system('mv chunks/%s $PWD' % file_name)
-                            raw_data = open(file_name,'rb').read()
+                        for n in range(n_frags):
+                            frag = 'chunk%d.frag' % n
+                            print 'Sending framgent %s' % frag
+                            # os.system('mv chunks/chunk%d.frag $PWD' % n)
+                            raw_data = open('chunks/'+frag, 'rb').read()
                             enc_data = utils.EncodeAES(cipher, raw_data)
                             rmt, rmt_addr = s.accept()
                             rmt.send(enc_data)
