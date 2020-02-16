@@ -63,8 +63,8 @@ def get_file(fname, mykey):
               '[o] Download will be in %d fragments...' % (file_size, n_fragments)
         # Now Download those fragments, and recombine
         recombined = False
-        n_recv = 0
-        while not recombined:
+        n_recv = 0; n_throw = 10
+        while not recombined or n_throw < 0:
             print '*Debug: %d fragments receieved' % n_recv
             if n_recv == n_fragments:
                 target = 'SHARED/%s' % fname
@@ -80,7 +80,10 @@ def get_file(fname, mykey):
                 s.close()
                 open('chunk%d.frag' % n_recv, 'wb').write(utils.DecodeAES(cipher, raw_chunk))
                 n_recv += 1
-            except socket:
+            except socket.error:
+                time.sleep(1)
+                n_throw -= 1
+                pass
                 print '[!!] Failed to create socket... Are you running as root?'
                 exit()
         print '[*] %d Fragments Received and Recombined into %s [%d bytes]' % \
