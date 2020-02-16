@@ -46,6 +46,7 @@ def generate_success(uname):
     body = '<body>\n\n<header>\n\t<h2> Home </h2>\n</header>\n\n<section>\n\t<nav>\n\t\t<ul>\n\n' \
            '\t\t\t<li> <a href="/Upload"> File Upload </a></li>\n' \
            '\t\t\t<li> <a href="/Shares"> Shared Files </a></li>\n'\
+           '\t\t\t<li> <a href="/BTC"> Bitcoin Price </a></li>\n'\
            '\t\t\t<li> <a href="/info"> Information </a></li>\n\n' \
            '\t\t\t<li> <a href="/FAQ"> FAQ </a></li>\n\n' \
            '\t\t\t<li> <a href="/Peers"> Active Peers </a></li>\n\n'\
@@ -217,9 +218,51 @@ def btc_price_tracking():
 
         print 'N Days Diff: %d' % d_days
         if d_days == 0:
-            usd_maxima = np.array(price_data['usd']).max()
-            eur_maxima = np.array(price_data['eur']).max()
-            gbp_maxima = np.array(price_data['gbp']).max()
+            usd_maxima, usd_mean = np.array(price_data['usd']).max(), np.array(price_data['usd']).mean()
+            eur_maxima, eur_mean = np.array(price_data['eur']).max(), np.array(price_data['eur']).mean()
+            gbp_maxima, gbp_mean = np.array(price_data['gbp']).max(), np.array(price_data['gbp']).mean()
+
+        else:
+            # TODO: Use a 24hr link and parse that
+            link_24hr = 'http://api.bitcoincharts.com/v1/weighted_prices.json'
+
+    meandiff_usd = current_usd_price - usd_mean
+    meandiff_eur = current_eur_price - eur_mean
+    meandiff_gbp = current_gbp_price - gbp_mean
+
+    if meandiff_usd < 0:    # Handle the USD Case
+        usd_c1 = 'Tomato'
+        usdd = '-'
+    elif meandiff_usd > 0:
+        usd_c1 = 'Green'
+        usdd = '+'
+    else:
+        usd_c1 = 'DodgerBlue'
+        usdd = ''
+
+    if meandiff_eur < 0:    # Handle the Euro Case
+        eur_c1 = 'Tomato'
+        eurd = '-'
+    elif meandiff_eur > 0:
+        eur_c1 = 'Green'
+        eurd = '+'
+    else:
+        eur_c1 = 'DodgerBlue'
+        eurd = ''
+
+    if meandiff_gbp < 0:    # Handle the Pound Case
+        gbp_c1 = 'Tomato'
+        gbpd = '-'
+    elif meandiff_gbp > 0:
+        gbp_c1 = 'Green'
+        gbpd = '+'
+    else:
+        gbp_c1 = 'DodgerBlue'
+        gbpd = ''
+
+    eur_c2 = 'white'
+    usd_c2 = 'white'
+    gbp_c2 = 'white'
 
     '''     Build the HTML for webpage          '''
     euro = u"\N{euro sign}".encode('utf-8')
@@ -228,11 +271,17 @@ def btc_price_tracking():
              '<meta charset="UTF-8" http-equiv="refresh" content="30;url=BTC">\n'
     title = '<head>\n<title> BTC Price </title>\n</head>\n' \
             '<h2> BTC Price Tracking </h2>'
-    ticker = '<p> $%f  - 24 Hr. Maximum: $%f</p>\t' % (current_usd_price,usd_maxima)
-    ticker += '<p> %s%f  - 24 Hr. Maximum: %s%f </p>\n' % \
-              (euro,  current_eur_price, euro, eur_maxima)
-    ticker += '<p> %s%f  - 24 Hr. Maximum: %s%f</p>\n' % \
-              (pound, current_gbp_price, pound, gbp_maxima)
+    ticker = '<div style="background-color:%s;color:%s;padding:30px;">\n' \
+             '<p> $%f  - 24 Hr. Maximum: $%f  - 24 Hr. Mean: $%f  [%s$%d]</p>\n</div>\n' % \
+             (usd_c1, usd_c2, current_usd_price, usd_maxima, usd_mean, usdd, meandiff_usd)
+
+    ticker += '<div style="background-color:%s;color:%s;padding:30px;">\n' \
+              '<p> %s%f  - 24 Hr. Maximum: %s%f - 24 Hr. Mean: %s%f  [%s%s%d]</p>\n\n</div>\n' % \
+              (eur_c1, eur_c2, euro,  current_eur_price, euro, eur_maxima, euro, eur_mean, eurd, euro, meandiff_eur)
+
+    ticker += '<div style="background-color:%s;color:%s;padding:30px;">\n' \
+              '<p> %s%f  - 24 Hr. Maximum: %s%f - 24 Hr. Mean: %s%f  [%s%s%d]</p>\n\n</div>\n' % \
+              (gbp_c1, gbp_c2, pound, current_gbp_price, pound, gbp_maxima, pound, gbp_mean, gbpd,pound, meandiff_gbp)
     title += ticker
     footer = '</html>\n'
     content = header + title + footer
