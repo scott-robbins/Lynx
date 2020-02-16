@@ -65,12 +65,6 @@ def get_file(fname, mykey):
         recombined = False
         n_recv = 0; n_throw = 3
         while not recombined or n_throw < 0:
-            print '*Debug: %d fragments receieved' % n_recv
-            if n_recv == (n_fragments):
-
-                break
-                recombined = True
-                n_throw = 0
             try:
                 time.sleep(0.2)
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -80,6 +74,9 @@ def get_file(fname, mykey):
                 s.close()
                 open('chunk%d.frag' % n_recv, 'wb').write(utils.DecodeAES(cipher, raw_chunk))
                 n_recv += 1
+                print '*Debug: %d fragments receieved' % n_recv
+                if n_recv == n_fragments:
+                    break
             except socket.error:
                 time.sleep(1)
                 n_throw -= 1
@@ -88,7 +85,7 @@ def get_file(fname, mykey):
         print '[*] Recombining %d fragments' % n_recv
         target = 'SHARED/%s' % fname
         content = ''
-        for i in range(1, n_fragments):
+        for i in range(0, n_fragments):
             content += open('chunk%d.frag' % i, 'rb').read()
         os.system('rm *.frag')
         open(target, 'wb').write(content)
