@@ -116,7 +116,7 @@ def fragmented(fname, frag_size):
             try:
                 a = blocks[block_ind - 1]
                 b = blocks[block_ind]
-                print 'data[%d:%d]' % (a, b)
+                # print 'data[%d:%d]' % (a, b)
                 chunk = raw_data[a:b]
                 fname = 'chunk%d.frag' % block_ind
                 open('chunks/' + fname, 'wb').write(chunk)
@@ -127,7 +127,7 @@ def fragmented(fname, frag_size):
         if blocks[len(blocks)-1] < len(raw_data):
             db = len(raw_data) - blocks[len(blocks)-1]
             chunk = raw_data[blocks[len(blocks)-1]:(blocks[len(blocks)-1]+db)]
-            print 'Adding %d bytes' % db
+            # print 'Adding %d bytes' % db
             fname = 'chunk%d.frag' % (len(blocks))
             fragments['frags'].append('chunks/' + fname)
             open('chunks/' + fname, 'wb').write(chunk)
@@ -229,7 +229,6 @@ class QueryApi:
                         for frag in fragments['frags']:
                             # print 'Sending framgent %s' % frag
                             # os.system('mv chunks/chunk%d.frag $PWD' % n)
-                            print 'Sending framgent %s' % frag
 
                             raw_data = open(frag, 'rb').read()
                             enc_data = utils.EncodeAES(cipher, raw_data)
