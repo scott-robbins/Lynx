@@ -73,8 +73,7 @@ def get_file(fname, mykey):
                 s.send('GOT:%d' % len(raw_chunk))
                 s.close()
                 open('chunk%d.frag' % n_recv, 'wb').write(utils.DecodeAES(cipher, raw_chunk))
-                n_recv += 1
-                print '*Debug: %d fragments receieved' % n_recv
+
                 if n_recv == n_fragments:
                     break
             except socket.error:
