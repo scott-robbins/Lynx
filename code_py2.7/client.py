@@ -57,8 +57,11 @@ def get_file(fname, mykey):
     if len(decr.split(':')) <= 1:
         open('SHARED/%s' % fname, 'wb').write(decr)
     else:
-        file_size = decr.split('-')[1]
-        print '[*] Remote File is %d bytes. Download will be fragmented...' % file_size
+        file_size = decr.split('-')[1].split('-')[0]
+        n_fragments = decr.split('-')[2]
+        print '[*] Remote File is %d bytes.\n' \
+              '[o] Download will be in %d fragments...' % (file_size, n_fragments)
+
     return len(encr)
 
 

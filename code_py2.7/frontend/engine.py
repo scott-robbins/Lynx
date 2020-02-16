@@ -99,6 +99,41 @@ def check_active():
     return active
 
 
+def fragmented(fname, frag_size):
+    if not os.path.isfile(fname):
+        print "[!] Cannot find %s" % fname
+    else:
+        n_files = os.path.getsize(fname)/frag_size
+        print '[*] Fragmenting %s into %d files' % (fname, n_files)
+        os.system('mkdir chunks/')
+        raw_data = open(fname,'rb').read()
+        block_ind = 1
+        blocks = range(0,len(raw_data), frag_size)
+        fragments = {'name': fname,
+                     'frags': []}
+
+        for ii in blocks:
+            try:
+                a = blocks[block_ind - 1]
+                b = blocks[block_ind]
+                print 'data[%d:%d]' % (a, b)
+                chunk = raw_data[a:b]
+                fname = 'chunk%d.frag' % block_ind
+                open('chunks/' + fname, 'wb').write(chunk)
+                fragments['frags'].append('chunks/' + fname)
+                block_ind += 1
+            except IndexError:
+                pass
+        if blocks[len(blocks)-1] < len(raw_data):
+            db = len(raw_data) - blocks[len(blocks)-1]
+            chunk = raw_data[blocks[len(blocks)-1]:(blocks[len(blocks)-1]+db)]
+            print 'Adding %d bytes' % db
+            fname = 'chunk%d.frag' % (len(blocks))
+            fragments['frags'].append('chunks/' + fname)
+            open('chunks/' + fname, 'wb').write(chunk)
+        return fragments
+
+
 class QueryApi:
     t0 = 0
 
@@ -182,8 +217,10 @@ class QueryApi:
                     size = os.path.getsize(name)
                     if size > 1200:
                         print '[*] Fragmenting download'
-                        msg_head = utils.EncodeAES(cipher, 'incoming_file:%s-%d' % (name, size))
-                        client.send(api_key + '??? '+msg_head, 10)
+                        fragments = fragmented(name, 800)
+                        n_frags = len(fragments['frags'])
+                        msg_head = utils.EncodeAES(cipher, 'incoming_file:%s-%d-%d' % (name, size,n_frags))
+                        client.send(msg_head, 10)
 
                     else:
                         print '[*] %s is requesting %s [%d bytes]' % (client_ip,
