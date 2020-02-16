@@ -71,9 +71,10 @@ def run(handler):
                 continue
 
             query = request.split('\r\n')
-            print query
+            # print query
             # Login attempts
             for field in query:
+                print field
                 if len(field.split('username=')) > 1:
                     server.submit_login(client,field,active_clients,client_addr)
                     break
