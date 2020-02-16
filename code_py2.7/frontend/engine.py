@@ -1,4 +1,5 @@
 from Crypto.Cipher import AES
+import network
 import base64
 import socket
 import utils
@@ -155,7 +156,8 @@ class QueryApi:
     @staticmethod
     def file_upload(client, client_ip,raw, decrypted_query):
         # TODO: socket error handling
-        cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
+        api_key = base64.b64decode(raw.split(' ???? ')[0])
+        cipher = AES.new(api_key)
         try:
             if 'PUT' in decrypted_query.split('_'):
                 max_size = 2000
@@ -179,10 +181,16 @@ class QueryApi:
                 name = '../SHARED/' + decrypted_query.split('_')[1]
                 if os.path.isfile(name):
                     size = os.path.isfile(name)
-                    print '[*] %s is requesting %s [%d bytes]' % (client_ip,
+                    if size > 1500:
+                        print '[*] Fragmenting download'
+                        msg_head = utils.EncodeAES(cipher, 'incoming_file:%s-%d' % (name, size))
+                        client.send(api_key + '??? '+msg_head, 10)
+
+                    else:
+                        print '[*] %s is requesting %s [%d bytes]' % (client_ip,
                                                                   name, size)
-                    enc_data = utils.EncodeAES(cipher, open(name, 'rb').read())
-                    client.send(enc_data)
+                        enc_data = utils.EncodeAES(cipher, open(name, 'rb').read())
+                        client.send(enc_data)
             else:
                 return client
         except IndexError:
@@ -201,7 +209,7 @@ def listen_alt_channel(timeout):
     while running and (time.time()-tic) < timeout:
 
         check_active()
-
+        # TODO: Improve performance by using dictionary of function calls like server
         try:
             client, client_addr = listener.accept()
             raw_data = client.recv(1028).replace('\n','')
@@ -211,7 +219,7 @@ def listen_alt_channel(timeout):
                 clients = exchange_keys(raw_data, clients, client_addr)
 
             # Encrypted API Queries
-            if len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
+            elif len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 

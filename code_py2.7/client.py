@@ -47,11 +47,18 @@ def initialize_keys(private_ip):
 
 
 def get_file(fname, mykey):
+    # TODO: Use the fragmentation method like the serverside PUT code, so that client can
+    #  GET files that are over ~1.5Kb
     query = 'GET_%s' % fname
     encq = utils.EncodeAES(cipher, query)
     print '[*] Requesting Lynx Cloud for file %s' % fname
     encr = network.connect_receive(cloud_gateway, 54123, mykey + ' ???? ' + encq, 10)
-    open('SHARED/%s' % fname, 'wb').write(utils.DecodeAES(cipher, encr))
+    decr = utils.DecodeAES(cipher, encr)
+    if len(decr.split(':')) <= 1:
+        open('SHARED/%s' % fname, 'wb').write(decr)
+    else:
+        file_size = decr.split('-')[1]
+        print '[*] Remote File is %d bytes. Download will be fragmented...' % file_size
     return len(encr)
 
 
@@ -94,6 +101,7 @@ def send_message(mykey, sender, receiver, data):
     enc_content = utils.EncodeAES(c, clear_content)
     network.connect_receive_send(cloud_gateway,54123,enc_send_query,enc_content, c)
 
+
 if __name__ == '__main__':
     verbose = True  # TODO: DEBUG setting
     date, localtime = utils.create_timestamp()
@@ -114,7 +122,6 @@ if __name__ == '__main__':
     private_key, public_key, shared_files = initialize_keys(public)
     # - [3] Create Key and Credentials
     if not utils.cmd('ls *.pass'):
-        print private
         login_data, username = create_username(public.replace('.','-')+'.pem')
         # Register With Main Cloud Server
         network.connect_send(cloud_gateway, 54123, '../' + username + ' :::: ' + open(username + '.pass', 'rb').read(), 10)
@@ -202,3 +209,4 @@ if __name__ == '__main__':
         if msg:
             data = raw_input('> ')
             send_message(my_api_key, sender, receiver, data)
+
