@@ -71,6 +71,7 @@ def run(handler):
                 continue
 
             query = request.split('\r\n')
+            print query
             if query[0] in server.actions.keys():
                 client = server.actions[query[0]](client, query, query[0], client_addr)
 
