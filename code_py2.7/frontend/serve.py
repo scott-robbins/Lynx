@@ -196,21 +196,24 @@ class HttpServer:
         return c
 
     def submit_login(self, c, request, active_clients, c_addr):
-        registered_users = refresh_users()
-        uname = request.split('username=')[1].split('&')[0]
-        passwd = request.split('password=')[1].split('%')[0]
-        if uname in registered_users.keys() and registered_users[uname] == passwd:
-            print '\033[1m[*] %s Has Logged in Successfully from %s\033[0m' % (uname, c_addr[0])
-            open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (c_addr[0], uname))
-            active_clients[uname] = [passwd]
-            self.known[c_addr[0]] = uname
-            success_page = html_engine.generate_success(uname)
-            c.send(open(success_page, 'rb').read())
-            os.remove(success_page)
-        else:
-            open(log_file_name, 'a').write('[!] %s FAILED to login as %s\n' % (c_addr[0], uname))
-            print '[*] Login failure for %s' % uname
-            c.send(open('login.html', 'rb').read())
+        try:
+            registered_users = refresh_users()
+            uname = request.split('username=')[1].split('&')[0]
+            passwd = request.split('password=')[1].split('%')[0]
+            if uname in registered_users.keys() and registered_users[uname] == passwd:
+                print '\033[1m[*] %s Has Logged in Successfully from %s\033[0m' % (uname, c_addr[0])
+                open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (c_addr[0], uname))
+                active_clients[uname] = [passwd]
+                self.known[c_addr[0]] = uname
+                success_page = html_engine.generate_success(uname)
+                c.send(open(success_page, 'rb').read())
+                os.remove(success_page)
+            else:
+                open(log_file_name, 'a').write('[!] %s FAILED to login as %s\n' % (c_addr[0], uname))
+                print '[*] Login failure for %s' % uname
+                c.send(open('login.html', 'rb').read())
+        except IndexError:
+            pass
         return c
 
     @staticmethod
