@@ -57,10 +57,30 @@ def get_file(fname, mykey):
     if len(decr.split(':')) <= 1:
         open('SHARED/%s' % fname, 'wb').write(decr)
     else:
-        file_size = decr.split('-')[1].split('-')[0]
-        n_fragments = decr.split('-')[2]
+        file_size = int(decr.split('-')[1].split('-')[0])
+        n_fragments = int(decr.split('-')[2])
         print '[*] Remote File is %d bytes.\n' \
               '[o] Download will be in %d fragments...' % (file_size, n_fragments)
+        # Now Download those fragments, and recombine
+        recombined = False
+        n_recv = 0
+        while not recombined:
+            if n_recv == n_fragments:
+                target = 'SHARED/%s' % fname
+                cmb = 'ls *.frag | while read n; do cat $n >> %s;rm $n; done' % target
+                os.system(cmb)
+                recombined = True
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((cloud_gateway, 54123))
+                raw_chunk = s.recv(2048)
+                open('chunk%d.frag' % n_recv, 'wb').write(utils.DecodeAES(cipher, raw_chunk))
+                n_recv += 1
+            except socket:
+                print '[!!] Failed to create socket... Are you running as root?'
+                exit()
+        print '[*] %d Fragments Received and Recombined into %s [%d bytes]' % \
+              (n_fragments, fname, file_size)
 
     return len(encr)
 

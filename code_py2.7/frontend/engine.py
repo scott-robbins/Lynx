@@ -221,7 +221,19 @@ class QueryApi:
                         n_frags = len(fragments['frags'])
                         msg_head = utils.EncodeAES(cipher, 'incoming_file:%s-%d-%d' % (name, size,n_frags))
                         client.send(msg_head, 10)
+                        # TODO: SEND FRAGMENTS
+                        chunks_sent = 0
+                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        s.bind(('0.0.0.0', 54124))
+                        s.listen()
+                        for file_name in os.listdir('chunks'):
+                            os.system('mv chunks/%s $PWD' % file_name)
+                            raw_data = open(file_name,'rb').read()
+                            enc_data = utils.EncodeAES(cipher, raw_data)
+                            rmt, rmt_addr = s.accept()
 
+
+                        os.system('rm -rf chunks/')
                     else:
                         print '[*] %s is requesting %s [%d bytes]' % (client_ip,
                                                                   name, size)
