@@ -260,6 +260,8 @@ def btc_price_tracking():
     usd_c2 = 'white'
     gbp_c2 = 'white'
 
+    points = price_data['usd']
+    height = 400
     '''     Build the HTML for webpage          '''
     euro = u"\N{euro sign}".encode('utf-8')
     pound = u"\N{pound sign}".encode('utf-8')
@@ -279,8 +281,28 @@ def btc_price_tracking():
               '<p> %s%f  - Maximum: %s%f - Mean: %s%f  [%s%s%d]</p>\n\n</div>\n' % \
               (gbp_c1, gbp_c2, pound, current_gbp_price, pound, gbp_maxima, pound, gbp_mean, gbpd,pound, meandiff_gbp)
     title += ticker
-    footer = '</html>\n'
-    content = header + title + footer
+    body = '</body>\n' \
+           '<meta http-equiv="refresh" content="30;url=%s">\n' \
+           '<canvas id="price_data" width="%d" height="%d" style="border:1px solid #d3d3d3;">\n' \
+           'This browser does not support the HTML5 canvas tag</canvas>\n<script>\n' \
+           % (name, height, height)
+    graph_data = 'var c = document.getElementById("price_data");\n' \
+                 'var ctx = c.getContext("2d");\n' \
+                 'ctx.moveTo(0,300);\nctx.stroke();\n'
+    largest = np.array(points).max()
+    # Data must come in as vector of line data as f(x)
+    for x in range(len(points) + 1):
+        try:
+            y = points.pop(x)
+            scaled_y = 300 - int(y/100)
+        except IndexError:
+            pass
+        graph_data += 'ctx.lineTo(%d,%d);\nctx.stroke();\n' % (x, scaled_y)
+
+    body += graph_data
+
+    footer = '</script>\n</html>\n'
+    content = header + title +body+ footer
     open(name, 'wb').write(content)
     return content
 
@@ -288,6 +310,6 @@ def btc_price_tracking():
 if '-t' in sys.argv:
     test_dir = '../SHARED'
     content = btc_price_tracking()
-    print content
+
 
 
