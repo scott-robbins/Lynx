@@ -195,6 +195,7 @@ class HttpServer:
 
     def submit_login(self, c, request, active_clients, c_addr):
         registered_users = refresh_users()
+        print request
         uname = request.split('username=')[1].split('&')[0]
         passwd = request.split('password=')[1].split('%')[0]
         if uname in registered_users.keys() and registered_users[uname] == passwd:
