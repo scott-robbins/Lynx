@@ -191,6 +191,8 @@ def btc_price_tracking():
         print 'Exists'
         data_loc = utils.cmd('find ~/BTC/code/price_log.txt').pop()
     else:
+        print 'Searching again...'
+        os.system('find /home/BTC/code/price*')
         data_loc = utils.cmd('find /home/BTC/code/price*').pop()
 
     price_data = parse_data(data_loc)
