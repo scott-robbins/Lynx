@@ -264,7 +264,7 @@ def btc_price_tracking():
     usd_c2 = 'white'
     gbp_c2 = 'white'
 
-    points = price_data['usd']
+    points = np.array(price_data['usd'])
     height = 400
     '''     Build the HTML for webpage          '''
     euro = u"\N{euro sign}".encode('utf-8')
@@ -292,27 +292,26 @@ def btc_price_tracking():
     graph_data = 'var c = document.getElementById("price_data");\n' \
                  'var ctx = c.getContext("2d");\n' \
                  'ctx.moveTo(0,300);\nctx.stroke();\n'
-    largest = np.array(points).max()
-    # Data must come in as vector of line data as f(x)
-    for x in range(len(points) + 1):
-        try:
-            y = points.pop(x)
-            scaled_y = 300 - int(y/100)
-        except IndexError:
-            pass
-        graph_data += 'ctx.lineTo(%d,%d);\nctx.stroke();\n' % (x, scaled_y)
 
+    # Data must come in as vector of line data as f(x)
+    scaled_y = points/points.max()*300.
+    for x in range(len(points) - 1):
+        graph_data += 'ctx.lineTo(%d,%d);\nctx.stroke();\n' % (x, scaled_y[x])
     body += graph_data
 
     footer = '</script>\n</html>\n'
-    content = header + title +body+ footer
+    content = header + title + body + footer
     open(name, 'wb').write(content)
-    return content
+    return content, points
 
 
 if '-t' in sys.argv:
     test_dir = '../SHARED'
-    content = btc_price_tracking()
+    content, dat = btc_price_tracking()
 
-
+    # import matplotlib.pyplot as plt
+    # prices = np.array(dat)
+    # s = prices/np.array(prices).max() * 300.
+    # plt.plot(s)
+    # plt.show()
 
