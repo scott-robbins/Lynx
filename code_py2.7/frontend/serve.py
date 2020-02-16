@@ -71,14 +71,13 @@ def run(handler):
                 continue
 
             query = request.split('\r\n')
-            print query
+            # print query
             # Login attempts
-            for field in query:
-
-                if len(field.split('username=')) > 1:
-                    print field
-                    server.submit_login(client,field,active_clients,client_addr)
-                    break
+            if 'POST / HTTP/1.1' == query[0]:
+                field = query.pop()
+                print field
+                server.submit_login(client,field,active_clients,client_addr)
+                break
 
             if query[0] in server.actions.keys():
                 client = server.actions[query[0]](client, query, query[0], client_addr)
