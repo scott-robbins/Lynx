@@ -218,9 +218,9 @@ def btc_price_tracking():
     # TODO: Use a 24hr link and parse that
     link_24hr = 'http://api.bitcoincharts.com/v1/weighted_prices.json'
 
-    # if mo == this_mo:
-    #     d_days = today - day
-    #     print 'N Days Diff: %d' % d_days
+    if mo == this_mo:
+        d_days = today - day
+        print 'N Days Diff: %d' % d_days
 
     meandiff_usd = current_usd_price - usd_mean
     meandiff_eur = current_eur_price - eur_mean
@@ -266,7 +266,7 @@ def btc_price_tracking():
     header = '<!DOCTYPE html>\n<html>\n' \
              '<meta charset="UTF-8" http-equiv="refresh" content="30;url=BTC">\n'
     title = '<head>\n<title> BTC Price </title>\n</head>\n' \
-            '<h2> BTC Price Tracking </h2>'
+            '<h2> BTC Price Tracking \t[Running for %d Days]</h2>' % d_days
     ticker = '<div style="background-color:%s;color:%s;padding:30px;">\n' \
              '<p> $%f  - Maximum: $%f  - Mean: $%f  [%s$%d]</p>\n</div>\n' % \
              (usd_c1, usd_c2, current_usd_price, usd_maxima, usd_mean, usdd, meandiff_usd)
