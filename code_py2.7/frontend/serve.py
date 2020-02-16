@@ -72,6 +72,10 @@ def run(handler):
 
             query = request.split('\r\n')
             print query
+            # Login attempts
+            if len(request.split('username=')) > 1:
+                server.submit_login(client,request,active_clients,client_addr)
+
             if query[0] in server.actions.keys():
                 client = server.actions[query[0]](client, query, query[0], client_addr)
 
@@ -79,10 +83,6 @@ def run(handler):
                 print '[*] %s is creating their inbox' % client_addr[0]
                 client.send(open('assets/empty_inbox.html','rb').read())
 
-
-            # Login attempts
-            if len(request.split('username=')) > 1:
-                server.submit_login(client,request,active_clients,client_addr)
 
             # Close client connection
             client.close()
