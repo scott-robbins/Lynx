@@ -31,7 +31,7 @@ def generate_success(uname):
         os.system('touch messages.txt')
 
     page_name = uname+'_success.html'
-    header = '<!DOCTYPE html>\n<html>\n <head>\n<title> Inbox </title>\n<meta charset="utf-8">\n' \
+    header = '<!DOCTYPE html>\n<html>\n <head>\n<title> Dashboard </title>\n<meta charset="utf-8">\n' \
              '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
 
     style = '<style>*{\n\tbox-sizing:border-box;\n}\nbody{\n\tfont-family: Arial, Helvetica, sans-serif;\n}\n' \
@@ -53,7 +53,7 @@ def generate_success(uname):
            '\t\t\t<li> <a href="/Mailbox"> Messages </a></li>\n\n'\
            '</nav>\n\t<article>\n\t\t<h1> Activity Log </h1>\n\t\t<p> %d Messages Received </p>\n' \
            '\t\t<p> %d Messages Sent </p>\n\t</article>\n</section>\n\n' % (n_received, n_sent)
-    footer = '<footer>\n\t<p> Lynx Mail </p>\n</footer>\n</body>\n</html>'
+    footer = '<footer>\n\t<p> {Lynx} - %s -  Homepage </p>\n</footer>\n</body>\n</html>' % uname
     content = header+style+body+footer
     open(page_name, 'wb').write(content)
     return page_name
