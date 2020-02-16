@@ -149,7 +149,15 @@ class QueryApi:
             if decrypted_query == 'show_peers':
                 reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
                 encrypted_content = utils.EncodeAES(cipher, reply)
-                client.send(encrypted_content)
+                if len(encrypted_content) < 1500:
+                    client.send(encrypted_content)
+                else:
+                    open('shared_data.txt','wb').write(encrypted_content)
+                    fragments = fragmented('shared_data.txt', 800)
+                    n_frags = len(fragments['frags'])
+                    print '[*] Fragmenting shared file data into %d packets' % n_frags
+                    os.remove('shared_data.txt')
+                    os.system('rm -rf chunks/')
             else:
                 return client
         except IndexError:
@@ -215,7 +223,7 @@ class QueryApi:
                 name = '../SHARED/' + decrypted_query.split('_')[1]
                 if os.path.isfile(name):
                     size = os.path.getsize(name)
-                    if size > 1200:
+                    if size > 1100:
                         print '[*] Fragmenting download'
                         fragments = fragmented(name, 800)
                         n_frags = len(fragments['frags'])
@@ -263,7 +271,7 @@ def listen_alt_channel(timeout):
     print '[*] %d existing users' % len(existing_users)
     while running and (time.time()-tic) < timeout:
 
-        check_active()
+        # check_active()
         # TODO: Improve performance by using dictionary of function calls like server
         try:
             client, client_addr = listener.accept()
