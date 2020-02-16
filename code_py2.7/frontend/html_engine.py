@@ -30,6 +30,11 @@ def generate_success(uname):
     else:
         os.system('touch messages.txt')
 
+    if os.path.isdir('../SHARED'):
+        n_shared = len(os.listdir('../SHARED'))
+    else:
+        n_shared = 0
+
     page_name = uname+'_success.html'
     header = '<!DOCTYPE html>\n<html>\n <head>\n<title> Dashboard </title>\n<meta charset="utf-8">\n' \
              '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
@@ -43,7 +48,7 @@ def generate_success(uname):
             'footer {\n\tbackground-color: #777;\n\tpadding: 10px;\n\ttext-align: center;\n\tcolor: white;\n}\n' \
             '@media (max-width: 600px) {\n\tnav, article {\n\twidth: 100%\n\theight: auto;\n\t}\n}\n</style>\n</head>\n'
 
-    body = '<body>\n\n<header>\n\t<h2> Home </h2>\n</header>\n\n<section>\n\t<nav>\n\t\t<ul>\n\n' \
+    body = '<body>\n\n<header>\n\t<h2> %s Homepage </h2>\n</header>\n\n<section>\n\t<nav>\n\t\t<ul>\n\n' \
            '\t\t\t<li> <a href="/Upload"> File Upload </a></li>\n' \
            '\t\t\t<li> <a href="/Shares"> Shared Files </a></li>\n'\
            '\t\t\t<li> <a href="/BTC"> Bitcoin Price </a></li>\n'\
@@ -52,7 +57,8 @@ def generate_success(uname):
            '\t\t\t<li> <a href="/Peers"> Active Peers </a></li>\n\n'\
            '\t\t\t<li> <a href="/Mailbox"> Messages </a></li>\n\n'\
            '</nav>\n\t<article>\n\t\t<h1> Activity Log </h1>\n\t\t<p> %d Messages Received </p>\n' \
-           '\t\t<p> %d Messages Sent </p>\n\t</article>\n</section>\n\n' % (n_received, n_sent)
+           '\t\t<p> %d Shared Files </p>\n' \
+           '\t\t<p> %d Messages Sent </p>\n\t</article>\n</section>\n\n' % (uname, n_shared, n_received, n_sent)
     footer = '<footer>\n\t<p> {Lynx} - %s -  Homepage </p>\n</footer>\n</body>\n</html>' % uname
     content = header+style+body+footer
     open(page_name, 'wb').write(content)
