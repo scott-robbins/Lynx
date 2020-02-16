@@ -63,10 +63,10 @@ def get_file(fname, mykey):
               '[o] Download will be in %d fragments...' % (file_size, n_fragments)
         # Now Download those fragments, and recombine
         recombined = False
-        n_recv = 1; n_throw = 3
+        n_recv = 0; n_throw = 3
         while not recombined or n_throw < 0:
             print '*Debug: %d fragments receieved' % n_recv
-            if n_recv == n_fragments:
+            if n_recv == (n_fragments):
 
                 break
                 recombined = True
