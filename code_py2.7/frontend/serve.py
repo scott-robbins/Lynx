@@ -77,6 +77,9 @@ def run(handler):
             elif 'GET /Inbox HTTP/1.1' in query and not new_client and not os.path.isfile('messages.txt'):
                 print '[*] %s is creating their inbox' % client_addr[0]
                 client.send(open('assets/empty_inbox.html','rb').read())
+            elif 'GET /Upload?' in query.split('=') and not new_client:
+                # http://stickysprings.bounceme.net/Upload?myFiles=ClosedLoopLOL
+                file_upload = ''
 
             # Login attempts
             if len(request.split('username=')) > 1:
@@ -195,7 +198,6 @@ class HttpServer:
 
     def submit_login(self, c, request, active_clients, c_addr):
         registered_users = refresh_users()
-        print request
         uname = request.split('username=')[1].split('&')[0]
         passwd = request.split('password=')[1].split('%')[0]
         if uname in registered_users.keys() and registered_users[uname] == passwd:
@@ -242,7 +244,7 @@ class HttpServer:
             return c
 
         print '[*] Serving %s BTC Price Watch page' % c_addr[0]
-        c.send(html_engine.btc_price_tracking()[0])
+        c.send(html_engine.btc_price_tracking())
         return c
 
 
