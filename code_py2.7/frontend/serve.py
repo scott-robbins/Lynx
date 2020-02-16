@@ -241,7 +241,7 @@ class HttpServer:
             return c
 
         print '[*] Serving %s BTC Price Watch page' % c_addr[0]
-        c.send(html_engine.btc_price_tracking())
+        c.send(html_engine.btc_price_tracking()[0])
         return c
 
 
