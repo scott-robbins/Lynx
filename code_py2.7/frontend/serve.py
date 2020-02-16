@@ -71,7 +71,7 @@ def run(handler):
                 continue
 
             query = request.split('\r\n')
-            # print query
+            print query
             # Login attempts
             for field in query:
 
