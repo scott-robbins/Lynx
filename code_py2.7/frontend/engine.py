@@ -236,6 +236,7 @@ class QueryApi:
                             rmt, rmt_addr = s.accept()
                             rmt.send(enc_data)
                             bytes_sent += int(rmt.recv(256).split(':')[1])
+                            chunks_sent += 1
                             rmt.close()
                             print '[o] %d bytes sent' % bytes_sent
 
@@ -249,6 +250,7 @@ class QueryApi:
             else:
                 return client
         except IndexError:
+            s.close()
             pass
         return client
 

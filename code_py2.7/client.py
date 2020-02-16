@@ -74,7 +74,7 @@ def get_file(fname, mykey):
             try:
                 time.sleep(0.2)
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect((cloud_gateway, 54123))
+                s.connect((cloud_gateway, 54124))
                 raw_chunk = s.recv(2048)
                 s.send('GOT:%d' % len(raw_chunk))
                 s.close()
