@@ -213,18 +213,20 @@ def btc_price_tracking():
 
     this_mo = current_date.split('/')[0]
     today = int(current_date.split('/')[1].split('/')[0])
-    if mo == this_mo:
-        d_days = today - day
 
-        print 'N Days Diff: %d' % d_days
-        if d_days == 0:
-            usd_maxima, usd_mean = np.array(price_data['usd']).max(), np.array(price_data['usd']).mean()
-            eur_maxima, eur_mean = np.array(price_data['eur']).max(), np.array(price_data['eur']).mean()
-            gbp_maxima, gbp_mean = np.array(price_data['gbp']).max(), np.array(price_data['gbp']).mean()
+    usd_maxima, usd_mean = np.array(price_data['usd']).max(), np.array(price_data['usd']).mean()
+    eur_maxima, eur_mean = np.array(price_data['eur']).max(), np.array(price_data['eur']).mean()
+    gbp_maxima, gbp_mean = np.array(price_data['gbp']).max(), np.array(price_data['gbp']).mean()
 
-        else:
-            # TODO: Use a 24hr link and parse that
-            link_24hr = 'http://api.bitcoincharts.com/v1/weighted_prices.json'
+    # TODO: Use a 24hr link and parse that
+    link_24hr = 'http://api.bitcoincharts.com/v1/weighted_prices.json'
+
+    # if mo == this_mo:
+    #     d_days = today - day
+    #
+    #     print 'N Days Diff: %d' % d_days
+
+
 
     meandiff_usd = current_usd_price - usd_mean
     meandiff_eur = current_eur_price - eur_mean
@@ -272,15 +274,15 @@ def btc_price_tracking():
     title = '<head>\n<title> BTC Price </title>\n</head>\n' \
             '<h2> BTC Price Tracking </h2>'
     ticker = '<div style="background-color:%s;color:%s;padding:30px;">\n' \
-             '<p> $%f  - 24 Hr. Maximum: $%f  - 24 Hr. Mean: $%f  [%s$%d]</p>\n</div>\n' % \
+             '<p> $%f  - Maximum: $%f  - Mean: $%f  [%s$%d]</p>\n</div>\n' % \
              (usd_c1, usd_c2, current_usd_price, usd_maxima, usd_mean, usdd, meandiff_usd)
 
     ticker += '<div style="background-color:%s;color:%s;padding:30px;">\n' \
-              '<p> %s%f  - 24 Hr. Maximum: %s%f - 24 Hr. Mean: %s%f  [%s%s%d]</p>\n\n</div>\n' % \
+              '<p> %s%f  - Maximum: %s%f - Mean: %s%f  [%s%s%d]</p>\n\n</div>\n' % \
               (eur_c1, eur_c2, euro,  current_eur_price, euro, eur_maxima, euro, eur_mean, eurd, euro, meandiff_eur)
 
     ticker += '<div style="background-color:%s;color:%s;padding:30px;">\n' \
-              '<p> %s%f  - 24 Hr. Maximum: %s%f - 24 Hr. Mean: %s%f  [%s%s%d]</p>\n\n</div>\n' % \
+              '<p> %s%f  - Maximum: %s%f - Mean: %s%f  [%s%s%d]</p>\n\n</div>\n' % \
               (gbp_c1, gbp_c2, pound, current_gbp_price, pound, gbp_maxima, pound, gbp_mean, gbpd,pound, meandiff_gbp)
     title += ticker
     footer = '</html>\n'
