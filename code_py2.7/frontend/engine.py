@@ -179,6 +179,8 @@ class QueryApi:
             elif 'GET' in decrypted_query.split('_'):
                 name = '../SHARED/' + decrypted_query.split('_')[1]
                 if os.path.isfile(name):
+                    print name
+                    os.system('ls -la %s' % name)
                     size = os.path.isfile(name)
                     if size > 1500:
                         print '[*] Fragmenting download'
