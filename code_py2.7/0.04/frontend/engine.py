@@ -311,7 +311,8 @@ def listen_alt_channel(timeout):
                     os.system('rm -rf chunks/')     # TODO: Why isn't this working??
                 if os.path.isdir('chunks/'):
                     os.system('sudo rm -rf chunks/')
-
+            else:
+                print raw_data
             # Check for add user command
             check_for_add_user_cmd(raw_data,client_addr, existing_users)
 
