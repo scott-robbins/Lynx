@@ -47,8 +47,6 @@ def initialize_keys(private_ip):
 
 
 def get_file(fname, mykey):
-    # TODO: Use the fragmentation method like the serverside PUT code, so that client can
-    #  GET files that are over ~1.5Kb
     query = 'GET_%s' % fname
     encq = utils.EncodeAES(cipher, query)
     print '[*] Requesting Lynx Cloud for file %s' % fname
