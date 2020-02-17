@@ -144,20 +144,17 @@ class QueryApi:
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         print '[*] Decrypted Query: %s' % decrypted_query
         try:
-            if decrypted_query == 'show_peers':
-                reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
-                encrypted_content = utils.EncodeAES(cipher, reply)
-                if len(encrypted_content) < 1500:
-                    client.send(encrypted_content)
-                else:
-                    open('shared_data.txt','wb').write(encrypted_content)
-                    fragments = fragmented('shared_data.txt', 800)
-                    n_frags = len(fragments['frags'])
-                    print '[*] Fragmenting shared file data into %d packets' % n_frags
-                    os.remove('shared_data.txt')
-                    os.system('rm -rf chunks/')
+            reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
+            encrypted_content = utils.EncodeAES(cipher, reply)
+            if len(encrypted_content) < 1500:
+                client.send(encrypted_content)
             else:
-                return client
+                open('shared_data.txt', 'wb').write(encrypted_content)
+                fragments = fragmented('shared_data.txt', 800)
+                n_frags = len(fragments['frags'])
+                print '[*] Fragmenting shared file data into %d packets' % n_frags
+                os.remove('shared_data.txt')
+                os.system('rm -rf chunks/')
         except IndexError:
             print '[!!] Error Decrypting Check Peers Command from %s' % clients[raw.split(' ???? ')[0]]
         return client
@@ -167,13 +164,12 @@ class QueryApi:
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         # print '[o] Incoming Message... '
         try:
-            if decrypted_query == 'send_message':
-                client.send(utils.EncodeAES(cipher, 'YES'))
-                enc_data = client.recv(1500000)
-                # print ' [*] Message Received!'
-                decrypted_data = utils.DecodeAES(cipher, enc_data)
-                # print decrypted_data
-                open('messages.txt', 'a').write(decrypted_data)
+            client.send(utils.EncodeAES(cipher, 'YES'))
+            enc_data = client.recv(1500000)
+            # print ' [*] Message Received!'
+            decrypted_data = utils.DecodeAES(cipher, enc_data)
+            # print decrypted_data
+            open('messages.txt', 'a').write(decrypted_data)
         except IndexError:
             print '[!!] Message Handler Error'
         return client
@@ -286,14 +282,15 @@ def listen_alt_channel(timeout):
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 
-                # Display peer names command
-                client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
+                if decrypted_query == 'show_peers':
+                    # Display peer names command
+                    client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 
                 # Check for show shares command
                 client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
-
-                # check for encrypted p2p messages
-                client = QueryApi.message_handler(client, clients, raw_data, decrypted_query)
+                if decrypted_query == 'send_message':
+                    # check for encrypted p2p messages
+                    client = QueryApi.message_handler(client, clients, raw_data, decrypted_query)
 
                 if 'fragments' in decrypted_query.split(':'):
                     N = decrypted_query.split(':')[1].split(' = ')[0]
