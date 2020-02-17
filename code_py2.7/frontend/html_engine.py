@@ -142,7 +142,6 @@ def render_file_structure(file_path):
             for fname in directory['file']:
                 dloc = where[fname]
                 h = hashes['"'+fname.replace('//','/')+'"']
-                print h
                 if dloc == folder:
                     more += '<li> %s : %s </li>\n' % (fname.replace('//','/'), h)
             more += '</ul>\n'
@@ -151,7 +150,8 @@ def render_file_structure(file_path):
     elif len(top_dirs) <= 1:
         m = '<ul>\n'
         for fname in directory['file']:
-            m +='<li> %s </li>\n' % fname.replace('//','/')
+            h = hashes['"' + fname.replace('//', '/') + '"']
+            m += '<li> %s : %s </li>\n' % (fname.replace('//','/'), h)
         m += '</ul>\n'
         content += m
     page = header + content + footer
