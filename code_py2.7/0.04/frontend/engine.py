@@ -147,17 +147,18 @@ class QueryApi:
         # TODO: socket error handling
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         try:
-            reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
-            encrypted_content = utils.EncodeAES(cipher, reply)
-            if len(encrypted_content) < 1500:
-                client.send(encrypted_content)
-            else:
-                open('shared_data.txt', 'wb').write(encrypted_content)
-                fragments = fragmented('shared_data.txt', 800)
-                n_frags = len(fragments['frags'])
-                print '[*] Fragmenting shared file data into %d packets' % n_frags
-                os.remove('shared_data.txt')
-                os.system('rm -rf chunks/')
+            if decrypted_query == 'show_peers':
+                reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
+                encrypted_content = utils.EncodeAES(cipher, reply)
+                if len(encrypted_content) < 1500:
+                    client.send(encrypted_content)
+                else:
+                    open('shared_data.txt', 'wb').write(encrypted_content)
+                    fragments = fragmented('shared_data.txt', 800)
+                    n_frags = len(fragments['frags'])
+                    print '[*] Fragmenting shared file data into %d packets' % n_frags
+                    os.remove('shared_data.txt')
+                    os.system('rm -rf chunks/')
         except IndexError:
             print '[!!] Error Decrypting Check Peers Command from %s' % clients[raw.split(' ???? ')[0]]
         return client
@@ -288,13 +289,13 @@ def listen_alt_channel(timeout):
                 # Check for show shares command
                 client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
 
+                # Display peer names command
+                client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
+
                 if len(decrypted_query.split('_')) >= 2:
                     # Upload file
                     client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
 
-                elif decrypted_query == 'show_peers':
-                    # Display peer names command
-                    client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 
                 elif decrypted_query == 'send_message':
                     # check for encrypted p2p messages
