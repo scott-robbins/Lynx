@@ -116,7 +116,7 @@ def fragmented(fname, frag_size):
         if blocks[len(blocks)-1] < len(raw_data):
             db = len(raw_data) - blocks[len(blocks)-1]
             chunk = raw_data[blocks[len(blocks)-1]:(blocks[len(blocks)-1]+db)]
-            print 'Adding %d bytes' % db
+            # print 'Adding %d bytes' % db
             fname = 'chunk%d.frag' % (len(blocks))
             fragments['frags'].append('chunks/' + fname)
             open('chunks/' + fname, 'wb').write(chunk)
