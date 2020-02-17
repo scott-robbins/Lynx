@@ -304,7 +304,7 @@ def listen_alt_channel(timeout):
                     print '[*] %s is requesting fragmented file re-assembly of %s fragments' %\
                           (client_addr[0], N)
                     defragment(int(N), name_out)
-                    os.system('rm -rf chunks/')
+                    os.system('rm -rf chunks/')     # TODO: Why isn't this working??
 
             # Check for add user command
             check_for_add_user_cmd(raw_data,client_addr, existing_users)
