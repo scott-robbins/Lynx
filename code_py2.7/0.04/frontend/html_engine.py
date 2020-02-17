@@ -143,7 +143,7 @@ def render_file_structure(file_path):
                 dloc = where[fname]
                 h = hashes['"' +fname.replace('//','/')+ '"']
                 if dloc == folder:
-                    more += '<li> %s : %s </li>\n' % (fname.replace('//','/'), h)
+                    more += '<li> %s : \t%s </li>\n' % (fname.replace('//','/'), h)
             more += '</ul>\n'
             if len(more):
                 content += more
