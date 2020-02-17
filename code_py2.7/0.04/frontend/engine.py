@@ -145,18 +145,17 @@ class QueryApi:
         # TODO: socket error handling
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         try:
-            if 'show_peers' in decrypted_query.split(': '):
-                reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
-                encrypted_content = utils.EncodeAES(cipher, reply)
-                if len(encrypted_content) < 1500:
-                    client.send(encrypted_content)
-                else:
-                    open('shared_data.txt', 'wb').write(encrypted_content)
-                    fragments = fragmented('shared_data.txt', 800)
-                    n_frags = len(fragments['frags'])
-                    print '[*] Fragmenting shared file data into %d packets' % n_frags
-                    os.remove('shared_data.txt')
-                    os.system('rm -rf chunks/')
+            reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
+            encrypted_content = utils.EncodeAES(cipher, reply)
+            if len(encrypted_content) < 1500:
+                client.send(encrypted_content)
+            else:
+                open('shared_data.txt', 'wb').write(encrypted_content)
+                fragments = fragmented('shared_data.txt', 800)
+                n_frags = len(fragments['frags'])
+                print '[*] Fragmenting shared file data into %d packets' % n_frags
+                os.remove('shared_data.txt')
+                os.system('rm -rf chunks/')
         except IndexError:
             print '[!!] Error Decrypting Check Peers Command from %s' % clients[raw.split(' ???? ')[0]]
         return client
@@ -281,8 +280,10 @@ def listen_alt_channel(timeout):
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 
-                # Display peer names command
-                client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
+                if 'show_peers' in decrypted_query.split(': '):
+                    # Display peer names command
+                    client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
+
                 if 'show_shares' in decrypted_query.split(':'):
                     # Check for show shares command
                     client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
