@@ -105,7 +105,7 @@ def fragmented(fname, frag_size):
         n_files = os.path.getsize(fname)/frag_size
         print '[*] Fragmenting %s into %d files' % (fname, n_files)
         if os.path.isdir('chunks/'):
-            os.system('rm -rf chunks')
+            os.system('rm -rf chunks/')
         os.system('mkdir chunks/')
         raw_data = open(fname,'rb').read()
         block_ind = 1
@@ -294,12 +294,11 @@ def listen_alt_channel(timeout):
                 elif decrypted_query == 'show_peers':
                     # Display peer names command
                     client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
-                    continue
 
                 elif decrypted_query == 'send_message':
                     # check for encrypted p2p messages
                     client = QueryApi.message_handler(client, clients, raw_data, decrypted_query)
-                    continue
+
                 elif 'fragments' in decrypted_query.split(':'):
                     N = decrypted_query.split(':')[1].split(' = ')[0]
                     name_out = decrypted_query.split(' = ')[1]
