@@ -274,21 +274,21 @@ def listen_alt_channel(timeout):
 
             # Encrypted API Queries
             if len(raw_data.split(' ???? ')) >= 2:
+                cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
+                decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
                 if raw_data.split(' ???? ')[0] not in clients.keys():
                     print '[*] Do not recognize key: %s from %s '% \
                           (raw_data.split(' ???? ')[0], client_addr[0])
-                cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
-                decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 
                 if 'show_peers' in decrypted_query.split(': '):
                     # Display peer names command
                     client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 
-                if 'show_shares' in decrypted_query.split(':'):
+                elif 'show_shares' in decrypted_query.split(':'):
                     # Check for show shares command
                     client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
 
-                if len(decrypted_query.split('_')) >= 2:
+                elif len(decrypted_query.split('_')) >= 2:
                     # Upload file
                     client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
 
