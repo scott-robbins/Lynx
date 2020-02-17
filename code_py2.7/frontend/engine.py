@@ -71,10 +71,9 @@ def defragment(n_frags, name):
     frag_files = utils.cmd('ls ../SHARED/chunk*') # TODO: This might not return in order for large files
     if len(frag_files) != n_frags:
         print '[!!] %d Fragments found (not %d)' % (len(frag_files), n_frags)
-    for ii in range(1,n_frags):
-        f = '../SHARED/chunk%d.frag' % ii
+    for f in frag_files:
         raw_data += open(f, 'rb').read()
-        os.remove(f)
+        os.remove('../SHARED/'+f)
     open('../SHARED/'+name, 'wb').write(raw_data)
 
 
@@ -168,7 +167,7 @@ class QueryApi:
     @staticmethod
     def message_handler(client, clients, raw, decrypted_query):
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
-        # print '[o] Incoming Message... '
+        print '[o] Incoming Message... '
         try:
             if decrypted_query == 'send_message':
                 client.send(utils.EncodeAES(cipher, 'YES'))
@@ -214,7 +213,7 @@ class QueryApi:
                     if len(raw_data) > 0:
                         try:
                             dec_data = utils.DecodeAES(cipher, raw_data)
-                            open('%s' % name, 'wb').write(dec_data)
+                            open('../SHARED/%s' % name, 'wb').write(dec_data)
                         except ValueError:
                             print '[!!] Failed to decrypt data'
                             pass
