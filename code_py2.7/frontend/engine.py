@@ -198,7 +198,7 @@ class QueryApi:
             name = decrypted_query.split('_')[1]
             size = int(decrypted_query.split('_')[2])
             if size < max_size:
-                # print '[*] %s is uploading %d bytes' % (client_ip, size)
+                print '[*] %s is uploading %d bytes' % (client_ip, size)
                 client.send(utils.EncodeAES(cipher, 'YES'))
                 raw_data = client.recv(size)
                 # print '[*] %d Encrypted Bytes Received' % len(raw_data)

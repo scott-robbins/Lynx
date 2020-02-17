@@ -198,21 +198,16 @@ if __name__ == '__main__':
         sz = os.path.getsize(n)
         if sz > 1500:
             fragments = network.fragmented(n, 800)
-            N = len(fragments['frags'])
             # TODO: Alert remote host about fragments coming
             msg = utils.EncodeAES(cipher, 'incoming_file:%s' % n)
             network.connect_send(cloud_gateway, 54123, my_api_key+' ???? '+msg,10)
             print '[*] File is %d bytes (over 1.5kB)' % sz
-            print '[*] Fragmenting into %d Files...' % N
+            print '[*] Fragmenting into %d Files...' % len(fragments['frags'])
+
             N = 0
-            # progress = tqdm(total=N,unit='packets')
             for file_name in tqdm(fragments['frags'], unit='packet'):
-                # os.system('mv %s $PWD' % file_name)
                 put_file(file_name, my_api_key)
-                os.remove(file_name)
                 N += 1
-                # progress.update(1)
-            # progress.close()
             os.system('rm -r chunks/')
             encr = utils.EncodeAES(cipher, 'fragments:%d = %s' % (N, n))
             network.connect_send(cloud_gateway, 54123, my_api_key + ' ???? '+encr, 10)
