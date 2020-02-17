@@ -88,7 +88,7 @@ def crawl_dir(file_path, h, verbose):
                 file_name = direct + "/" + item
                 directory['file'].append(file_name)
                 if h:
-                    hashes['"'+file_name+'"'] = get_sha256_sum(file_name.replace('//','/'), False)
+                    hashes['"'+file_name.replace('//','/')+'"'] = get_sha256_sum(file_name, False)
                 if verbose:
                     print '\033[3m- %s Added to Shared Folder\033[0m' % file_name
             else:
