@@ -206,7 +206,7 @@ if __name__ == '__main__':
             print '[*] Fragmenting into %d Files...' % N
             N = 0
             # progress = tqdm(total=N,unit='packets')
-            for file_name in tqdm(fragments['frags']):
+            for file_name in tqdm(fragments['frags'], unit='packet'):
                 # os.system('mv %s $PWD' % file_name)
                 put_file(file_name, my_api_key)
                 os.remove(file_name)
