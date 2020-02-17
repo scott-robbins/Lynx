@@ -279,9 +279,11 @@ def listen_alt_channel(timeout):
                 clients = exchange_keys(raw_data, clients, client_addr)
 
             # Encrypted API Queries
-            elif len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
+            if len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
+
+                print '*Debug: %s' % decrypted_query
 
                 if 'show_shares' in decrypted_query.split(':'):
                     # Check for show shares command
