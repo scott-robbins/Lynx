@@ -148,6 +148,7 @@ class QueryApi:
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         try:
             if decrypted_query == 'show_peers':
+                print 'showing peers'
                 reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
                 encrypted_content = utils.EncodeAES(cipher, reply)
                 if len(encrypted_content) < 1500:
@@ -185,6 +186,7 @@ class QueryApi:
         get_shares = 'ls ../SHARED | while read n; do sha256sum ../SHARED/$n >> files.txt; done'
         try:
             if decrypted_query == 'show_shares':
+                print 'Showing shared files'
                 os.system(get_shares)
                 client.send(utils.EncodeAES(cipher, utils.arr2lines(utils.swap('files.txt', True))))
             else:
@@ -295,7 +297,6 @@ def listen_alt_channel(timeout):
                 if len(decrypted_query.split('_')) >= 2:
                     # Upload file
                     client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
-
 
                 elif decrypted_query == 'send_message':
                     # check for encrypted p2p messages
