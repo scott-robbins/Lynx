@@ -261,7 +261,7 @@ class QueryApi:
 
 def listen_alt_channel(timeout):
     clients = {}
-    # refresh_registered_nodes()
+    refresh_registered_nodes()
     # TODO: Create a log file for this alternate channel
     tic = time.time(); running = True
     listener = utils.start_listener(54123, timeout)
@@ -280,10 +280,11 @@ def listen_alt_channel(timeout):
                 clients = exchange_keys(raw_data, clients, client_addr)
 
             # Encrypted API Queries
-            elif len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
+            if len(raw_data.split(' ???? ')) >= 2:
+                if raw_data.split(' ???? ')[0] not in clients.keys():
+                    print '[*] Do not recognize key: %s'%  raw_data.split(' ???? ')[0]
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
-
 
                 # Display peer names command
                 client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
@@ -291,12 +292,9 @@ def listen_alt_channel(timeout):
                 # Check for show shares command
                 client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
 
-
                 if len(decrypted_query.split('_')) >= 2:
                     # Upload file
                     client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
-
-
 
                 elif decrypted_query == 'send_message':
                     # check for encrypted p2p messages
