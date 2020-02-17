@@ -1,6 +1,11 @@
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
-from tqdm import tqdm
+try:
+    from tqdm import tqdm
+    progress_bar = True
+except ImportError:
+    progress_bar = False
+    pass
 import socket
 import base64
 import network
@@ -62,7 +67,10 @@ def get_file(fname, mykey):
         # Now Download those fragments, and recombine
         recombined = False
         n_recv = 0; n_throw = 3
-        progress = tqdm(total=n_fragments, unit=' packets')
+        if progress_bar:
+            progress = tqdm(total=n_fragments, unit=' packets')
+        else:
+            progress = ''
         while not recombined or n_throw < 0:
             try:
                 time.sleep(0.2)
@@ -72,7 +80,10 @@ def get_file(fname, mykey):
                 s.send('GOT:%d' % len(raw_chunk))
                 s.close()
                 open('chunk%d.frag' % n_recv, 'wb').write(utils.DecodeAES(cipher, raw_chunk))
-                progress.update(1)
+                if progress_bar:
+                    progress.update(1)
+                else:
+                    progress = int(n_recv/n_fragments)*'#'
                 n_recv += 1
                 # print '*Debug: %d fragments receieved' % n_recv
                 if n_recv == n_fragments:
@@ -82,7 +93,8 @@ def get_file(fname, mykey):
                 n_throw -= 1
                 pass
                 print '[!!] Failed to create socket... Are you running as root?'
-        progress.close()
+        if progress_bar:
+            progress.close()
         print '[*] Recombining %d fragments' % n_recv
         target = 'SHARED/%s' % fname
         content = ''
@@ -171,19 +183,6 @@ if __name__ == '__main__':
     my_api_key = base64.b64encode(get_random_bytes(32))  # set api key
     cipher = AES.new(base64.b64decode(my_api_key))
 
-    if '-peer' not in sys.argv:
-        network.connect_send(cloud_gateway, 54123, username+' !!!! '+my_api_key, 10)
-    else:
-        ii = 0
-        for e in sys.argv:
-            if e != '-peer':
-                ii += 1
-            else:
-                ii = ii + 1
-                break
-        print 'synchronizing with PEER %s' % sys.argv[ii]
-        network.connect_send(sys.argv[ii],54123, username + ' !!!! ' + my_api_key, 10)
-
     if 'peers' in sys.argv:  # show registed peers using api key
         show_peers(my_api_key)
 
@@ -206,9 +205,14 @@ if __name__ == '__main__':
             print '[*] Fragmenting into %d Files...' % len(fragments['frags'])
 
             N = 0
-            for file_name in tqdm(fragments['frags'], unit=' fragments'):
-                put_file(file_name, my_api_key)
-                N += 1
+            if progress_bar:
+                for file_name in tqdm(fragments['frags'], unit=' fragments'):
+                    put_file(file_name, my_api_key)
+                    N += 1
+            else:
+                for file_name in fragments['frags']:
+                    put_file(file_name, my_api_key)
+                    N+=1
             os.system('rm -r chunks/')
             encr = utils.EncodeAES(cipher, 'fragments:%d = %s' % (N, n))
             network.connect_send(cloud_gateway, 54123, my_api_key + ' ???? '+encr, 10)
