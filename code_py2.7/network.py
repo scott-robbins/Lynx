@@ -93,7 +93,7 @@ def fragmented(fname, frag_size):
         print "[!] Cannot find %s" % fname
     else:
         n_files = os.path.getsize(fname)/frag_size
-        print '[*] Fragmenting %s into %d files' % (fname, n_files)
+        # print '[*] Fragmenting %s into %d files' % (fname, n_files)
         os.system('mkdir chunks/')
         raw_data = open(fname,'rb').read()
         block_ind = 1
