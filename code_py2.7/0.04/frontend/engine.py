@@ -280,11 +280,11 @@ def listen_alt_channel(timeout):
                 clients = exchange_keys(raw_data, clients, client_addr)
 
             # Encrypted API Queries
-            if len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
+            elif len(raw_data.split(' ???? ')) >= 2 and raw_data.split(' ???? ')[0] in clients.keys():
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 
-                print '*Debug: %s' % decrypted_query
+
                 # Display peer names command
                 client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 
