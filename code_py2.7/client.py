@@ -205,7 +205,7 @@ if __name__ == '__main__':
 
             N = 0
             for file_name in fragments['frags']:
-                os.system('mv chunks/%s $PWD' % file_name)
+                # os.system('mv %s $PWD' % file_name)
                 put_file(file_name, my_api_key)
                 os.remove(file_name)
                 N += 1
