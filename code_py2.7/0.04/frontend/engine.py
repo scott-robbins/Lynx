@@ -282,7 +282,8 @@ def listen_alt_channel(timeout):
             # Encrypted API Queries
             if len(raw_data.split(' ???? ')) >= 2:
                 if raw_data.split(' ???? ')[0] not in clients.keys():
-                    print '[*] Do not recognize key: %s'%  raw_data.split(' ???? ')[0]
+                    print '[*] Do not recognize key: %s from %s '% \
+                          (raw_data.split(' ???? ')[0], client_addr[0])
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 
