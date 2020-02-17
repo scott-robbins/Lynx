@@ -67,7 +67,8 @@ def get_file(fname, mykey):
         # Now Download those fragments, and recombine
         recombined = False
         n_recv = 0; n_throw = 3
-        progress = tqdm(total=n_fragments, unit=' packets')
+        if progress_bar:
+            progress = tqdm(total=n_fragments, unit=' packets')
         while not recombined or n_throw < 0:
             try:
                 time.sleep(0.2)
@@ -77,7 +78,8 @@ def get_file(fname, mykey):
                 s.send('GOT:%d' % len(raw_chunk))
                 s.close()
                 open('chunk%d.frag' % n_recv, 'wb').write(utils.DecodeAES(cipher, raw_chunk))
-                progress.update(1)
+                if progress_bar:
+                    progress.update(1)
                 n_recv += 1
                 # print '*Debug: %d fragments receieved' % n_recv
                 if n_recv == n_fragments:
@@ -87,7 +89,8 @@ def get_file(fname, mykey):
                 n_throw -= 1
                 pass
                 print '[!!] Failed to create socket... Are you running as root?'
-        progress.close()
+        if progress_bar:
+            progress.close()
         print '[*] Recombining %d fragments' % n_recv
         target = 'SHARED/%s' % fname
         content = ''
