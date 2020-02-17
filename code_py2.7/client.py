@@ -1,5 +1,6 @@
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
+from tqdm import tqdm
 import socket
 import base64
 import network
@@ -202,13 +203,16 @@ if __name__ == '__main__':
             msg = utils.EncodeAES(cipher, 'incoming_file:%s' % n)
             network.connect_send(cloud_gateway, 54123, my_api_key+' ???? '+msg,10)
             print '[*] File is %d bytes (over 1.5kB)' % sz
-
+            print '[*] Fragmenting into %d Files...' % N
             N = 0
+            progress = tqdm(total=N)
             for file_name in fragments['frags']:
                 # os.system('mv %s $PWD' % file_name)
                 put_file(file_name, my_api_key)
                 os.remove(file_name)
                 N += 1
+                progress.update(1)
+            progress.close()
             os.system('rm -r chunks/')
             encr = utils.EncodeAES(cipher, 'fragments:%d = %s' % (N, n))
             network.connect_send(cloud_gateway, 54123, my_api_key + ' ???? '+encr, 10)
