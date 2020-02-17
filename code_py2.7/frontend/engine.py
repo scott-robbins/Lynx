@@ -258,6 +258,7 @@ class QueryApi:
         if not os.path.isdir('chunks/'):
             os.mkdir('chunks/')
         try:
+            print decrypted_query
             client = modes[decrypted_query.split('_')[0]]
         except IndexError:
             pass
