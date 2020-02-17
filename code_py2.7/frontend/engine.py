@@ -71,7 +71,7 @@ def defragment(n_frags, name):
     frag_files = utils.cmd('ls chunks/') # TODO: This might not return in order for large files
     if len(frag_files) != n_frags:
         print '[!!] %d Fragments found (not %d)' % (len(frag_files), n_frags)
-    for f in range(1, n_frags):
+    for f in range(1, n_frags+1):
         print '[o] Recombining file chunk%d.frag' % f
         raw_data += open('chunks/chunk%d.frag' % f, 'rb').read()
         # os.remove('chunks/chunk%d.frag' % f)
