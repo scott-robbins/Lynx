@@ -75,7 +75,7 @@ def defragment(n_frags, name):
         raw_data += open('chunks/chunk%d.frag' % f, 'rb').read()
         os.remove('chunks/chunk%d.frag' % f)
     open('../SHARED/'+name, 'wb').write(raw_data)
-    os.system('rm -rf ')
+    os.system('rm -rf chunks/')
 
 
 def check_active():
