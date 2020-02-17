@@ -69,6 +69,8 @@ def get_file(fname, mykey):
         n_recv = 0; n_throw = 3
         if progress_bar:
             progress = tqdm(total=n_fragments, unit=' packets')
+        else:
+            progress = ''
         while not recombined or n_throw < 0:
             try:
                 time.sleep(0.2)
@@ -80,6 +82,8 @@ def get_file(fname, mykey):
                 open('chunk%d.frag' % n_recv, 'wb').write(utils.DecodeAES(cipher, raw_chunk))
                 if progress_bar:
                     progress.update(1)
+                else:
+                    progress = int(n_recv/n_fragments)*'#'
                 n_recv += 1
                 # print '*Debug: %d fragments receieved' % n_recv
                 if n_recv == n_fragments:
@@ -178,19 +182,6 @@ if __name__ == '__main__':
     # Update/Sync with the P2P Cloud
     my_api_key = base64.b64encode(get_random_bytes(32))  # set api key
     cipher = AES.new(base64.b64decode(my_api_key))
-
-    if '-peer' not in sys.argv:
-        network.connect_send(cloud_gateway, 54123, username+' !!!! '+my_api_key, 10)
-    else:
-        ii = 0
-        for e in sys.argv:
-            if e != '-peer':
-                ii += 1
-            else:
-                ii = ii + 1
-                break
-        print 'synchronizing with PEER %s' % sys.argv[ii]
-        network.connect_send(sys.argv[ii],54123, username + ' !!!! ' + my_api_key, 10)
 
     if 'peers' in sys.argv:  # show registed peers using api key
         show_peers(my_api_key)
