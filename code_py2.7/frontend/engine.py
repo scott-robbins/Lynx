@@ -209,6 +209,8 @@ class QueryApi:
                         try:
                             dec_data = utils.DecodeAES(cipher, raw_data)
                             open('%s' % name, 'wb').write(dec_data)
+                            client.close()
+                            return client
                         except ValueError:
                             print '[!!] Failed to decrypt data'
                             pass
@@ -243,6 +245,7 @@ class QueryApi:
 
                         os.system('rm -rf chunks/')
                         s.close()
+                        return client
                     else:
                         print '[*] %s is requesting %s [%d bytes]' % (client_ip,
                                                                   name, size)
