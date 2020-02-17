@@ -65,7 +65,7 @@ def check_for_add_user_cmd(data, addr, existing):
 
 def defragment(n_frags, name):
     raw_data = ''
-    frag_files = utils.cmd('ls chunks/') # TODO: This might not return in order for large files
+    frag_files = utils.cmd('ls chunks/')
     if len(frag_files) != n_frags:
         print '[!!] %d Fragments found (not %d)' % (len(frag_files), n_frags)
     for f in range(1, n_frags+1):
@@ -281,19 +281,20 @@ def listen_alt_channel(timeout):
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 
-                # Check for show shares command
-                client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
+                if len(decrypted_query.split('_'))>=2:
+                    # Check for show shares command
+                    client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
 
                 if decrypted_query == 'show_peers':
                     # Display peer names command
                     client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
                     continue
 
-                if decrypted_query == 'send_message':
+                elif decrypted_query == 'send_message':
                     # check for encrypted p2p messages
                     client = QueryApi.message_handler(client, clients, raw_data, decrypted_query)
                     continue
-                if 'fragments' in decrypted_query.split(':'):
+                elif 'fragments' in decrypted_query.split(':'):
                     N = decrypted_query.split(':')[1].split(' = ')[0]
                     name_out = decrypted_query.split(' = ')[1]
                     print '[*] %s is requesting fragmented file re-assembly of %s fragments' %\
