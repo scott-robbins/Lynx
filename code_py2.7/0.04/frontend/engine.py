@@ -105,7 +105,9 @@ def fragmented(fname, frag_size):
         n_files = os.path.getsize(fname)/frag_size
         print '[*] Fragmenting %s into %d files' % (fname, n_files)
         if os.path.isdir('chunks/'):
-            os.system('mkdir chunks/')
+            os.system('rm -rf chunks; mkdir chunks/')
+        else:
+            os.mkdir('chunks')
         raw_data = open(fname,'rb').read()
         block_ind = 1
         blocks = range(0,len(raw_data), frag_size)
