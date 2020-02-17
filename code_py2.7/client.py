@@ -217,7 +217,9 @@ if __name__ == '__main__':
             encr = utils.EncodeAES(cipher, 'fragments:%d = %s' % (N, n))
             network.connect_send(cloud_gateway, 54123, my_api_key + ' ???? '+encr, 10)
         else:
-            put_file(n, my_api_key)     # TODO: This breaking for some reason after about 1.5kB
+            put_file(n, my_api_key)
+        print 'File Transferred. File Data:\n'
+        os.system('sha256sum %s' % n)
 
     if 'get' in sys.argv and len(sys.argv) >= 3:
         n = sys.argv[2]

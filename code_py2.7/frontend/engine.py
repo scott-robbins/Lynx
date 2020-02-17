@@ -53,11 +53,8 @@ def check_for_add_user_cmd(data, addr, existing):
     query_user = data.split(' :::: ')[0]
     query_pass = ''
     legit_pass = False
-    print '[*] Client Connected %s' % addr[0]
     try:
         query_pass = data.split(' :::: ')[1]
-        print query_user
-        print query_pass
         legit_pass = True
     except IndexError:
         pass
