@@ -47,4 +47,4 @@ then the file downloaded with show a hash sum too) using the client like this:
 ![download](https://raw.githubusercontent.com/scott-robbins/Lynx/master/code_py2.7/lynx_file_download.png)
 __________________________________________________________________________________
 
-This project is currently under development     **Last Updated January 2020**
+This project is currently under development     **Last Updated February 2020**
