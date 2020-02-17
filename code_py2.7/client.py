@@ -205,14 +205,14 @@ if __name__ == '__main__':
             print '[*] File is %d bytes (over 1.5kB)' % sz
             print '[*] Fragmenting into %d Files...' % N
             N = 0
-            progress = tqdm(total=N,unit='packets')
-            for file_name in fragments['frags']:
+            # progress = tqdm(total=N,unit='packets')
+            for file_name in tqdm(fragments['frags']):
                 # os.system('mv %s $PWD' % file_name)
                 put_file(file_name, my_api_key)
                 os.remove(file_name)
                 N += 1
-                progress.update(1)
-            progress.close()
+                # progress.update(1)
+            # progress.close()
             os.system('rm -r chunks/')
             encr = utils.EncodeAES(cipher, 'fragments:%d = %s' % (N, n))
             network.connect_send(cloud_gateway, 54123, my_api_key + ' ???? '+encr, 10)
