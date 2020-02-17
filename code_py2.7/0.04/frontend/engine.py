@@ -292,7 +292,7 @@ def listen_alt_channel(timeout):
                 # Display peer names command
                 client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 
-                elif len(decrypted_query.split('_')) >= 2:
+                if len(decrypted_query.split('_')) >= 2:
                     # Upload file
                     client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
 
