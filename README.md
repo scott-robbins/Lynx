@@ -40,6 +40,11 @@ to the remote server from your browser, you will see the following page:
 
 ![dash](https://raw.githubusercontent.com/scott-robbins/Lynx/master/code_py2.7/lynx_dash.png)
 
+You view available Shared files from the browser, or with the client using the command 'shares', 
+and then download that file (hash sums for the file will be displayed serverside on webpage, and
+then the file downloaded with show a hash sum too) using the client like this: 
+
+![download](https://raw.githubusercontent.com/scott-robbins/Lynx/master/code_py2.7/lynx_file_download.png)
 __________________________________________________________________________________
 
 This project is currently under development     **Last Updated January 2020**
