@@ -71,9 +71,9 @@ def defragment(n_frags, name):
     frag_files = utils.cmd('ls ../SHARED/chunk*') # TODO: This might not return in order for large files
     if len(frag_files) != n_frags:
         print '[!!] %d Fragments found (not %d)' % (len(frag_files), n_frags)
-    for f in frag_files:
-        raw_data += open(f, 'rb').read()
-        os.remove('../SHARED/'+f)
+    for f in range(1, n_frags, 1):
+        raw_data += open('../SHARED/chunk%d.frag' % f, 'rb').read()
+        os.remove('../SHARED/chunk%d.frag' % f)
     open('../SHARED/'+name, 'wb').write(raw_data)
 
 
@@ -213,6 +213,7 @@ class QueryApi:
                     if len(raw_data) > 0:
                         try:
                             dec_data = utils.DecodeAES(cipher, raw_data)
+                            os.system('touch ../SHARED/%s' % name)
                             open('../SHARED/%s' % name, 'wb').write(dec_data)
                         except ValueError:
                             print '[!!] Failed to decrypt data'
