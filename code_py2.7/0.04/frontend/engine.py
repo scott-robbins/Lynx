@@ -282,7 +282,7 @@ def listen_alt_channel(timeout):
                     print '[*] Do not recognize key: %s from %s '% \
                           (raw_data.split(' ???? ')[0], client_addr[0])
 
-                elif 'show_peers' in decrypted_query.split(': '):
+                if 'show_peers' in decrypted_query.split(': '):
                     # Display peer names command
                     client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 
