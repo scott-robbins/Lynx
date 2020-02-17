@@ -105,7 +105,7 @@ def fragmented(fname, frag_size):
             try:
                 a = blocks[block_ind - 1]
                 b = blocks[block_ind]
-                print 'data[%d:%d]' % (a, b)
+                # print 'data[%d:%d]' % (a, b)
                 chunk = raw_data[a:b]
                 fname = 'chunk%d.frag' % block_ind
                 open('chunks/' + fname, 'wb').write(chunk)
