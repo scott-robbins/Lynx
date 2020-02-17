@@ -221,16 +221,6 @@ if __name__ == '__main__':
         n = sys.argv[2]
         get_file(n,my_api_key)
 
-    if 'register' in sys.argv:
-        public, private, nic_name = utils.get_nx_info(verbose=False)
-        # Register locally
-        cloud_gateway = get_cloud_ip()
-        # - [1] Create/Load Local Private Key
-        private_key, public_key, shared_files = initialize_keys(private)
-        login_data, username = create_username(private.replace('.', '-') + '.pem')
-        # Register With Main Cloud Server
-        network.connect_send(cloud_gateway, 54123, '../'+username+' :::: '+open(username+'.pass', 'rb').read(), 10)
-
     if 'send' in sys.argv:
         sender = raw_input('Enter Username: \n')
         receiver = raw_input('Enter Recipient: \n')
@@ -246,4 +236,44 @@ if __name__ == '__main__':
         if msg:
             data = raw_input('> ')
             send_message(my_api_key, sender, receiver, data)
+
+    if 'browser' in sys.argv:
+        # try firefox first, if that doesnt work try chrome
+        try:
+            os.system('sh $(firefox %s:80)&' % cloud_gateway)
+        except OSError:
+            # TODO: try chrome
+            pass
+
+    if 'run' in sys.argv:
+        # Synchronize SHARED folder with cloud
+        os.system('python client.py shares >> shared.txt')
+        dat = utils.swap('shared.txt', True)
+        dat.pop(0)
+        dat.pop(0)
+        dat.pop(0)
+        shared = {}
+        for line in dat:
+            try:
+                f_hash = line.split(' ')[0]
+                if len(f_hash) > 1:
+                    f_name = line.split(f_hash)[1]
+                    shared[f_hash] = f_name
+            except IndexError:
+                pass
+
+        direct, hashed = utils.crawl_dir('SHARED',True,False)
+        if len(hashed.keys()) > len(shared.keys()):
+            for local in hashed.keys():
+                key = hashed[local]
+                if key not in shared.keys() and len(key)>11:
+                    print '[*] %s is not in local Shared/' % hashed[key]
+        elif len(hashed.keys()) < len(shared.keys()):
+            for remote_key in shared.keys():
+                if remote_key not in hashed.values() and len(remote_key)>11:
+                    print '[*] %s is not in local Shared/' % shared[remote_key]
+                    cmd = 'python client.get %s' % shared[remote_key].split('../SHARED/')[1]
+                    os.system(cmd)
+        # check routing to each peer
+
 
