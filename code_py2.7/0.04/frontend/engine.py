@@ -145,17 +145,18 @@ class QueryApi:
         # TODO: socket error handling
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         try:
-            reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
-            encrypted_content = utils.EncodeAES(cipher, reply)
-            if len(encrypted_content) < 1500:
-                client.send(encrypted_content)
-            else:
-                open('shared_data.txt', 'wb').write(encrypted_content)
-                fragments = fragmented('shared_data.txt', 800)
-                n_frags = len(fragments['frags'])
-                print '[*] Fragmenting shared file data into %d packets' % n_frags
-                os.remove('shared_data.txt')
-                os.system('rm -rf chunks/')
+            if 'show_peers' in decrypted_query.split(': '):
+                reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
+                encrypted_content = utils.EncodeAES(cipher, reply)
+                if len(encrypted_content) < 1500:
+                    client.send(encrypted_content)
+                else:
+                    open('shared_data.txt', 'wb').write(encrypted_content)
+                    fragments = fragmented('shared_data.txt', 800)
+                    n_frags = len(fragments['frags'])
+                    print '[*] Fragmenting shared file data into %d packets' % n_frags
+                    os.remove('shared_data.txt')
+                    os.system('rm -rf chunks/')
         except IndexError:
             print '[!!] Error Decrypting Check Peers Command from %s' % clients[raw.split(' ???? ')[0]]
         return client
@@ -181,7 +182,7 @@ class QueryApi:
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         get_shares = 'ls ../SHARED | while read n; do sha256sum ../SHARED/$n >> files.txt; done'
         try:
-            if decrypted_query == 'show_shares':
+            if 'show_shares' in decrypted_query.split(':'):
                 os.system(get_shares)
                 client.send(utils.EncodeAES(cipher, utils.arr2lines(utils.swap('files.txt', True))))
             else:
@@ -284,18 +285,18 @@ def listen_alt_channel(timeout):
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 
                 print '*Debug: %s' % decrypted_query
+                # Display peer names command
+                client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 
-                if 'show_shares' in decrypted_query.split(':'):
-                    # Check for show shares command
-                    client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
+                # Check for show shares command
+                client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
+
 
                 if len(decrypted_query.split('_')) >= 2:
                     # Upload file
                     client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
 
-                elif 'show_peers' in decrypted_query.split(':'):
-                    # Display peer names command
-                    client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
+
 
                 elif decrypted_query == 'send_message':
                     # check for encrypted p2p messages
