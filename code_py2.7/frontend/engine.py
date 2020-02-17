@@ -188,7 +188,7 @@ class QueryApi:
         return client
 
     @staticmethod
-    def file_upload(client, client_ip,raw, decrypted_query, mode):
+    def file_upload(client, client_ip,raw, decrypted_query):
         # TODO: socket error handling
         api_key = base64.b64decode(raw.split(' ???? ')[0])
         cipher = AES.new(api_key)
@@ -286,14 +286,13 @@ def listen_alt_channel(timeout):
                 # Check for show shares command
                 client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
 
-                if ('GET' or 'PUT') in decrypted_query.split('_'):
-                    # Upload file
-                    client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
-
-                elif decrypted_query == 'show_peers':
+                if decrypted_query == 'show_peers':
                     # Display peer names command
                     client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 
+                elif ('GET' or 'PUT') in decrypted_query.split('_'):
+                    # Upload file
+                    client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
                 elif decrypted_query == 'send_message':
                     # check for encrypted p2p messages
                     client = QueryApi.message_handler(client, clients, raw_data, decrypted_query)
