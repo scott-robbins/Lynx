@@ -214,7 +214,7 @@ class QueryApi:
                     if len(raw_data) > 0:
                         try:
                             dec_data = utils.DecodeAES(cipher, raw_data)
-                            open('../SHARED/%s' % name, 'wb').write(dec_data)
+                            open('%s' % name, 'wb').write(dec_data)
                         except ValueError:
                             print '[!!] Failed to decrypt data'
                             pass
