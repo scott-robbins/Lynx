@@ -205,7 +205,7 @@ if __name__ == '__main__':
             print '[*] Fragmenting into %d Files...' % len(fragments['frags'])
 
             N = 0
-            for file_name in tqdm(fragments['frags'], unit='packet'):
+            for file_name in tqdm(fragments['frags'], unit='packets '):
                 put_file(file_name, my_api_key)
                 N += 1
             os.system('rm -r chunks/')

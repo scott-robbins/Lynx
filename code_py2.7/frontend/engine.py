@@ -284,7 +284,11 @@ def listen_alt_channel(timeout):
                 # Check for show shares command
                 client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
 
-                if decrypted_query == 'show_peers':
+                if len(decrypted_query.split('_')) >= 2:
+                    # Upload file
+                    client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
+
+                elif decrypted_query == 'show_peers':
                     # Display peer names command
                     client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
                     continue
@@ -299,9 +303,6 @@ def listen_alt_channel(timeout):
                     print '[*] %s is requesting fragmented file re-assembly of %s fragments' %\
                           (client_addr[0], N)
                     defragment(int(N), name_out)
-
-                # Upload file
-                client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
 
             # Check for add user command
             check_for_add_user_cmd(raw_data,client_addr, existing_users)
