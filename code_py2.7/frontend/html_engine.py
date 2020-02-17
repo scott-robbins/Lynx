@@ -121,7 +121,7 @@ def render_file_structure(file_path):
     header = '<!DOCTYPE html>\n<html>\n <body>\n'
     footer = '<body>\n</html>'
     content = '<h2> %s </h2>\n<ul>\n' % file_path
-    directory, empty = utils.crawl_dir(file_path, False, False)
+    directory, hashes = utils.crawl_dir(file_path, True, False)
     print '[*] %d Files found ' % len(directory['file'])
     top_dirs = []
     where = {}
@@ -142,7 +142,7 @@ def render_file_structure(file_path):
             for fname in directory['file']:
                 dloc = where[fname]
                 if dloc == folder:
-                    more += '<li> %s </li>\n' % fname.replace('//','/')
+                    more += '<li> %s : %s </li>\n' % (fname.replace('//','/'), hashes['"'+fname.replace('//','/')+'"'])
             more += '</ul>\n'
             if len(more):
                 content += more
