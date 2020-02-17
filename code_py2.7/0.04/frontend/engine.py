@@ -181,14 +181,8 @@ class QueryApi:
         # TODO: socket error handling
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         get_shares = 'ls ../SHARED | while read n; do sha256sum ../SHARED/$n >> files.txt; done'
-        try:
-            if 'show_shares' in decrypted_query.split(':'):
-                os.system(get_shares)
-                client.send(utils.EncodeAES(cipher, utils.arr2lines(utils.swap('files.txt', True))))
-            else:
-                return client
-        except IndexError:
-            pass
+        os.system(get_shares)
+        client.send(utils.EncodeAES(cipher, utils.arr2lines(utils.swap('files.txt', True))))
         return client
 
     @staticmethod
@@ -289,9 +283,9 @@ def listen_alt_channel(timeout):
 
                 # Display peer names command
                 client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
-
-                # Check for show shares command
-                client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
+                if 'show_shares' in decrypted_query.split(':'):
+                    # Check for show shares command
+                    client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
 
                 if len(decrypted_query.split('_')) >= 2:
                     # Upload file
