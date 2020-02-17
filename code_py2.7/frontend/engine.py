@@ -281,9 +281,8 @@ def listen_alt_channel(timeout):
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 
-                if len(decrypted_query.split('_'))>=2:
-                    # Check for show shares command
-                    client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
+                # Check for show shares command
+                client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
 
                 if decrypted_query == 'show_peers':
                     # Display peer names command
