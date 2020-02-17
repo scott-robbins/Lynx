@@ -272,8 +272,7 @@ if __name__ == '__main__':
             for remote_key in shared.keys():
                 if remote_key not in hashed.values() and len(remote_key)>11:
                     print '[*] %s is not in local Shared/' % shared[remote_key]
-                    cmd = 'python client.py get %s' % shared[remote_key].split('../SHARED/')[1]
-                    os.system(cmd)
+                    get_file(shared[remote_key].split('../SHARED/')[1], my_api_key)
         # check routing to each peer
 
 
