@@ -319,5 +319,5 @@ def listen_alt_channel(timeout):
 if __name__ == '__main__':
     if '-l' in sys.argv and len(sys.argv) >= 3:
         timer = int(sys.argv[2])
-        print '[*] Starting Backend Listener'
+        print '[*] Starting Backend Server'
         listen_alt_channel(timer)
