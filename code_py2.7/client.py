@@ -33,7 +33,6 @@ def get_cloud_ip():
 
 
 def initialize_keys(private_ip):
-    print private_ip
     key_file_name = private_ip.replace('.', '-') + '.pem' # TODO: Should this be public or private ip?
     priv = utils.load_private_key(key_file_name)
     pub = priv.publickey()
@@ -43,7 +42,7 @@ def initialize_keys(private_ip):
         shares = []
     else:
         shares = os.listdir('SHARED')
-    print '[*] %d files in SHARED/ Folder' % len(shares)
+    print '[*] %d files in Local SHARED/ Folder' % len(shares)
     return priv, pub, shares
 
 
@@ -194,6 +193,8 @@ if __name__ == '__main__':
     if 'put' in sys.argv and len(sys.argv) >= 3:
         if not os.path.isfile(sys.argv[2]):
             print '[!!] Cannot find file %s' % sys.argv[2]
+        else:
+            print '[*] Uploading %s to Lynx Cloud' % sys.argv[2]
         n = sys.argv[2]
         sz = os.path.getsize(n)
         if sz > 1500:

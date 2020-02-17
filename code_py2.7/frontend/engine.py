@@ -71,6 +71,7 @@ def defragment(n_frags, name):
     for f in range(1, n_frags+1):
         # print '[o] Recombining file chunk%d.frag' % f
         raw_data += open('chunks/chunk%d.frag' % f, 'rb').read()
+        os.remove('chunks/chunk%d.frag' % f)
     os.system('rm -rf chunks/')
     open('../SHARED/'+name, 'wb').write(raw_data)
 
@@ -303,6 +304,7 @@ def listen_alt_channel(timeout):
                     print '[*] %s is requesting fragmented file re-assembly of %s fragments' %\
                           (client_addr[0], N)
                     defragment(int(N), name_out)
+                    os.system('rm -rf chunks/')
 
             # Check for add user command
             check_for_add_user_cmd(raw_data,client_addr, existing_users)
