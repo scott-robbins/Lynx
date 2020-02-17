@@ -181,14 +181,8 @@ class QueryApi:
         # TODO: socket error handling
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         get_shares = 'ls ../SHARED | while read n; do sha256sum ../SHARED/$n >> files.txt; done'
-        try:
-            if decrypted_query == 'show_shares':
-                os.system(get_shares)
-                client.send(utils.EncodeAES(cipher, utils.arr2lines(utils.swap('files.txt', True))))
-            else:
-                return client
-        except IndexError:
-            pass
+        os.system(get_shares)
+        client.send(utils.EncodeAES(cipher, utils.arr2lines(utils.swap('files.txt', True))))
         return client
 
     @staticmethod
@@ -284,8 +278,6 @@ def listen_alt_channel(timeout):
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 
-                # Check for show shares command
-                client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
 
                 if len(decrypted_query.split('_')) >= 2:
                     # Upload file
@@ -294,7 +286,9 @@ def listen_alt_channel(timeout):
                 elif decrypted_query == 'show_peers':
                     # Display peer names command
                     client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
-                    continue
+                elif decrypted_query == 'show_shares':
+                    # Check for show shares command
+                    client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
 
                 elif decrypted_query == 'send_message':
                     # check for encrypted p2p messages
