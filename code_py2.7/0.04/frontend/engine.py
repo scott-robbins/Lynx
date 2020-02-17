@@ -280,7 +280,7 @@ def listen_alt_channel(timeout):
                     print '[*] Do not recognize key: %s from %s '% \
                           (raw_data.split(' ???? ')[0], client_addr[0])
 
-                if 'show_peers' in decrypted_query.split(': '):
+                elif 'show_peers' in decrypted_query.split(': '):
                     # Display peer names command
                     client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 
@@ -302,7 +302,7 @@ def listen_alt_channel(timeout):
                     print '[*] %s is requesting fragmented file re-assembly of %s fragments' %\
                           (client_addr[0], N)
                     defragment(int(N), name_out)
-                    os.system('rm -rf chunks/')     # TODO: Why isn't this working??
+
                 if os.path.isdir('chunks/'):
                     os.system('sudo rm -rf chunks/')
             else:
