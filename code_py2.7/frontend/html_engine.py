@@ -125,7 +125,6 @@ def render_file_structure(file_path):
     print '[*] %d Files found ' % len(directory['file'])
     top_dirs = []
     where = {}
-    print hashes.keys()
     for f in directory['file']:
         element = f.split(file_path).pop()
         if len(element.split('/')) > 2:
