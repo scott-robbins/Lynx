@@ -59,7 +59,7 @@ def connect_receive(remote_address, remote_port, query, timeout):
         try:
             reply = s.recv(1250000)
             unacknowledged = False
-            print '[*] %d Bytes Received' % len(reply)
+            # print '[*] %d Bytes Received' % len(reply)
         except socket.error:
             print '[!!] Connection Broken'
             break
@@ -82,7 +82,7 @@ def connect_receive_send(remote_address, remote_port, query, data, cipher):
     # Now Get a Reply
     reply = utils.DecodeAES(cipher, s.recv(2048))
     if reply == ('YES' or 'READY'):
-        print '[*] %s is sending %d bytes of data' % (remote_address, len(data))
+        # print '[*] %s is sending %d bytes of data' % (remote_address, len(data))
         s.send(data)
     s.close()
     return reply
