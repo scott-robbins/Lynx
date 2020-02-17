@@ -102,7 +102,6 @@ def fragmented(fname, frag_size):
         print "[!] Cannot find %s" % fname
     else:
         n_files = os.path.getsize(fname)/frag_size
-        print '[*] Fragmenting %s into %d files' % (fname, n_files)
         os.system('mkdir chunks/')
         raw_data = open(fname,'rb').read()
         block_ind = 1
@@ -151,7 +150,7 @@ class QueryApi:
                 open('shared_data.txt', 'wb').write(encrypted_content)
                 fragments = fragmented('shared_data.txt', 800)
                 n_frags = len(fragments['frags'])
-                print '[*] Fragmenting shared file data into %d packets' % n_frags
+                # print '[*] Fragmenting shared file data into %d packets' % n_frags
                 os.remove('shared_data.txt')
                 os.system('rm -rf chunks/')
         except IndexError:
