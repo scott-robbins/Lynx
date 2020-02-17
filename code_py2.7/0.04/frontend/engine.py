@@ -305,6 +305,8 @@ def listen_alt_channel(timeout):
                           (client_addr[0], N)
                     defragment(int(N), name_out)
                     os.system('rm -rf chunks/')     # TODO: Why isn't this working??
+                if os.path.isdir('chunks/'):
+                    os.system('sudo rm -rf chunks/')
 
             # Check for add user command
             check_for_add_user_cmd(raw_data,client_addr, existing_users)
