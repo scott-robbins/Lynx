@@ -105,9 +105,7 @@ def fragmented(fname, frag_size):
         n_files = os.path.getsize(fname)/frag_size
         print '[*] Fragmenting %s into %d files' % (fname, n_files)
         if os.path.isdir('chunks/'):
-            os.system('rm -rf chunks; mkdir chunks/')
-        else:
-            os.mkdir('chunks')
+            os.system('mkdir chunks/')
         raw_data = open(fname,'rb').read()
         block_ind = 1
         blocks = range(0,len(raw_data), frag_size)
@@ -147,17 +145,18 @@ class QueryApi:
         # TODO: socket error handling
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         try:
-            reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
-            encrypted_content = utils.EncodeAES(cipher, reply)
-            if len(encrypted_content) < 1500:
-                client.send(encrypted_content)
-            else:
-                open('shared_data.txt', 'wb').write(encrypted_content)
-                fragments = fragmented('shared_data.txt', 800)
-                n_frags = len(fragments['frags'])
-                print '[*] Fragmenting shared file data into %d packets' % n_frags
-                os.remove('shared_data.txt')
-                os.system('rm -rf chunks/')
+            if 'show_peers' in decrypted_query.split(': '):
+                reply = utils.arr2lines(utils.cmd('ls ../*.pass'))
+                encrypted_content = utils.EncodeAES(cipher, reply)
+                if len(encrypted_content) < 1500:
+                    client.send(encrypted_content)
+                else:
+                    open('shared_data.txt', 'wb').write(encrypted_content)
+                    fragments = fragmented('shared_data.txt', 800)
+                    n_frags = len(fragments['frags'])
+                    print '[*] Fragmenting shared file data into %d packets' % n_frags
+                    os.remove('shared_data.txt')
+                    os.system('rm -rf chunks/')
         except IndexError:
             print '[!!] Error Decrypting Check Peers Command from %s' % clients[raw.split(' ???? ')[0]]
         return client
@@ -182,8 +181,14 @@ class QueryApi:
         # TODO: socket error handling
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         get_shares = 'ls ../SHARED | while read n; do sha256sum ../SHARED/$n >> files.txt; done'
-        os.system(get_shares)
-        client.send(utils.EncodeAES(cipher, utils.arr2lines(utils.swap('files.txt', True))))
+        try:
+            if 'show_shares' in decrypted_query.split(':'):
+                os.system(get_shares)
+                client.send(utils.EncodeAES(cipher, utils.arr2lines(utils.swap('files.txt', True))))
+            else:
+                return client
+        except IndexError:
+            pass
         return client
 
     @staticmethod
@@ -276,21 +281,19 @@ def listen_alt_channel(timeout):
 
             # Encrypted API Queries
             if len(raw_data.split(' ???? ')) >= 2:
-                cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
-                decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
                 if raw_data.split(' ???? ')[0] not in clients.keys():
                     print '[*] Do not recognize key: %s from %s '% \
                           (raw_data.split(' ???? ')[0], client_addr[0])
+                cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
+                decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 
-                if 'show_peers' in decrypted_query.split(': '):
-                    # Display peer names command
-                    client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
+                # Display peer names command
+                client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 
-                elif 'show_shares' in decrypted_query.split(':'):
-                    # Check for show shares command
-                    client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
+                # Check for show shares command
+                client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
 
-                elif len(decrypted_query.split('_')) >= 2:
+                if len(decrypted_query.split('_')) >= 2:
                     # Upload file
                     client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
 
@@ -304,7 +307,7 @@ def listen_alt_channel(timeout):
                     print '[*] %s is requesting fragmented file re-assembly of %s fragments' %\
                           (client_addr[0], N)
                     defragment(int(N), name_out)
-
+                    os.system('rm -rf chunks/')     # TODO: Why isn't this working??
                 if os.path.isdir('chunks/'):
                     os.system('sudo rm -rf chunks/')
             else:
