@@ -197,7 +197,7 @@ if __name__ == '__main__':
         n = sys.argv[2]
         sz = os.path.getsize(n)
         if sz > 1500:
-            fragments = network.fragmented(n, 800)
+            fragments = network.fragmented(n, 850)
             N = len(fragments['frags'])
             # TODO: Alert remote host about fragments coming
             msg = utils.EncodeAES(cipher, 'incoming_file:%s' % n)

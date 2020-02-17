@@ -192,66 +192,73 @@ class QueryApi:
         # TODO: socket error handling
         api_key = base64.b64decode(raw.split(' ???? ')[0])
         cipher = AES.new(api_key)
+
+        def put():
+            max_size = 2000
+            name = decrypted_query.split('_')[1]
+            size = int(decrypted_query.split('_')[2])
+            if size < max_size:
+                # print '[*] %s is uploading %d bytes' % (client_ip, size)
+                client.send(utils.EncodeAES(cipher, 'YES'))
+                raw_data = client.recv(size)
+                # print '[*] %d Encrypted Bytes Received' % len(raw_data)
+                if len(raw_data) > 0:
+                    try:
+                        dec_data = utils.DecodeAES(cipher, raw_data)
+                        open('%s' % name, 'wb').write(dec_data)
+                        client.close()
+                        return client
+                    except ValueError:
+                        print '[!!] Failed to decrypt data'
+                        pass
+            else:
+                client.send(utils.EncodeAES(cipher, 'NO'))
+
+        def get():
+            name = '../SHARED/' + decrypted_query.split('_')[1]
+            if os.path.isfile(name):
+                size = os.path.getsize(name)
+                if size > 1100:
+                    print '[*] Fragmenting download'
+                    fragments = fragmented(name, 800)
+                    n_frags = len(fragments['frags'])
+                    msg_head = utils.EncodeAES(cipher, 'incoming_file:%s-%d-%d' % (name, size, n_frags))
+                    client.send(msg_head, 10)
+                    chunks_sent = 0
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.bind(('0.0.0.0', 54124))
+                    s.listen(5)
+                    bytes_sent = 0
+                    for frag in fragments['frags']:
+                        # print 'Sending framgent %s' % frag
+                        # os.system('mv chunks/chunk%d.frag $PWD' % n)
+
+                        raw_data = open(frag, 'rb').read()
+                        enc_data = utils.EncodeAES(cipher, raw_data)
+                        rmt, rmt_addr = s.accept()
+                        rmt.send(enc_data)
+                        bytes_sent += int(rmt.recv(256).split(':')[1])
+                        chunks_sent += 1
+                        rmt.close()
+
+                    os.system('rm -rf chunks/')
+                    s.close()
+                    return client
+                else:
+                    print '[*] %s is requesting %s [%d bytes]' % (client_ip,
+                                                              name, size)
+                    enc_data = utils.EncodeAES(cipher, open(name, 'rb').read())
+                    client.send(enc_data)
+                    client.close()
+                    return client
+
+        modes = {'PUT': put(),
+                 'GET': get()}
+
         if not os.path.isdir('chunks/'):
             os.mkdir('chunks/')
         try:
-            if 'PUT' in decrypted_query.split('_'):
-                max_size = 2000
-                name = decrypted_query.split('_')[1]
-                size = int(decrypted_query.split('_')[2])
-                if size < max_size:
-                    # print '[*] %s is uploading %d bytes' % (client_ip, size)
-                    client.send(utils.EncodeAES(cipher, 'YES'))
-                    raw_data = client.recv(size)
-                    # print '[*] %d Encrypted Bytes Received' % len(raw_data)
-                    if len(raw_data) > 0:
-                        try:
-                            dec_data = utils.DecodeAES(cipher, raw_data)
-                            open('%s' % name, 'wb').write(dec_data)
-                            client.close()
-                            return client
-                        except ValueError:
-                            print '[!!] Failed to decrypt data'
-                            pass
-                else:
-                    client.send(utils.EncodeAES(cipher, 'NO'))
-            elif 'GET' in decrypted_query.split('_'):
-                name = '../SHARED/' + decrypted_query.split('_')[1]
-                if os.path.isfile(name):
-                    size = os.path.getsize(name)
-                    if size > 1100:
-                        print '[*] Fragmenting download'
-                        fragments = fragmented(name, 800)
-                        n_frags = len(fragments['frags'])
-                        msg_head = utils.EncodeAES(cipher, 'incoming_file:%s-%d-%d' % (name, size,n_frags))
-                        client.send(msg_head, 10)
-                        chunks_sent = 0
-                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        s.bind(('0.0.0.0', 54124))
-                        s.listen(5)
-                        bytes_sent = 0
-                        for frag in fragments['frags']:
-                            # print 'Sending framgent %s' % frag
-                            # os.system('mv chunks/chunk%d.frag $PWD' % n)
-
-                            raw_data = open(frag, 'rb').read()
-                            enc_data = utils.EncodeAES(cipher, raw_data)
-                            rmt, rmt_addr = s.accept()
-                            rmt.send(enc_data)
-                            bytes_sent += int(rmt.recv(256).split(':')[1])
-                            chunks_sent += 1
-                            rmt.close()
-
-                        os.system('rm -rf chunks/')
-                        s.close()
-                        return client
-                    else:
-                        print '[*] %s is requesting %s [%d bytes]' % (client_ip,
-                                                                  name, size)
-                        enc_data = utils.EncodeAES(cipher, open(name, 'rb').read())
-                        client.send(enc_data)
-            else:
-                return client
+           client = modes[decrypted_query.split('_')[0]]
         except IndexError:
             s.close()
             pass
@@ -286,24 +293,26 @@ def listen_alt_channel(timeout):
                 # Check for show shares command
                 client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
 
-                if decrypted_query == 'show_peers':
+                if ('GET' or 'PUT') in decrypted_query.split('_'):
+                    # Upload file
+                    client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
+
+                elif decrypted_query == 'show_peers':
                     # Display peer names command
                     client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
-                    continue
 
-                if decrypted_query == 'send_message':
+                elif decrypted_query == 'send_message':
                     # check for encrypted p2p messages
                     client = QueryApi.message_handler(client, clients, raw_data, decrypted_query)
                     continue
-                if 'fragments' in decrypted_query.split(':'):
+                elif 'fragments' in decrypted_query.split(':'):
                     N = decrypted_query.split(':')[1].split(' = ')[0]
                     name_out = decrypted_query.split(' = ')[1]
                     print '[*] %s is requesting fragmented file re-assembly of %s fragments' %\
                           (client_addr[0], N)
                     defragment(int(N), name_out)
 
-                # Upload file
-                client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
+
 
             # Check for add user command
             check_for_add_user_cmd(raw_data,client_addr, existing_users)
