@@ -143,6 +143,7 @@ class QueryApi:
 
     @staticmethod
     def show_peers(client, clients, raw, decrypted_query):
+        print 'Showing Shared Peers'
         # TODO: socket error handling
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         try:
@@ -294,12 +295,11 @@ def listen_alt_channel(timeout):
                 elif decrypted_query == 'show_peers':
                     # Display peer names command
                     client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
-                    continue
 
                 elif decrypted_query == 'send_message':
                     # check for encrypted p2p messages
                     client = QueryApi.message_handler(client, clients, raw_data, decrypted_query)
-                    continue
+
                 elif 'fragments' in decrypted_query.split(':'):
                     N = decrypted_query.split(':')[1].split(' = ')[0]
                     name_out = decrypted_query.split(' = ')[1]
