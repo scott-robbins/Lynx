@@ -290,7 +290,7 @@ if __name__ == '__main__':
             print 'Starting CameraFeed'
             while running and (time.time() - start) < runtime:
 
-                if (time.time()-start)%3600==0 or ticks%5555==0:
+                if int(time.time()-start)%600==0:
                     if os.path.isfile('im.jpeg'):
                         os.remove('im.jpeg')
                     print 'Snapping image'
