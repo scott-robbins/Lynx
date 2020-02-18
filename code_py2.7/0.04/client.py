@@ -300,13 +300,12 @@ if __name__ == '__main__':
                 #         print '[!!] Unable to create connection to Lynx Server!'
                 #         break
 
-                if (time.time()-start)%3600==0:
+                if (time.time()-start)%3600==0 or ticks%5555==0:
                     if os.path.isfile('im.jpeg'):
                         os.remove('im.jpeg')
                     print 'Snapping image'
                     os.system('raspistill -t 1 -o im.jpeg')
                     put_file('im.jpeg', my_api_key)
-                    ticks += 1
                     time.sleep(10)
                 ticks += 1
 
