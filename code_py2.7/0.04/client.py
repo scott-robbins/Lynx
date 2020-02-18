@@ -302,6 +302,7 @@ if __name__ == '__main__':
                 enc_query = client.recv(2048)
                 sess_key = enc_query.split(' ???? ')[0]
                 query = enc_query.split(' ???? ')[1]
+                print 'Sending Query: %s' % query
                 c = AES.new(base64.b64decode((sess_key)))
                 dec_query = utils.DecodeAES(c, query)
                 if dec_query == 'GET':

