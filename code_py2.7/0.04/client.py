@@ -290,12 +290,13 @@ if __name__ == '__main__':
             print 'Starting CameraFeed'
             while running and (time.time() - start) < runtime:
 
-                if int(time.time()-start)%600==0:
+                if int(time.time()-start) % 600 == 0:
                     if os.path.isfile('im.jpeg'):
                         os.remove('im.jpeg')
                     print 'Snapping image'
                     os.system('python camera.py snap_n_send.py')
-                    time.sleep(10)
+                if int(time.time()-start) % 100 == 0:
+                    print 'Tick...'
                 ticks += 1
 
         except KeyboardInterrupt:
