@@ -289,23 +289,12 @@ if __name__ == '__main__':
         try:
             print 'Starting CameraFeed'
             while running and (time.time() - start) < runtime:
-                # if ticks % 5 == 0:
-                #     try:
-                #         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                #         s.connect((cloud_gateway, 54123))
-                #         s.send(my_api_key + ' ???? ' + utils.EncodeAES(cipher, 'cam_ready'))
-                #         s.close()
-                #     except socket.error:
-                #         s.close()
-                #         print '[!!] Unable to create connection to Lynx Server!'
-                #         break
 
                 if (time.time()-start)%3600==0 or ticks%5555==0:
                     if os.path.isfile('im.jpeg'):
                         os.remove('im.jpeg')
                     print 'Snapping image'
-                    os.system('raspistill -t 1 -o im.jpeg')
-                    put_file('im.jpeg', my_api_key)
+                    os.system('python camera.py snap_n_send.py')
                     time.sleep(10)
                 ticks += 1
 

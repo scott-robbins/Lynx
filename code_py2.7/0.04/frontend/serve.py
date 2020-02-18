@@ -252,11 +252,17 @@ class HttpServer:
 
     def camera_feed(self, c, f, q, caddr):
         # load camera credentials
-        os.system('cp ~/Desktop/picam.key archive.key;')
-        # snap new image
-        key = base64.b64encode(get_random_bytes(24))
-
-        os.system()
+        header = '<!DOCTYPE html>\n<html>\n <body>\n'
+        if os.path.isfile('../SHARED/im.jpeg'):
+            os.system('mv ../SHARED/im.jpeg assets/img/im.peg')
+            body = '<img src="assets/img/im.jpeg" alt="Feed" height="400">'
+        else:
+            print '[!!] No LiveFeed Image Available'
+            body = '<img src="assets/img/logo.png" alt="FeedDown" height="400">'
+        footer = '<body>\n</html>'
+        content = header + body + footer
+        c.send(content)
+        return c
 
 
 if __name__ == '__main__':
