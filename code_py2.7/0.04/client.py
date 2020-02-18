@@ -310,7 +310,7 @@ if __name__ == '__main__':
                     # Close When finished transerring image with netcat!
                     rmt = caddr[0]
                     os.system('raspistill -t 1 -o im.jpeg;'
-                              'cat im.jpeg | nc -q 3 %s 42042' % cloud_gateway)
+                              'cat im.jpeg | nc -q 4 %s 42042' % cloud_gateway)
                     client.close()
                     print '[*] Image Transerreed to Lynx Cloud [%s - %s]' % (d, l)
                 ticks += 1

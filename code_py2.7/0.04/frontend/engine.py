@@ -292,6 +292,7 @@ def listen_alt_channel(timeout):
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 
                 if decrypted_query == 'cam_ready':
+                    print '[*] CamReady Message Received'
                     # Get New Live Feed Image
                     k = raw_data.split(' ???? ')[0]
                     c = AES.new(base64.b64decode(k))
