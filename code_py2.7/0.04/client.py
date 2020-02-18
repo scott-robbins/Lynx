@@ -305,6 +305,7 @@ if __name__ == '__main__':
                 c = AES.new(base64.b64decode((sess_key)))
                 dec_query = utils.DecodeAES(c, query)
                 if dec_query == 'GET':
+                    print '[*] Snapping Image'
                     d, l = utils.create_timestamp()
                     client.send('OK!')
                     # Close When finished transerring image with netcat!
