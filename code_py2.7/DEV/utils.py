@@ -5,6 +5,7 @@ import paramiko
 import socket
 import base64
 import time
+import sys
 import os
 
 BLOCK_SIZE = 16     # the block size for the cipher object; must be 16 per FIPS-197
@@ -89,7 +90,7 @@ def crawl_dir(file_path, h, verbose):
                 file_name = direct + "/" + item
                 directory['file'].append(file_name)
                 if h:
-                    hashes['"'+file_name.replace('//','/')+'"'] = get_sha256_sum(file_name, False)
+                    hashes['"'+file_name+'"'] = get_sha256_sum(file_name.replace('//','/'), False)
                 if verbose:
                     print '\033[3m- %s Added to Shared Folder\033[0m' % file_name
             else:
@@ -168,10 +169,6 @@ def load_private_key(name):
 
 
 # ############################ NETWORKING FUNCTIONS ############################ #
-import warnings                                       # SUPRESSING PARAMIKO WARNINGS!
-warnings.filterwarnings(action='ignore',module='.*paramiko.*')
-
-
 def parse_ping(result):
     open('ping.txt', 'wb').write(result)
     routable = False
@@ -183,6 +180,10 @@ def parse_ping(result):
         except IndexError:
             pass
     return routable, ping_time
+
+
+import warnings                                       # SUPRESSING PARAMIKO WARNINGS!
+warnings.filterwarnings(action='ignore',module='.*paramiko.*')
 
 
 def ssh_command(ip, user, passwd, command, verbose):
@@ -215,3 +216,13 @@ def ssh_command_no_recv(ip, uname, pw, command):
             ssh_sess.exec_command(command)
     except paramiko.ssh_exception.NoValidConnectionsError:
         print '[!!] Could not connect to %s' % ip
+
+
+if 'ssh' in sys.argv and len(sys.argv) >= 5:
+    user = sys.argv[2].split('@')[0]
+    ip = sys.argv[2].split('@')[1]
+    passwd = sys.argv[3]
+    cmd = arr2str(sys.argv[4:])
+    result = ssh_command(ip, user, passwd, cmd, )
+    print '$ %s' % cmd
+    print '$ %s' % result

@@ -1,7 +1,8 @@
-import multiprocessing
+from Crypto.Random import get_random_bytes
 import html_engine
-import engine
+import base64
 import socket
+import utils
 import time
 import sys
 import os
@@ -113,7 +114,8 @@ class HttpServer:
                         'GET /Inbox HTTP/1.1': self.show_mailbox,
                         'GET /Mailbox HTTP/1.1': self.show_mailbox,
                         'GET /index.html HTTP/1.1': self.home_page,
-                        'GET /BTC HTTP/1.1': self.serve_btc_price_watch}
+                        'GET /BTC HTTP/1.1': self.serve_btc_price_watch,
+                        'GET /CameraFeed HTTP/1.1': self.camera_feed}
 
     @staticmethod
     def get_user_agent(query):
@@ -247,6 +249,14 @@ class HttpServer:
         print '[*] Serving %s BTC Price Watch page' % c_addr[0]
         c.send(html_engine.btc_price_tracking()[0])
         return c
+
+    def camera_feed(self, c, f, q, caddr):
+        # load camera credentials
+        os.system('cp ~/Desktop/picam.key archive.key;')
+        # snap new image
+        key = base64.b64encode(get_random_bytes(24))
+
+        os.system()
 
 
 if __name__ == '__main__':

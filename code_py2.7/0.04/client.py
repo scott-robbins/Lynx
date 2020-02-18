@@ -279,4 +279,42 @@ if __name__ == '__main__':
                     get_file(shared[remote_key].split('../SHARED/')[1], my_api_key)
         # check routing to each peer
 
+        if 'camera' in sys.argv:
+            # not a typical client, but utilizes the same resources for communication
+            callback = utils.start_listener(56234, 5)
+            running = True; runtime = 60*60*24*7
+            start = time.time()
+            ticks = 0
+            try:
+                while running and (time.time()-start) < runtime:
+                    client, caddr = callback.accept()
+                    enc_query = client.recv(2048)
+                    sess_key = enc_query.split(' ???? ')[0]
+                    query = enc_query.split(' ???? ')[1]
+                    c = AES.new(base64.b64decode((sess_key)))
+                    dec_query = utils.DecodeAES(c, query)
+                    if dec_query == 'GET':
+                        d,l = utils.create_timestamp()
+                        client.send('OK!')
+                        # Close When finished transerring image with netcat!
+                        rmt = caddr[0]
+                        os.system('raspistill -t 1 -o im.jpeg;'
+                                  'cat im.jpeg | nc -q 3 %s 42042' % cloud_gateway)
+                        client.close()
+                        print '[*] Image Transerreed to Lynx Cloud [%s - %s]' % (d, l)
+                    ticks += 1
+                    if ticks % 5 == 0:
+                        try:
+                            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                            s.connect((cloud_gateway, 54123))
+                            s.send(my_api_key + ' ???? ' + utils.EncodeAES(cipher, 'cam_ready'))
+                        except socket.error:
+                            print '[!!] Unable to create connection to Lynx Server!'
+                            break
+            except KeyboardInterrupt:
+                end_date, end_time = utils.create_timestamp()
+                callback.close()
+                running = False
+                print '[!!] Server Killed! [%s - %s]' % (end_date, end_time)
+                pass
 
