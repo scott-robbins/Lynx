@@ -286,6 +286,7 @@ if __name__ == '__main__':
             start = time.time()
             ticks = 0
             try:
+                print 'Starting CameraFeed'
                 while running and (time.time()-start) < runtime:
                     client, caddr = callback.accept()
                     enc_query = client.recv(2048)
