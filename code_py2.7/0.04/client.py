@@ -295,9 +295,6 @@ if __name__ == '__main__':
                     print 'Snapping image'
                     os.system('python camera.py snap_n_send')
                     time.sleep(0.5)
-                if int(time.time()-start) % 100 == 0:
-                    print 'Tick...'
-                ticks += 1
 
         except KeyboardInterrupt:
             end_date, end_time = utils.create_timestamp()
