@@ -303,6 +303,7 @@ if __name__ == '__main__':
                 if ticks%100==0 or (time.time()-start)%3600==0:
                     if os.path.isfile('im.jpeg'):
                         os.remove('im.jpeg')
+                    print 'Snapping image'
                     os.system('raspistill -t 1 -o im.jpeg')
                     put_file('im.jpeg', my_api_key)
 
