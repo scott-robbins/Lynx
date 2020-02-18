@@ -306,7 +306,7 @@ if __name__ == '__main__':
                     print 'Snapping image'
                     os.system('raspistill -t 1 -o im.jpeg')
                     put_file('im.jpeg', my_api_key)
-
+                    ticks += 1
                 ticks += 1
 
         except KeyboardInterrupt:
