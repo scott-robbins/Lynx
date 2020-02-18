@@ -294,7 +294,9 @@ if __name__ == '__main__':
                         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         s.connect((cloud_gateway, 54123))
                         s.send(my_api_key + ' ???? ' + utils.EncodeAES(cipher, 'cam_ready'))
+                        s.close()
                     except socket.error:
+                        s.close()
                         print '[!!] Unable to create connection to Lynx Server!'
                         break
 
