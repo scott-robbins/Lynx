@@ -289,6 +289,15 @@ if __name__ == '__main__':
         try:
             print 'Starting CameraFeed'
             while running and (time.time() - start) < runtime:
+                if ticks % 5 == 0:
+                    try:
+                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        s.connect((cloud_gateway, 54123))
+                        s.send(my_api_key + ' ???? ' + utils.EncodeAES(cipher, 'cam_ready'))
+                    except socket.error:
+                        print '[!!] Unable to create connection to Lynx Server!'
+                        break
+
                 client, caddr = callback.accept()
                 enc_query = client.recv(2048)
                 sess_key = enc_query.split(' ???? ')[0]
@@ -305,14 +314,7 @@ if __name__ == '__main__':
                     client.close()
                     print '[*] Image Transerreed to Lynx Cloud [%s - %s]' % (d, l)
                 ticks += 1
-                if ticks % 5 == 0:
-                    try:
-                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        s.connect((cloud_gateway, 54123))
-                        s.send(my_api_key + ' ???? ' + utils.EncodeAES(cipher, 'cam_ready'))
-                    except socket.error:
-                        print '[!!] Unable to create connection to Lynx Server!'
-                        break
+
         except KeyboardInterrupt:
             end_date, end_time = utils.create_timestamp()
             callback.close()
