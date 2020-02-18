@@ -296,6 +296,7 @@ def listen_alt_channel(timeout):
                     # Get New Live Feed Image
                     k = raw_data.split(' ???? ')[0]
                     c = AES.new(base64.b64decode(k))
+                    time.sleep(1)
                     try:
                         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         s.connect((client_addr[0], 56234))
