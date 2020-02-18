@@ -293,26 +293,7 @@ def listen_alt_channel(timeout):
 
                 if decrypted_query == 'cam_ready':
                     print '[*] CamReady Message Received'
-                    # Get New Live Feed Image
-                    k = raw_data.split(' ???? ')[0]
-                    c = AES.new(base64.b64decode(k))
-                    time.sleep(1)
-                    try:
-                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        s.connect((client_addr[0], 56234))
-                        snap = k+' ???? '+utils.EncodeAES(c, 'GET')
-                        s.send(snap)
-                        print snap
-                        os.system('nc -l 42024 >> im.jpeg')
-                        if os.path.isfile('im.jpeg'):
-                            isize = os.path.getsize('im.jpeg')
-                            print '[*] New Live Feed Image Uploaded [%d bytes]' % isize
-                        s.close()
-                        client.close()
-                    except socket.error:
-                        client.close()
-                        pass
-
+                    
                 # Display peer names command
                 client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 

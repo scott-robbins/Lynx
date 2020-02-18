@@ -289,34 +289,23 @@ if __name__ == '__main__':
         try:
             print 'Starting CameraFeed'
             while running and (time.time() - start) < runtime:
-                if ticks % 5 == 0:
-                    try:
-                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        s.connect((cloud_gateway, 54123))
-                        s.send(my_api_key + ' ???? ' + utils.EncodeAES(cipher, 'cam_ready'))
-                        s.close()
-                    except socket.error:
-                        s.close()
-                        print '[!!] Unable to create connection to Lynx Server!'
-                        break
+                # if ticks % 5 == 0:
+                #     try:
+                #         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                #         s.connect((cloud_gateway, 54123))
+                #         s.send(my_api_key + ' ???? ' + utils.EncodeAES(cipher, 'cam_ready'))
+                #         s.close()
+                #     except socket.error:
+                #         s.close()
+                #         print '[!!] Unable to create connection to Lynx Server!'
+                #         break
 
-                client, caddr = callback.accept()
-                enc_query = client.recv(2048)
-                sess_key = enc_query.split(' ???? ')[0]
-                query = enc_query.split(' ???? ')[1]
-                print 'Sending Query: %s' % query
-                c = AES.new(base64.b64decode((sess_key)))
-                dec_query = utils.DecodeAES(c, query)
-                if dec_query == 'GET':
-                    print '[*] Snapping Image'
-                    d, l = utils.create_timestamp()
-                    client.send('OK!')
-                    # Close When finished transerring image with netcat!
-                    rmt = caddr[0]
-                    os.system('raspistill -t 1 -o im.jpeg;'
-                              'cat im.jpeg | nc -q 4 %s 42042' % cloud_gateway)
-                    client.close()
-                    print '[*] Image Transerreed to Lynx Cloud [%s - %s]' % (d, l)
+                if ticks%100==0 or (time.time()-start)%3600==0:
+                    if os.path.isfile('im.jpeg'):
+                        os.remove('im.jpeg')
+                    os.system('raspistill -t 1 -o im.jpeg')
+                    put_file('im.jpeg', my_api_key)
+
                 ticks += 1
 
         except KeyboardInterrupt:
