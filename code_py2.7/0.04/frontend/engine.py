@@ -247,8 +247,6 @@ class QueryApi:
                             bytes_sent += int(rmt.recv(256).split(':')[1])
                             chunks_sent += 1
                             rmt.close()
-
-                        os.system('rm -rf chunks/')
                         s.close()
                         return client
                     else:
