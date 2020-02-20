@@ -215,7 +215,7 @@ class QueryApi:
                             dec_data = utils.DecodeAES(cipher, raw_data)
                             open('%s' % name, 'wb').write(dec_data)
                             if os.path.isfile(name):
-                                print '%d bytes written to disk' % os.path.getsize(name)
+                                print '%d bytes written to %s' % (os.path.getsize(name), name)
                             client.close()
                         except ValueError:
                             print '[!!] Failed to decrypt data'
