@@ -259,7 +259,8 @@ class HttpServer:
 
     def camera_feed(self, c, f, q, caddr):
         # load camera credentials
-        header = '<!DOCTYPE html>\n<html>\n <body>\n'
+        header = '<!DOCTYPE html>\n<html>\n <body>\n' \
+                 '<meta charset="UTF-8" http-equiv="refresh" content="900;url=BTC">\n'
         if os.path.isfile('../SHARED/im.jpeg'):
             os.system('mv ../SHARED/im.jpeg assets/img/im.jpeg')
             body = '<img src="assets/img/im.jpeg" alt="Feed" height="400">'
