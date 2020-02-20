@@ -214,8 +214,8 @@ class QueryApi:
                         try:
                             dec_data = utils.DecodeAES(cipher, raw_data)
                             open('%s' % name, 'wb').write(dec_data)
-                            if os.path.isfile(name):
-                                print '%d bytes written to %s' % (os.path.getsize(name), name)
+                            # if os.path.isfile(name):
+                                # print '%d bytes written to %s' % (os.path.getsize(name), name)
                             client.close()
                         except ValueError:
                             print '[!!] Failed to decrypt data'
@@ -304,7 +304,6 @@ def listen_alt_channel(timeout):
                 # Check for show shares command
                 client = QueryApi.show_shared_files(client, raw_data, decrypted_query)
 
-
                 if decrypted_query == 'send_message':
                     # check for encrypted p2p messages
                     client = QueryApi.message_handler(client, clients, raw_data, decrypted_query)
@@ -315,7 +314,7 @@ def listen_alt_channel(timeout):
                     print '[*] %s is requesting fragmented file re-assembly of %s fragments' %\
                           (client_addr[0], N)
                     defragment(int(N), name_out)
-                    os.system('rm -rf chunks/')     # TODO: Why isn't this working??
+                    os.system('rm -rf chunks/')
 
             else:
                 print raw_data
