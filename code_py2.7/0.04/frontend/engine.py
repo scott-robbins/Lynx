@@ -211,7 +211,7 @@ class QueryApi:
                     # print '[*] %s is uploading %d bytes' % (client_ip, size)
                     client.send(utils.EncodeAES(cipher, 'YES'))
                     raw_data = client.recv(size)
-                    # print '[*] %d Encrypted Bytes Received' % len(raw_data)
+                    print '[*] %d Encrypted Bytes Received' % len(raw_data)
                     if len(raw_data) > 0:
                         try:
                             dec_data = utils.DecodeAES(cipher, raw_data)
@@ -294,7 +294,7 @@ def listen_alt_channel(timeout):
 
                 if 'PUT' in decrypted_query.split('_') or 'GET' in decrypted_query.split('_'):
                     # Upload file
-                    print '[*] %s in uploading a file' % client_addr[0]
+                    # print '[*] %s in uploading a file' % client_addr[0]
                     client = QueryApi.file_upload(client, client_addr[0], raw_data, decrypted_query)
 
                 if decrypted_query == 'cam_ready':
