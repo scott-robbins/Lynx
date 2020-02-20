@@ -254,7 +254,7 @@ class HttpServer:
         # load camera credentials
         header = '<!DOCTYPE html>\n<html>\n <body>\n'
         if os.path.isfile('../SHARED/im.jpeg'):
-            os.system('mv ../SHARED/im.jpeg assets/img/im.peg')
+            os.system('mv ../SHARED/im.jpeg assets/img/im.jpeg')
             body = '<img src="assets/img/im.jpeg" alt="Feed" height="400">'
         else:
             print '[!!] No LiveFeed Image Available'
