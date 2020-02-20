@@ -263,9 +263,9 @@ class HttpServer:
                      '<meta charset="UTF-8" http-equiv="refresh" content="900;url=BTC">\n'
             if os.path.isfile('../SHARED/im.jpeg'):
                 os.system('mv ../SHARED/im.jpeg assets/img/im.jpeg')
-                body = '<img src="assets/img/im.jpeg" alt="Feed" height="800">'
+                body = '<img src="assets/img/im.jpeg" alt="Feed" height="600">'
             elif os.path.isfile('assets/img/im.jpeg'):
-                body = '<img src="assets/img/im.jpeg" alt="Feed" height="400">'
+                body = '<img src="assets/img/im.jpeg" alt="Feed" height="600">'
             else:
                 print '[!!] No LiveFeed Image Available'
                 body = '<img src="assets/img/logo.png" alt="FeedDown" height="400">'
