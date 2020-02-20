@@ -105,6 +105,8 @@ class HttpServer:
                         'GET /assets/img/logo.png HTTP/1.1': self.logo,
                         'GET img/logo.png HTTP/1.1': self.logo,
                         'GET /favicon.ico HTTP/1.1': self.logo,
+                        'GET /assets/img/logo.png HTTP/1.1': self.camera_feed,
+                        'GET img/logo.png HTTP/1.1': self.camera_feed,
                         'POST / HTTP/1.1': self.login,
                         'GET /info HTTP/1.1': self.show_info,
                         'GET /Shares HTTP/1.1': self.get_shares,
