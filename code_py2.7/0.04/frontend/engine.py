@@ -200,8 +200,6 @@ class QueryApi:
         cipher = AES.new(api_key)
         if not os.path.isdir('chunks/'):
             os.mkdir('chunks/')
-        else:
-            os.system('rm -rf chunks; mkdir chunks')
         try:
             if 'PUT' in decrypted_query.split('_'):
                 max_size = 2000
@@ -211,7 +209,7 @@ class QueryApi:
                     # print '[*] %s is uploading %d bytes' % (client_ip, size)
                     client.send(utils.EncodeAES(cipher, 'YES'))
                     raw_data = client.recv(size)
-                    print '[*] %d Encrypted Bytes Received' % len(raw_data)
+                    # print '[*] %d Encrypted Bytes Received' % len(raw_data)
                     if len(raw_data) > 0:
                         try:
                             dec_data = utils.DecodeAES(cipher, raw_data)
