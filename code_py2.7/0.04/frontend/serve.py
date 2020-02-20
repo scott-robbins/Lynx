@@ -257,21 +257,24 @@ class HttpServer:
         c.send(html_engine.btc_price_tracking()[0])
         return c
 
-    def camera_feed(self, c, f, q, caddr):
-        # load camera credentials
-        header = '<!DOCTYPE html>\n<html>\n <body>\n' \
-                 '<meta charset="UTF-8" http-equiv="refresh" content="900;url=BTC">\n'
-        if os.path.isfile('../SHARED/im.jpeg'):
-            os.system('mv ../SHARED/im.jpeg assets/img/im.jpeg')
-            body = '<img src="assets/img/im.jpeg" alt="Feed" height="400">'
-        elif os.path.isfile('assets/img/im.jpeg'):
-            body = '<img src="assets/img/im.jpeg" alt="Feed" height="400">'
+    def camera_feed(self, c, f, q, c_addr):
+        if c_addr in self.known.keys()
+            header = '<!DOCTYPE html>\n<html>\n <body>\n' \
+                     '<meta charset="UTF-8" http-equiv="refresh" content="900;url=BTC">\n'
+            if os.path.isfile('../SHARED/im.jpeg'):
+                os.system('mv ../SHARED/im.jpeg assets/img/im.jpeg')
+                body = '<img src="assets/img/im.jpeg" alt="Feed" height="400">'
+            elif os.path.isfile('assets/img/im.jpeg'):
+                body = '<img src="assets/img/im.jpeg" alt="Feed" height="400">'
+            else:
+                print '[!!] No LiveFeed Image Available'
+                body = '<img src="assets/img/logo.png" alt="FeedDown" height="400">'
+            footer = '<body>\n</html>'
+            content = header + body + footer
+            c.send(content)
         else:
-            print '[!!] No LiveFeed Image Available'
-            body = '<img src="assets/img/logo.png" alt="FeedDown" height="400">'
-        footer = '<body>\n</html>'
-        content = header + body + footer
-        c.send(content)
+            forbidden = open('assets/forbidden.html', 'rb').read()
+            c.send(forbidden)
         return c
 
 
