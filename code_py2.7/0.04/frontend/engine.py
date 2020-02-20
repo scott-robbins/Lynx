@@ -238,6 +238,7 @@ class QueryApi:
                         s.bind(('0.0.0.0', 54124))
                         s.listen(5)
                         bytes_sent = 0
+                        print '[*] Receiving %d Fragments' % n_frags
                         for frag in fragments['frags']:
                             raw_data = open(frag, 'rb').read()
                             enc_data = utils.EncodeAES(cipher, raw_data)

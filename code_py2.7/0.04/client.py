@@ -286,14 +286,34 @@ if __name__ == '__main__':
         runtime = 60 * 60 * 24 * 7
         start = time.time()
         ticks = 0
+
+        # Load Camera Config (This code will not necessarily work on other client installs)
+        utils.decrypt_file('camera.config', 'camera_data.config', False)
+        cam_pass = ''
+        cam_name = ''
+        cam_ip = ''
+        for line in utils.swap('camera_data.config', True):
+            try:
+                cam_ip = line.split('ip:')[1]
+            except IndexError:
+                pass
+            try:
+                cam_pass = line.split('password:')[1]
+            except IndexError:
+                pass
+            try:
+                cam_name = line.split('username:')[1]
+            except IndexError:
+                pass
         try:
             print 'Starting CameraFeed'
             while running and (time.time() - start) < runtime:
                 if int(time.time()-start) % 600 == 0:
-                    if os.path.isfile('im.jpeg'):
-                        os.remove('im.jpeg')
-                    print 'Snapping image'
-                    os.system('python camera.py snap_n_send')
+                    snap_cmd = 'sshpass -p %s ssh %s@%s raspistill -t 1 -o im.jpeg' % \
+                               (cam_pass, cam_name, cam_ip)
+                    get_cmd = 'sshpass -p %s sftp %s@%s:/home/%s/im/jpeg' % \
+                              (cam_pass, cam_name, cam_ip, cam_name)
+                    os.system('python client.py put im.jpeg')
                     time.sleep(0.5)
 
         except KeyboardInterrupt:
