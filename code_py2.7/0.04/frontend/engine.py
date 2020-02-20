@@ -270,8 +270,7 @@ def listen_alt_channel(timeout):
     existing_users = utils.cmd('ls ../*.pass')
     print '[*] %d existing users' % len(existing_users)
     while running and (time.time()-tic) < timeout:
-        if os.path.isdir('chunks/'):
-            os.system('sudo rm -rf chunks/')
+
         # check_active()
         # TODO: Improve performance by using dictionary of function calls like server
         try:
