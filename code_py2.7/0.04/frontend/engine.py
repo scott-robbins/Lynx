@@ -215,7 +215,6 @@ class QueryApi:
                             dec_data = utils.DecodeAES(cipher, raw_data)
                             open('%s' % name, 'wb').write(dec_data)
                             client.close()
-                            return client
                         except ValueError:
                             print '[!!] Failed to decrypt data'
                             pass
