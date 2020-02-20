@@ -213,7 +213,9 @@ class QueryApi:
                     if len(raw_data) > 0:
                         try:
                             dec_data = utils.DecodeAES(cipher, raw_data)
-                            open('%s' % name % name, 'wb').write(dec_data)
+                            open('%s' % name, 'wb').write(dec_data)
+                            if os.path.isfile(name):
+                                print '%d bytes written to disk' % os.path.getsize(name)
                             client.close()
                         except ValueError:
                             print '[!!] Failed to decrypt data'
