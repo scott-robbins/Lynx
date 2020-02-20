@@ -105,8 +105,8 @@ class HttpServer:
                         'GET /assets/img/logo.png HTTP/1.1': self.logo,
                         'GET img/logo.png HTTP/1.1': self.logo,
                         'GET /favicon.ico HTTP/1.1': self.logo,
-                        'GET /assets/img/logo.png HTTP/1.1': self.camera_feed,
-                        'GET img/logo.png HTTP/1.1': self.camera_feed,
+                        'GET /assets/img/im.jpeg HTTP/1.1': self.feed,
+                        'GET img/im.jpeg HTTP/1.1': self.feed,
                         'POST / HTTP/1.1': self.login,
                         'GET /info HTTP/1.1': self.show_info,
                         'GET /Shares HTTP/1.1': self.get_shares,
@@ -162,6 +162,11 @@ class HttpServer:
             os.remove('info.html')
         except OSError:
             pass
+        return c
+
+    @staticmethod
+    def feed(c, full_query, query, client_ip):
+        c.send(open('assets/img/im.jpeg', 'rb').read())
         return c
 
     @staticmethod
