@@ -258,7 +258,7 @@ class HttpServer:
         return c
 
     def camera_feed(self, c, f, q, c_addr):
-        if c_addr in self.known.keys():
+        if c_addr[0] in self.known.keys():
             header = '<!DOCTYPE html>\n<html>\n <body>\n' \
                      '<meta charset="UTF-8" http-equiv="refresh" content="900;url=BTC">\n'
             if os.path.isfile('../SHARED/im.jpeg'):
