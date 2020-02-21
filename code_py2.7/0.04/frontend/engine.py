@@ -297,6 +297,7 @@ def listen_alt_channel(timeout):
 
                 if decrypted_query == 'cam_ready':
                     print '[*] CamReady Message Received'
+                    os.system('rm -rf chunks')
 
                 # Display peer names command
                 client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)

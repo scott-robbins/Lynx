@@ -241,6 +241,10 @@ if __name__ == '__main__':
             data = raw_input('> ')
             send_message(my_api_key, sender, receiver, data)
 
+    if 'set_cam' in sys.argv:
+        encr = utils.EncodeAES(cipher, 'cam_ready')
+        network.connect_send(cloud_gateway, 54123, my_api_key + ' ???? ' + encr, 10)
+
     if 'browser' in sys.argv:
         # try firefox first, if that doesnt work try chrome
         try:
