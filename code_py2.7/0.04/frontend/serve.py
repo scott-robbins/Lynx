@@ -120,6 +120,7 @@ class HttpServer:
                         'GET /index.html HTTP/1.1': self.home_page,
                         'GET /BTC HTTP/1.1': self.serve_btc_price_watch,
                         'GET /CameraFeed HTTP/1.1': self.camera_feed}
+        self.add_shared_files()
 
     def add_shared_files(self):
         files = os.listdir('../SHARED')
