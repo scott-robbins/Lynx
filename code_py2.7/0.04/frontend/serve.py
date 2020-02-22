@@ -84,7 +84,7 @@ def run(handler):
             elif 'GET /Inbox HTTP/1.1' in query and not new_client and not os.path.isfile('messages.txt'):
                 print '[*] %s is creating their inbox' % client_addr[0]
                 client.send(open('assets/empty_inbox.html','rb').read())
-            elif 'GET' in query.split(' ') and not new_client and 'Shared' in query.split(' ')[1].split('/'):
+            elif 'GET' in query[0].split(' ') and not new_client and 'Shared' in query[0].split(' ')[1].split('/'):
                 freq = query.split('GET ')[1]
                 print '[*] %s is downloading %s' % (client_addr[0], freq)
             # Close client connection
