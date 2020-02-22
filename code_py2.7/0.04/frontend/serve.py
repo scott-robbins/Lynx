@@ -73,6 +73,9 @@ def run(handler):
 
             query = request.split('\r\n')
 
+            if 'GET' in query[0].split(' ') and not new_client:
+                print query[0]
+                # print '[*] %s is downloading %s' % (client_addr[0], freq)
             # Login attempts
             if 'POST / HTTP/1.1' == query[0]:
                 field = query.pop()
@@ -84,9 +87,6 @@ def run(handler):
             elif 'GET /Inbox HTTP/1.1' in query and not new_client and not os.path.isfile('messages.txt'):
                 print '[*] %s is creating their inbox' % client_addr[0]
                 client.send(open('assets/empty_inbox.html','rb').read())
-            if 'GET' in query[0].split(' ') and not new_client:
-                freq = query[0].split('GET ')[1].split('HTTP/1.1')[0]
-                print '[*] %s is downloading %s' % (client_addr[0], freq)
             # Close client connection
             client.close()
 
