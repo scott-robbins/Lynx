@@ -72,6 +72,7 @@ def run(handler):
                 continue
 
             query = request.split('\r\n')
+            print query[0]
 
             # Login attempts
             if 'POST / HTTP/1.1' == query[0]:
