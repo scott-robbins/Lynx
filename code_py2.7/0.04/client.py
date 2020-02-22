@@ -203,8 +203,6 @@ if __name__ == '__main__':
             query = utils.EncodeAES(cipher, 'upload_%d' % n_frags)
             network.connect_send(cloud_gateway,54123, my_api_key+' ???? '+query, 10)
 
-            # msg = utils.EncodeAES(cipher, 'incoming_file:%s' % n)
-            # network.connect_send(cloud_gateway, 54123, my_api_key+' ???? '+msg, 10)
             print '[*] File is %d bytes (over 1.5kB)' % sz
             print '[*] Fragmenting into %d Files...' % len(fragments['frags'])
 

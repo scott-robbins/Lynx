@@ -304,6 +304,8 @@ def listen_alt_channel(timeout):
                     try:
                         n_fragments = int(decrypted_query.split('_')[1])
                         print '%s is uploading %d fragmented files' % (client_addr[0], n_fragments)
+                        if os.path.isdir('chunks'):
+                            os.system('rm -rf chunks/')
                     except IndexError:
                         client.send(utils.EncodeAES(cipher, '!! Unable to parse fragment count !!'))
 
