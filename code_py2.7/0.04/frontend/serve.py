@@ -84,8 +84,6 @@ def run(handler):
             elif 'GET /Inbox HTTP/1.1' in query and not new_client and not os.path.isfile('messages.txt'):
                 print '[*] %s is creating their inbox' % client_addr[0]
                 client.send(open('assets/empty_inbox.html','rb').read())
-            else:
-                print query[0]
             # Close client connection
             client.close()
 
@@ -130,10 +128,12 @@ class HttpServer:
 
     @staticmethod
     def file_download(c, f, q, ci):
-        file_name = q.split(' ')[1]
+        file_name = q.split('GET ')[1]
         print '%s is downloading %s' % (ci[0], q)
         if os.path.isfile('..'+q):
             c.send(open('..'+q, 'rb').read())
+        else:
+            print 'Cannot Find ..'+q
         return c
 
     @staticmethod
