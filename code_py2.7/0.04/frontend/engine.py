@@ -299,6 +299,14 @@ def listen_alt_channel(timeout):
                     print '[*] CamReady Message Received'
                     os.system('rm -rf chunks')
 
+                if 'upload' in decrypted_query.split('_'):
+                    # TODO: Only a client with a password should be able to do this
+                    try:
+                        n_fragments = int(decrypted_query.split('_')[1])
+                        print '%s is uploading %d fragmented files' % (client_addr[0], n_fragments)
+                    except IndexError:
+                        client.send(utils.EncodeAES(cipher, '!! Unable to parse fragment count !!'))
+
                 # Display peer names command
                 client = QueryApi.show_peers(client, clients, raw_data, decrypted_query)
 

@@ -198,9 +198,13 @@ if __name__ == '__main__':
         sz = os.path.getsize(n)
         if sz > 1500:
             fragments = network.fragmented(n, 800)
-            # TODO: Alert remote host about fragments coming
-            msg = utils.EncodeAES(cipher, 'incoming_file:%s' % n)
-            network.connect_send(cloud_gateway, 54123, my_api_key+' ???? '+msg,10)
+            # Alert remote host about fragments coming
+            n_frags = len(fragments['frags'])
+            query = utils.EncodeAES(cipher, 'upload_%d' % n_frags)
+            network.connect_send(cloud_gateway,54123, my_api_key+' ???? '+query, 10)
+
+            # msg = utils.EncodeAES(cipher, 'incoming_file:%s' % n)
+            # network.connect_send(cloud_gateway, 54123, my_api_key+' ???? '+msg, 10)
             print '[*] File is %d bytes (over 1.5kB)' % sz
             print '[*] Fragmenting into %d Files...' % len(fragments['frags'])
 
@@ -283,47 +287,5 @@ if __name__ == '__main__':
                     get_file(shared[remote_key].split('../SHARED/')[1], my_api_key)
         # check routing to each peer
 
-    if 'camera' in sys.argv:
-        # not a typical client, but utilizes the same resources for communication
-        callback = utils.start_listener(56234, 5)
-        running = True;
-        runtime = 60 * 60 * 24 * 7
-        start = time.time()
-        ticks = 0
 
-        # Load Camera Config (This code will not necessarily work on other client installs)
-        utils.decrypt_file('camera.config', 'camera_data.config', False)
-        cam_pass = ''
-        cam_name = ''
-        cam_ip = ''
-        for line in utils.swap('camera_data.config', True):
-            try:
-                cam_ip = line.split('ip:')[1]
-            except IndexError:
-                pass
-            try:
-                cam_pass = line.split('password:')[1]
-            except IndexError:
-                pass
-            try:
-                cam_name = line.split('username:')[1]
-            except IndexError:
-                pass
-        try:
-            print 'Starting CameraFeed'
-            while running and (time.time() - start) < runtime:
-                if int(time.time()-start) % 600 == 0:
-                    snap_cmd = 'sshpass -p %s ssh %s@%s raspistill -t 1 -o im.jpeg' % \
-                               (cam_pass, cam_name, cam_ip)
-                    get_cmd = 'sshpass -p %s sftp %s@%s:/home/%s/im/jpeg' % \
-                              (cam_pass, cam_name, cam_ip, cam_name)
-                    os.system('python client.py put im.jpeg')
-                    time.sleep(0.5)
-
-        except KeyboardInterrupt:
-            end_date, end_time = utils.create_timestamp()
-            callback.close()
-            running = False
-            print '[!!] Server Killed! [%s - %s]' % (end_date, end_time)
-            pass
 
