@@ -272,7 +272,9 @@ class HttpServer:
             else:
                 print '[!!] No LiveFeed Image Available'
                 body = '<img src="assets/img/logo.png" alt="FeedDown" height="400">'
-            footer = '<body>\n</html>'
+            d, l = utils.create_timestamp()
+            stamp = '<p> %s  -  %s </p>\n' % (d, l)
+            footer = stamp+'<body>\n</html>'
             content = header + body + footer
             c.send(content)
         else:
