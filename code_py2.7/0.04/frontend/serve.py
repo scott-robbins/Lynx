@@ -130,7 +130,11 @@ class HttpServer:
 
     @staticmethod
     def file_download(c, f, q, ci):
+        file_name = q.split(' ')[1]
         print '%s is downloading %s' % (ci[0], q)
+        if os.path.isfile('..'+q):
+            c.send(open('..'+q, 'rb').read())
+        return c
 
     @staticmethod
     def get_user_agent(query):
