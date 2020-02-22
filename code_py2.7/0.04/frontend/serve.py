@@ -266,7 +266,7 @@ class HttpServer:
                 body = '<img src="assets/img/im.jpeg" alt="Feed" height="600">'
             elif os.path.isfile('assets/img/im.jpeg'):
                 body = '<img src="assets/img/im.jpeg" alt="Feed" height="600">'
-            elif os.path.isfile('../SHARED/im.jpeg.gz'):
+            if os.path.isfile('../SHARED/im.jpeg.gz'):
                 os.system('gzip -d im.jpeg.gz; mv ../SHARED/im.jpeg assets/img/im.jpeg')
                 body = '<img src="assets/img/im.jpeg" alt="Feed" height="600">'
             else:

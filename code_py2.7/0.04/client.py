@@ -51,6 +51,35 @@ def initialize_keys(private_ip):
     return priv, pub, shares
 
 
+# get operating system. this is currently only designed for linux!
+if os.name == 'nt':
+    print '[!!] Operating System is WINDOWS. This software only ' \
+          'supports Linux as of now.'
+    exit()
+# Get external/internal nx info
+public, private, nic_name = utils.get_nx_info(verbose=False)
+
+# Register locally
+cloud_gateway = get_cloud_ip()
+# - [1] Create/Load Local Private Key
+private_key, public_key, shared_files = initialize_keys(public)
+# - [3] Create Key and Credentials
+if not utils.cmd('ls *.pass'):
+    login_data, username = create_username(public.replace('.','-')+'.pem')
+    # Register With Main Cloud Server
+    network.connect_send(cloud_gateway, 54123, '../' + username + ' :::: ' + open(username + '.pass', 'rb').read(), 10)
+else:
+    pass_file_list = utils.cmd('ls *.pass')
+    if len(pass_file_list)>=1:
+        pass_file = pass_file_list.pop()
+    login_data = open(pass_file, 'rb').read()
+    username = pass_file.split('.pass')[0]
+
+# Update/Sync with the P2P Cloud
+my_api_key = base64.b64encode(get_random_bytes(32))  # set api key
+cipher = AES.new(base64.b64decode(my_api_key))
+
+
 def get_file(fname, mykey):
     query = 'GET_%s' % fname
     encq = utils.EncodeAES(cipher, query)
@@ -149,45 +178,13 @@ def send_message(mykey, sender, receiver, data):
     network.connect_receive_send(cloud_gateway,54123,enc_send_query,enc_content, c)
 
 
-if __name__ == '__main__':
-    verbose = True  # TODO: DEBUG setting
-    date, localtime = utils.create_timestamp()
-    print '[{(~\033[1m LYNX CLIENT \033[0m~)}]\t\t%s - %s' % (localtime, date)
-    domain = 'http://stickysprings.bounceme.net'
-
-    # get operating system. this is currently only designed for linux!
-    if os.name == 'nt':
-        print '[!!] Operating System is WINDOWS. This software only ' \
-              'supports Linux as of now.'
-        exit()
-    # Get external/internal nx info
-    public, private, nic_name = utils.get_nx_info(verbose=False)
-
-    # Register locally
-    cloud_gateway = get_cloud_ip()
-    # - [1] Create/Load Local Private Key
-    private_key, public_key, shared_files = initialize_keys(public)
-    # - [3] Create Key and Credentials
-    if not utils.cmd('ls *.pass'):
-        login_data, username = create_username(public.replace('.','-')+'.pem')
-        # Register With Main Cloud Server
-        network.connect_send(cloud_gateway, 54123, '../' + username + ' :::: ' + open(username + '.pass', 'rb').read(), 10)
-    else:
-        pass_file_list = utils.cmd('ls *.pass')
-        if len(pass_file_list)>=1:
-            pass_file = pass_file_list.pop()
-        login_data = open(pass_file, 'rb').read()
-        username = pass_file.split('.pass')[0]
-
-    # Update/Sync with the P2P Cloud
-    my_api_key = base64.b64encode(get_random_bytes(32))  # set api key
-    cipher = AES.new(base64.b64decode(my_api_key))
+def arg_handler(gateway, api_key):
 
     if 'peers' in sys.argv:  # show registed peers using api key
-        show_peers(my_api_key)
+        show_peers(api_key)
 
     if 'shares' in sys.argv:
-        show_shared(my_api_key)
+        show_shared(api_key)
 
     if 'put' in sys.argv and len(sys.argv) >= 3:
         if not os.path.isfile(sys.argv[2]):
@@ -201,7 +198,7 @@ if __name__ == '__main__':
             # Alert remote host about fragments coming
             n_frags = len(fragments['frags'])
             query = utils.EncodeAES(cipher, 'upload_%d' % n_frags)
-            network.connect_send(cloud_gateway,54123, my_api_key+' ???? '+query, 10)
+            network.connect_send(gateway,54123, api_key+' ???? '+query, 10)
 
             print '[*] File is %d bytes (over 1.5kB)' % sz
             print '[*] Fragmenting into %d Files...' % len(fragments['frags'])
@@ -209,23 +206,23 @@ if __name__ == '__main__':
             N = 0
             if progress_bar:
                 for file_name in tqdm(fragments['frags'], unit=' fragments'):
-                    put_file(file_name, my_api_key)
+                    put_file(file_name, api_key)
                     N += 1
             else:
                 for file_name in fragments['frags']:
-                    put_file(file_name, my_api_key)
-                    N+=1
+                    put_file(file_name, api_key)
+                    N += 1
             os.system('rm -r chunks/')
             encr = utils.EncodeAES(cipher, 'fragments:%d = %s' % (N, n))
-            network.connect_send(cloud_gateway, 54123, my_api_key + ' ???? '+encr, 10)
+            network.connect_send(gateway, 54123, api_key + ' ???? '+encr, 10)
         else:
-            put_file(n, my_api_key)
+            put_file(n, api_key)
         print 'File Transferred. File Data:\n'
         os.system('sha256sum %s' % n)
 
     if 'get' in sys.argv and len(sys.argv) >= 3:
         n = sys.argv[2]
-        get_file(n,my_api_key)
+        get_file(n, api_key)
 
     if 'send' in sys.argv:
         sender = raw_input('Enter Username: \n')
@@ -241,11 +238,11 @@ if __name__ == '__main__':
             exit()
         if msg:
             data = raw_input('> ')
-            send_message(my_api_key, sender, receiver, data)
+            send_message(api_key, sender, receiver, data)
 
     if 'set_cam' in sys.argv:
         encr = utils.EncodeAES(cipher, 'cam_ready')
-        network.connect_send(cloud_gateway, 54123, my_api_key + ' ???? ' + encr, 10)
+        network.connect_send(gateway, 54123, my_api_key + ' ???? ' + encr, 10)
 
     if 'browser' in sys.argv:
         # try firefox first, if that doesnt work try chrome
@@ -254,7 +251,6 @@ if __name__ == '__main__':
         except OSError:
             # TODO: try chrome
             pass
-
     if 'run' in sys.argv:
         # Synchronize SHARED folder with cloud
         os.system('python client.py shares >> shared.txt')
@@ -272,18 +268,26 @@ if __name__ == '__main__':
             except IndexError:
                 pass
 
-        direct, hashed = utils.crawl_dir('SHARED',True,False)
+        direct, hashed = utils.crawl_dir('SHARED', True, False)
         if len(hashed.keys()) > len(shared.keys()):
             for local in hashed.keys():
                 key = hashed[local]
-                if key not in shared.keys() and len(key)>11:
+                if key not in shared.keys() and len(key) > 11:
                     print '[*] %s is not in local Shared/' % hashed[key]
         elif len(hashed.keys()) < len(shared.keys()):
             for remote_key in shared.keys():
-                if remote_key not in hashed.values() and len(remote_key)>11:
+                if remote_key not in hashed.values() and len(remote_key) > 11:
                     print '[*] %s is not in local Shared/' % shared[remote_key]
-                    get_file(shared[remote_key].split('../SHARED/')[1], my_api_key)
+                    get_file(shared[remote_key].split('../SHARED/')[1], api_key)
         # check routing to each peer
 
+
+if __name__ == '__main__':
+    verbose = True  # TODO: DEBUG setting
+    date, localtime = utils.create_timestamp()
+    print '[{(~\033[1m LYNX CLIENT \033[0m~)}]\t\t%s - %s' % (localtime, date)
+    domain = 'http://stickysprings.bounceme.net'
+
+    arg_handler(cloud_gateway, my_api_key)
 
 
