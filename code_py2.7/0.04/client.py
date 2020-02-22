@@ -14,6 +14,8 @@ import time
 import sys
 import os
 
+domain = 'http://stickysprings.bounceme.net'
+
 
 def create_username(key_file):
     print 'This is your internet login password: '
@@ -247,7 +249,7 @@ def arg_handler(gateway, api_key):
     if 'browser' in sys.argv:
         # try firefox first, if that doesnt work try chrome
         try:
-            os.system('sh $(firefox %s:80)&' % cloud_gateway)
+            os.system('sh $(firefox www.lynx-network.us)&')
         except OSError:
             # TODO: try chrome
             pass
@@ -286,7 +288,7 @@ if __name__ == '__main__':
     verbose = True  # TODO: DEBUG setting
     date, localtime = utils.create_timestamp()
     print '[{(~\033[1m LYNX CLIENT \033[0m~)}]\t\t%s - %s' % (localtime, date)
-    domain = 'http://stickysprings.bounceme.net'
+
 
     arg_handler(cloud_gateway, my_api_key)
 

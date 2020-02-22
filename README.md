@@ -55,14 +55,15 @@ benefit the entire network in several ways, and also sort of unlock some of the 
 you get from peer to peer networks. Let me elaborate. 
 
 As of now the burden of file upload/download is constrained by the single central server that must track and 
-synchronize the initial authentication. This will not scale well if the number of clients increases. 
+synchronize the initial authentication of a client, and *all uploads/downloads* . This will not scale well if
+the number of clients increases. 
 
 On the other hand, with say half a dozen public nodes (each with a unique public domain) a very different 
 architecture could be implemented. In this case, whenever a file is uploaded to one public node, it's name and
-a uniquely identifying hash of it would be added to list among all the other shared files present on all of the 
-public nodes. If each node then sends the other nodes it's own updates list of all file hashes it has, the nodes
-will collectively generate/maintain a list of the resources each other has, and a  master list of the entire set
-of files available. 
+a uniquely identifying hash of it would be added to a list containing all the shared files present among all of
+the  public nodes. If each node then sends each other nodes it's own update, listing of all file hashes it has,
+the nodes will collectively generate/maintain a list of the resources each other has (and a master list of the
+entire set of files available). 
 
 Now when users want to download/upload a file, the will visit perhaps one master site which will redirect them to
 the geographically closest node, which will be able to serve them any file on the network (even if it doesn't have it,
