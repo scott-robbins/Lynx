@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cookie Dump</title>
+<style type="text/css">
+a { text-decoration:none; }
+body { margin:0; font-size:100%; font-family:verdana, arial, sans-serif; }
+th { font-size:.75em; }
+td { font-size:1.25em; font-family:monospace; }
+table {border-collapse:collapse; }
+</style></head>
+<body><div style="padding:75px 50px 100px 50px; display:table; margin:auto auto;">
+<h1 style="font-weight:normal; letter-spacing:3px;"><a href="https://www.willmaster.com/">
+<img src="https://www.willmaster.com/images/wmlogo_icon.gif" style="width:50px; height:50px; border:none;" alt="Willmaster logo">
+</a> Cookie Dump</h1>
+<?php
+/*
+   Cookie Values Dump
+   Version 1.0
+   June 8, 2014
+
+   Will Bontrager Software LLC
+   https://www.willmaster.com/
+   Copyright 2014 Will Bontrager Software LLC
+
+   This software is provided "AS IS," without 
+   any warranty of any kind, without even any 
+   implied warranty such as merchantability 
+   or fitness for a particular purpose.
+   Will Bontrager Software LLC grants 
+   you a royalty free license to use or 
+   modify this software provided this 
+   notice appears on all copies. 
+*/
+
+if( count($_COOKIE) )
+{
+   $tabstart = '<tr><td valign="top">';
+   echo('<table border="1" cellpadding="5" cellspacing="0">');
+   echo('<tr><th>Cookie Name</th><th>Cookie Value</th></tr>');
+   ksort($_COOKIE);
+   foreach($_COOKIE as $k => $v)
+   {
+      $pk = htmlspecialchars($k);
+      if( is_array($_COOKIE[$k]) )
+      {
+         $counter = 0;
+         $pkh = array();
+         foreach( $_COOKIE[$k] as $kk => $vv )
+         {
+            if( empty($vv) ) { $pv = ' '; }
+            else { $pv = htmlspecialchars($vv); }
+            $pkh[$counter] = $pk.'['.$counter.']'."\t$pv";
+            $counter++;
+         }
+         foreach( $pkh as $tpk => $tpv )
+         {
+            list($tk,$tv) = explode("\t",$tpv,2);
+            echo("${tabstart}$tk</td><td>$tv</td></tr>");
+         }
+      }
+      else
+      {
+         if( empty($v) ) { $pv = ' '; }
+         else { $pv = htmlspecialchars($v); }
+         echo("${tabstart}$pk</td><td>$pv</td></tr>");
+      }
+   }
+   echo('</table>');
+}
+else { echo('<h4 style="font-weight:normal;">No cookies received from the browser.</h4>'); }
+?>
+<p style="margin-top:30px; padding:0 10px 0 5px; border-radius:5px; display:table; box-shadow:-3px 3px 3px 0px #ccc;">
+Copyright 2015 <a href="https://www.willmaster.com/">Will Bontrager Software, LLC</a>
+</p>
+</body>
+</html>
+
+
