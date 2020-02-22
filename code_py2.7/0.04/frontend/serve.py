@@ -130,8 +130,9 @@ class HttpServer:
     def file_download(c, f, q, ci):
         file_name = q.split('HTTP/1.1')[0].split('GET')[1].replace(' ','')
         print '%s is downloading %s' % (ci[0], file_name)
-        if os.path.isfile('..'+q):
-            c.send(open('..'+file_name, 'rb').read())
+        if os.path.isfile('..'+file_name):
+            # os.system('cp ../%s' % file_name)
+            c.send(open(file_name, 'rb').read())
         else:
             print 'Cannot Find ..'+file_name
         return c
