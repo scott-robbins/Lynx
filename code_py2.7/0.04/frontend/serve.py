@@ -121,6 +121,16 @@ class HttpServer:
                         'GET /BTC HTTP/1.1': self.serve_btc_price_watch,
                         'GET /CameraFeed HTTP/1.1': self.camera_feed}
 
+    def add_shared_files(self):
+        files = os.listdir('../SHARED')
+        for name in files:
+            query_string = 'GET /SHARED/%s HTTP/1.1' % name
+            self.actions[query_string] = self.file_download
+
+    @staticmethod
+    def file_download(c, f, q, ci):
+        print '%s is downloading %s' % (ci[0], q)
+
     @staticmethod
     def get_user_agent(query):
         user_agent = ''
