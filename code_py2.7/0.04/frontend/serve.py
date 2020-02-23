@@ -183,9 +183,9 @@ class HttpServer:
             # maintain state with a file for this client, encrypted w their public key
             state_file = self.known[ci[0]] + '.state'
             if not os.path.isfile(state_file):
-                open(state_file, 'wb').write('%s logged in from %s [%s -%s]' % (self.known[ci[0]], ci[0], d, l))
+                open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' % (self.known[ci[0]], ci[0], d, l))
             open(state_file,'a').write('%s [%s] is downloading %s\nUserAgent:\n%s\n' %
-                 (self.known[ci[0]],ci[0],file_name.split('/')[-1],self.get_user_agent(f)))
+                (self.known[ci[0]],ci[0],file_name.split('/')[-1],self.get_user_agent(f)))
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
             c.send(forbidden)
@@ -296,10 +296,10 @@ class HttpServer:
                 # maintain state with a file for this client, encrypted w their public key
                 state_file = self.known[c_addr[0]] + '.state'
                 if not os.path.isfile(state_file):
-                    open(state_file, 'wb').write('%s logged in from %s [%s -%s]' %
+                    open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' %
                                                  (self.known[c_addr[0]], c_addr[0], d, l))
                 else:
-                    open(state_file, 'a').write('%s logged in from %s [%s -%s]' %
+                    open(state_file, 'a').write('%s logged in from %s [%s -%s]\n' %
                                                 (self.known[c_addr[0]], c_addr[0], d, l))
 
             else:
