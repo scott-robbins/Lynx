@@ -134,7 +134,7 @@ class HttpServer:
         footer = page[175:]
         body = '\n<h2> What is your computer revealing about you? </h2>\n'
         for line in utils.cmd('curl -s https://ipinfo.io/%s' % ci[0]):
-            if line !='{\n' and line != '}\n':
+            if line != '{' and line != '}':
                 body += '<p>%s</p>\n' % line.replace('"','')
         body += '<p> User Agent Received: </p>\n<p>%s</p>\n' % user_agent
         content = header + body + footer
