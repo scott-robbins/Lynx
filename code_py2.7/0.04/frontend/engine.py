@@ -144,6 +144,7 @@ class QueryApi:
 
     @staticmethod
     def show_peers(client, clients, raw, decrypted_query):
+        refresh_registered_nodes()
         # TODO: socket error handling
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
         try:
