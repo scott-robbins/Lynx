@@ -84,8 +84,8 @@ def run(handler):
             elif 'GET /Inbox HTTP/1.1' in query and not new_client and not os.path.isfile('messages.txt'):
                 print '[*] %s is creating their inbox' % client_addr[0]
                 client.send(open('assets/empty_inbox.html','rb').read())
-            else:
-                print query[0]
+            # else: # this is only for debugging new queries
+            #     print query[0]
             # Close client connection
             client.close()
 
@@ -109,7 +109,7 @@ class HttpServer:
                         'GET /favicon.ico HTTP/1.1': self.logo,
                         'GET /assets/img/im.jpeg HTTP/1.1': self.feed,
                         'GET img/im.jpeg HTTP/1.1': self.feed,
-                        'GET img/recent_attacks.png HTTP/1.1': self.graph,
+                        'GET /assets/img/recent_attacks.png HTTP/1.1': self.graph,
                         'POST / HTTP/1.1': self.login,
                         'GET /info HTTP/1.1': self.show_info,
                         'GET /Shares HTTP/1.1': self.get_shares,
@@ -141,7 +141,7 @@ class HttpServer:
 
     def graph(self,c, f, q, ci):
         if ci in self.known:
-            c.send(open('assets/img/recent_attacks.png', 'rb').read())
+            c.send(open('/assets/img/recent_attacks.png', 'rb').read())
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
             c.send(forbidden)
