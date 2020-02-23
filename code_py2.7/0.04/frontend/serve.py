@@ -110,6 +110,7 @@ class HttpServer:
                         'GET /assets/img/im.jpeg HTTP/1.1': self.feed,
                         'GET img/im.jpeg HTTP/1.1': self.feed,
                         'GET /assets/img/recent_attacks.png HTTP/1.1': self.graph,
+                        'GET img/recent_attacks.png HTTP/1.1': self.graph,
                         'POST / HTTP/1.1': self.login,
                         'GET /info HTTP/1.1': self.show_info,
                         'GET /Shares HTTP/1.1': self.get_shares,
