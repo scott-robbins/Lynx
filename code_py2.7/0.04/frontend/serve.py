@@ -132,7 +132,7 @@ class HttpServer:
         print '%s is downloading %s' % (ci[0], file_name)
         if os.path.isfile('..'+file_name):
             # os.system('cp ../%s' % file_name)
-            c.send(open(file_name, 'rb').read())
+            c.send(open('..'+file_name, 'rb').read())
         else:
             print 'Cannot Find ..'+file_name
         return c
