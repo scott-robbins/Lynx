@@ -158,6 +158,9 @@ def render_file_structure(file_path):
                  (hyperlink('/Shared/' + fname.replace('//', '/'), fname.replace('//', '/')), h)
         m += '</ul>\n'
         content += m
+
+    # TODO: Search out Peer's Shared files and add them here/make them downloadable as well
+
     page = header + content + footer
     return page
 
