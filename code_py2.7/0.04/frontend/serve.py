@@ -210,7 +210,7 @@ class HttpServer:
         self.add_shared_files()
         user_agent = ''.join(f[1:3])
         if c_addr[0] not in self.known.keys():
-            print self.known
+            # print self.known
             msg = '[!!] %s Has NOT LOGGED IN and tried to access Shared/ Files page\n' \
                   '[*] UserAgent:\n%s' % (c_addr[0], user_agent)
             print msg
