@@ -205,6 +205,7 @@ class HttpServer:
         return c
 
     def get_shares(self, c, f, q, c_addr):
+        self.add_shared_files()
         user_agent = ''.join(f[1:3])
         if c_addr[0] not in self.known.keys():
             print self.known
