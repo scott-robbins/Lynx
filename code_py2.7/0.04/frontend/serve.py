@@ -124,7 +124,7 @@ class HttpServer:
     def add_shared_files(self):
         files = os.listdir('../SHARED/Downloadable')
         for name in files:
-            query_string = 'GET /SHARED/%s HTTP/1.1' % name
+            query_string = 'GET /SHARED/Downloadable/%s HTTP/1.1' % name
             self.actions[query_string] = self.file_download
 
     @staticmethod
