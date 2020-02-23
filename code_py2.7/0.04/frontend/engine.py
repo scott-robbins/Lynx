@@ -9,6 +9,7 @@ import os
 
 def refresh_registered_nodes():
     if not os.path.isfile('registered.txt'):
+        open('registered.txt', 'wb').write('s')
         return
     nodes = {}
     unames = []
@@ -348,4 +349,6 @@ if __name__ == '__main__':
     if '-l' in sys.argv and len(sys.argv) >= 3:
         timer = int(sys.argv[2])
         print '[*] Starting Backend Server'
+        refresh_registered_nodes()
         listen_alt_channel(timer)
+
