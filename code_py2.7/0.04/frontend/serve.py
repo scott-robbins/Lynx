@@ -118,7 +118,8 @@ class HttpServer:
                         'GET /Mailbox HTTP/1.1': self.show_mailbox,
                         'GET /index.html HTTP/1.1': self.home_page,
                         'GET /BTC HTTP/1.1': self.serve_btc_price_watch,
-                        'GET /CameraFeed HTTP/1.1': self.camera_feed}
+                        'GET /CameraFeed HTTP/1.1': self.camera_feed,
+                        ''}
         self.add_shared_files()
 
     def add_shared_files(self):
@@ -127,12 +128,32 @@ class HttpServer:
             query_string = 'GET /SHARED/Downloadable/%s HTTP/1.1' % name
             self.actions[query_string] = self.file_download
 
-    @staticmethod
-    def file_download(c, f, q, ci):
-        file_name = q.split('HTTP/1.1')[0].split('GET')[1].replace(' ','')
-        print '[*] %s is downloading %s' % (ci[0], file_name)
-        if os.path.isfile('..'+file_name):
-            c.send(open('..'+file_name, 'rb').read())
+
+    def upload_css(self, c,f,q,ci):
+        if ci[0] in self.known:
+            c.send(open('assets/jquery.drag.drop.css'))
+        else:
+            forbidden = open('assets/forbidden.html', 'rb').read()
+            c.send(forbidden)
+        return c
+
+    def upload_js(self, c,f,g,ci):
+        if ci[0] in self.known:
+            c.send(open('assets/jquery.drag.drop.js'))
+        else:
+            forbidden = open('assets/forbidden.html', 'rb').read()
+            c.send(forbidden)
+        return c
+
+    def file_download(self, c, f, q, ci):
+        if ci[0] in self.known:
+            file_name = q.split('HTTP/1.1')[0].split('GET')[1].replace(' ','')
+            print '[*] %s is downloading %s' % (ci[0], file_name)
+            if os.path.isfile('..'+file_name):
+                c.send(open('..'+file_name, 'rb').read())
+        else:
+            forbidden = open('assets/forbidden.html', 'rb').read()
+            c.send(forbidden)
         return c
 
     @staticmethod
@@ -168,6 +189,7 @@ class HttpServer:
 
     @staticmethod
     def show_mailbox(c,f,g,ci):
+
         c.send(html_engine.show_inbox_in())
         return c
 
