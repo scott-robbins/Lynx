@@ -108,6 +108,7 @@ class HttpServer:
                         'GET /favicon.ico HTTP/1.1': self.logo,
                         'GET /assets/img/im.jpeg HTTP/1.1': self.feed,
                         'GET img/im.jpeg HTTP/1.1': self.feed,
+                        'GET img/recent_attacks.png HTTP/1.1': self.graph,
                         'POST / HTTP/1.1': self.login,
                         'GET /info HTTP/1.1': self.show_info,
                         'GET /Shares HTTP/1.1': self.get_shares,
@@ -119,9 +120,31 @@ class HttpServer:
                         'GET /index.html HTTP/1.1': self.home_page,
                         'GET /BTC HTTP/1.1': self.serve_btc_price_watch,
                         'GET /CameraFeed HTTP/1.1': self.camera_feed,
-                        'GET /assets/jquery.drag.drop.css': self.upload_css,
-                        'GET /assets/jquery.drag.drop.js': self.upload_js}
+                        'GET /assets/jquery.drag.drop.css /HTTP/1.1': self.upload_css,
+                        'GET /assets/jquery.drag.drop.js /HTTP/1.1': self.upload_js,
+                        'GET /Security /HTTP/1.1': self.security}
         self.add_shared_files()
+
+    def security(self, c, f, q, ci):
+        user_agent = ''.join(q[1:3])
+        page = open('assets/security.html', 'rb').read()
+        header = page[:174]
+        footer = page[175:]
+        body = '\n<h2> What is your computer revealing about you? </h2>\n'
+        for line in utils.cmd('curl -s https://ipinfo.io/%s' % ci[0]):
+            body += '<p>%s</p>\n' % line
+        body += '<p> User Agent Received: </p>\n<p>%s</p>\n' % user_agent
+        content = header + body + footer
+        c.send(content)
+        return c
+
+    def graph(self,c, f, q, ci):
+        if ci in self.known:
+            c.send(open('assets/img/recent_attacks.png', 'rb').read())
+        else:
+            forbidden = open('assets/forbidden.html', 'rb').read()
+            c.send(forbidden)
+        return c
 
     def add_shared_files(self):
         files = os.listdir('../SHARED/Downloadable')
