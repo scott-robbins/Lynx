@@ -185,8 +185,8 @@ class QueryApi:
         shared, hashes = utils.crawl_dir('../SHARED',True,False)
         data = ''
         for filename in hashes.keys():
-            f = filename.replace('"','')
-            data += '%s : %s\n' % (f, hashes[filename])
+            f = filename.replace('"','').split('/')[-1]
+            data += '%s : \t%s\n' % (f, hashes[filename])
         open('files.txt', 'wb').write(data)
         try:
             if 'show_shares' in decrypted_query.split(':'):
