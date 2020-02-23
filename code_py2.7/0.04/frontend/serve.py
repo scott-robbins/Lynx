@@ -134,7 +134,8 @@ class HttpServer:
         footer = page[175:]
         body = '\n<h2> What is your computer revealing about you? </h2>\n'
         for line in utils.cmd('curl -s https://ipinfo.io/%s' % ci[0]):
-            body += '<p>%s</p>\n' % line
+            if line !='{\n' and line != '}\n':
+                body += '<p>%s</p>\n' % line.replace('"','')
         body += '<p> User Agent Received: </p>\n<p>%s</p>\n' % user_agent
         content = header + body + footer
         c.send(content)
@@ -205,6 +206,7 @@ class HttpServer:
         return c
 
     def display_peers(self, c, f, q, ci):
+        refresh_users()
         if ci[0] in self.known.keys():
             print '[*] Showing %s active peer list' % ci[0]
             content = html_engine.show_active()
