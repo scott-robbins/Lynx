@@ -141,7 +141,7 @@ class HttpServer:
 
     def graph(self,c, f, q, ci):
         if ci in self.known:
-            c.send(open('/assets/img/recent_attacks.png', 'rb').read())
+            c.send(open('assets/img/recent_attacks.png', 'rb').read())
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
             c.send(forbidden)
