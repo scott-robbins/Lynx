@@ -129,9 +129,9 @@ class HttpServer:
             query_string = 'GET /SHARED/Downloadable/%s HTTP/1.1' % name
             self.actions[query_string] = self.file_download
 
-
     def upload_css(self, c,f,q,ci):
         if ci[0] in self.known:
+            print 'Serving css'
             c.send(open('assets/jquery.drag.drop.css'))
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
@@ -140,6 +140,7 @@ class HttpServer:
 
     def upload_js(self, c,f,g,ci):
         if ci[0] in self.known:
+            print 'serving javascript'
             c.send(open('assets/jquery.drag.drop.js'))
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
