@@ -182,10 +182,14 @@ class QueryApi:
     def show_shared_files(client, raw, decrypted_query):
         # TODO: socket error handling
         cipher = AES.new(base64.b64decode(raw.split(' ???? ')[0]))
-        get_shares = 'ls ../SHARED | while read n; do sha256sum ../SHARED/$n >> files.txt; done'
+        shared, hashes = utils.crawl_dir('../SHARED',True,False)
+        data = ''
+        for filename in hashes.keys():
+            f = filename.replace('"','')
+            data += '%s : %s\n' % (f, hashes[filename])
+        open('files.txt', 'wb').write(data)
         try:
             if 'show_shares' in decrypted_query.split(':'):
-                os.system(get_shares)
                 client.send(utils.EncodeAES(cipher, utils.arr2lines(utils.swap('files.txt', True))))
             else:
                 return client
