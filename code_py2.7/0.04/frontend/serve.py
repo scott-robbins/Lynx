@@ -120,9 +120,9 @@ class HttpServer:
                         'GET /index.html HTTP/1.1': self.home_page,
                         'GET /BTC HTTP/1.1': self.serve_btc_price_watch,
                         'GET /CameraFeed HTTP/1.1': self.camera_feed,
-                        'GET /assets/jquery.drag.drop.css /HTTP/1.1': self.upload_css,
-                        'GET /assets/jquery.drag.drop.js /HTTP/1.1': self.upload_js,
-                        'GET /Security /HTTP/1.1': self.security}
+                        'GET /assets/jquery.drag.drop.css HTTP/1.1': self.upload_css,
+                        'GET /assets/jquery.drag.drop.js HTTP/1.1': self.upload_js,
+                        'GET /Security HTTP/1.1': self.security}
         self.add_shared_files()
 
     def security(self, c, f, q, ci):
