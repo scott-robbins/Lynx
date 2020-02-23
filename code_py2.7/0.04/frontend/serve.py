@@ -127,7 +127,7 @@ class HttpServer:
         self.add_shared_files()
 
     def security(self, c, f, q, ci):
-        user_agent = ''.join(q[1:3])
+        user_agent = self.get_user_agent(f)
         page = open('assets/security.html', 'rb').read()
         header = page[:174]
         footer = page[175:]
