@@ -82,7 +82,7 @@ def show_active():
             pass
     n_peers = len(list(set(lines.keys())))
     header = '<!DOCTYPE html>\n<html>\n <body>\n' \
-             '<div style="background-color:PowderBlue;color:white;padding:30px;">\n' \
+             '<div style="background-color:PowderBlue;color:black;padding:30px;">\n' \
              '<h2> %d Active Nodes </h2>\n<ul>\n' % n_peers
     for name in list(set(lines.keys())):
         header += lines[name]
@@ -121,7 +121,8 @@ def render_file_structure(file_path):
     :param directory:
     :return html_content:
     """
-    header = '<!DOCTYPE html>\n<html>\n <body>\n'
+    header = '<!DOCTYPE html>\n<html>\n <body>\n' \
+             '<meta charset="UTF-8" http-equiv="refresh" content="30;url=/Shares">\n'
     footer = '<body>\n</html>'
     content = '<h2> %s </h2>\n<ul>\n' % file_path
     directory, hashes = utils.crawl_dir(file_path, True, False)
