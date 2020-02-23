@@ -208,6 +208,11 @@ class HttpServer:
             success_page = html_engine.generate_success(self.known[client_ip])
             c.send(open(success_page, 'rb').read())
             os.remove(success_page)
+            state_file = self.known[client_ip[0]] + '.state'
+            if not os.path.isfile(state_file):
+                open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' %
+                                             (self.known[client_ip[0]], client_ip[0], d, l))
+            open(state_file, 'a').write('UserAgent:%s\n' % (client_ip[0]))
         else:
             c.send(open('login.html', 'rb').read())
         return c
@@ -218,6 +223,11 @@ class HttpServer:
             print '[*] Showing %s active peer list' % ci[0]
             content = html_engine.show_active()
             c.send(content)
+            state_file = self.known[ci[0]] + '.state'
+            if not os.path.isfile(state_file):
+                open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' % (self.known[ci[0]], ci[0], d, l))
+            open(state_file, 'a').write('%s [%s] is Checking PeerList \nUserAgent: %s\n' %
+                                        (self.known[ci[0]], ci[0], self.get_user_agent(f)))
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
             c.send(forbidden)
@@ -276,6 +286,12 @@ class HttpServer:
             return c
         print '[*] Serving %s html rendering of their local share folder' % c_addr[0]
         c.send(html_engine.render_file_structure('../SHARED/'))
+        state_file = self.known[c_addr[0]] + '.state'
+        if not os.path.isfile(state_file):
+            open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' % (self.known[c_addr[0]], c_addr[0], d, l))
+        open(state_file, 'a').write('%s [%s] is checking Shared/ Folder \nUserAgent:%s\n' %
+                                    (self.known[c_addr[0]], c_addr[0], self.get_user_agent(f)))
+
         return c
 
     def submit_login(self, c, request, active_clients, c_addr):
@@ -324,6 +340,7 @@ class HttpServer:
             print '[*] %s is uploading a file to the server' % c_addr[0]
             c = html_engine.display_upload_page(c)
             time.sleep(0.1)
+
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
             c.send(forbidden)
@@ -363,6 +380,11 @@ class HttpServer:
             footer = stamp+'<body>\n</html>'
             content = header + body + footer
             c.send(content)
+            state_file = self.known[c_addr[0]] + '.state'
+            if not os.path.isfile(state_file):
+                open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' % (self.known[c_addr[0]], c_addr[0], d, l))
+            open(state_file, 'a').write('%s [%s] is weatching camera feed \nUserAgent:%s\n' %
+                                        (self.known[c_addr[0]], c_addr[0], self.get_user_agent(f)))
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
             c.send(forbidden)
