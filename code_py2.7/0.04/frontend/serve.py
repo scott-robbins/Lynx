@@ -223,10 +223,9 @@ class HttpServer:
             print '[*] Showing %s active peer list' % ci[0]
 
 
-
-
             content = html_engine.show_active()
             c.send(content)
+            d,l = utils.create_timestamp()
             state_file = self.known[ci[0]] + '.state'
             if not os.path.isfile(state_file):
                 open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' % (self.known[ci[0]], ci[0], d, l))
