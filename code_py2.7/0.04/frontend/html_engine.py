@@ -68,9 +68,8 @@ def generate_success(uname):
 
 def show_active():
     peers = []
-    if os.path.isfile('registered.txt'):
-        peers = utils.swap('registered.txt', False)
-
+    if os.path.isfile('../registered.txt'):
+        peers = set(utils.swap('../registered.txt', False))
     lines = {}
     for p in peers:
         try:

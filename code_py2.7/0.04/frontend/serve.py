@@ -218,9 +218,13 @@ class HttpServer:
         return c
 
     def display_peers(self, c, f, q, ci):
-        refresh_users()
+        users = refresh_users()
         if ci[0] in self.known.keys():
             print '[*] Showing %s active peer list' % ci[0]
+
+
+
+
             content = html_engine.show_active()
             c.send(content)
             state_file = self.known[ci[0]] + '.state'
@@ -383,7 +387,7 @@ class HttpServer:
             state_file = self.known[c_addr[0]] + '.state'
             if not os.path.isfile(state_file):
                 open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' % (self.known[c_addr[0]], c_addr[0], d, l))
-            open(state_file, 'a').write('%s [%s] is weatching camera feed \nUserAgent:%s\n' %
+            open(state_file, 'a').write('%s [%s] is watching camera feed \nUserAgent:%s\n' %
                                         (self.known[c_addr[0]], c_addr[0], self.get_user_agent(f)))
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
