@@ -201,6 +201,17 @@ class HttpServer:
             success_page = html_engine.generate_success(self.known[client_ip])
             c.send(open(success_page, 'rb').read())
             os.remove(success_page)
+            d,l = utils.create_timestamp()
+            # maintain state with a file for this client, encrypted w their public key
+            state_file = self.known[client_ip[0]]+'.state'
+            user_agent_consistency = self.get_user_agent(full_query)
+            if not os.path.isfile(state_file):
+                open(state_file, 'wb').write('%s logged in from %s [%s -%s]' %
+                                                 (self.known[client_ip[0]],client_ip[0],d,l))
+            else:
+                open(state_file, 'a').write('%s logged in from %s [%s -%s]' %
+                                                 (self.known[client_ip[0]], client_ip[0], d, l))
+            open(state_file, 'a').write('UserAgent:\n%s\n' % user_agent_consistency)
         else:
             c.send(open('login.html', 'rb').read())
         return c
