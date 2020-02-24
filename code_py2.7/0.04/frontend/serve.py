@@ -364,6 +364,10 @@ class HttpServer:
         return c
 
     def camera_feed(self, c, f, q, c_addr):
+        if os.path.isdir('timelapse'):
+            n_frames = len(list(os.listdir('timelapse')))
+        else:
+            n_frames = 0
         if c_addr[0] in self.known.keys():
             header = '<!DOCTYPE html>\n<html>\n <body>\n' \
                      '<meta charset="UTF-8" http-equiv="refresh" content="25;url=CameraFeed">\n'
