@@ -324,7 +324,11 @@ class HttpServer:
             else:
                 open(log_file_name, 'a').write('[!] %s FAILED to login as %s\n' % (c_addr[0], uname))
                 print '[*] Login failure for %s' % uname
-                c.send(open('login.html', 'rb').read())
+                try: 
+                    c.send(open('login.html', 'rb').read())
+                except socket.error:
+                    c.close()
+                    pass
         except IndexError:
             pass
         return c
@@ -383,7 +387,7 @@ class HttpServer:
                 print '[!!] No LiveFeed Image Available'
                 body = '<img src="assets/img/logo.png" alt="FeedDown" height="400">'
             d, l = utils.create_timestamp()
-            stamp = '<h1> %s  -  %s </h1>\n' % (d, l)
+            stamp = '<h1> Under Development   [%s] </h1>\n' % d
             footer = stamp+'<body>\n</html>'
             content = header + body + footer
             c.send(content)
