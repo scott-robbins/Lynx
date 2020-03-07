@@ -125,8 +125,8 @@ def run(handler):
             elif 'GET /Inbox HTTP/1.1' in query and not new_client and not os.path.isfile('messages.txt'):
                 print '[*] %s is creating their inbox' % client_addr[0]
                 client.send(open('assets/empty_inbox.html','rb').read())
-            # else: # this is only for debugging new queries
-            #     print query[0]
+            else: # this is only for debugging new queries
+                print query[0]
             # Close client connection
             client.close()
 
@@ -259,12 +259,9 @@ class HttpServer:
         return c
 
     def display_peers(self, c, f, q, ci):
-<<<<<<< HEAD
         refresh_users()
         refresh_registered_nodes()
-=======
         users = refresh_users()
->>>>>>> fff6c4cae517f2989583323659d3cbe8b4b1a931
         if ci[0] in self.known.keys():
             print '[*] Showing %s active peer list' % ci[0]
 
@@ -275,7 +272,8 @@ class HttpServer:
             state_file = self.known[ci[0]] + '.state'
             if not os.path.isfile(state_file):
                 open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' % (self.known[ci[0]], ci[0], d, l))
-            open(state_file, 'a').write('%s [%s] is Checking PeerList \nUserAgent: %s\n' %
+            else:
+                open(state_file, 'a').write('%s [%s] is Checking PeerList \nUserAgent: %s\n' %
                                         (self.known[ci[0]], ci[0], self.get_user_agent(f)))
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
