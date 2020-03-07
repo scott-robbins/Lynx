@@ -39,6 +39,47 @@ def create_listener():
     return s
 
 
+def check_active():
+    active = []
+    if os.path.isfile('registered.txt'):
+        for u in utils.swap('registered.txt', False):
+            user = u.split('@')[0]
+            ip = u.split('@')[1].split('=')[0]
+            os.system('ping -c 1 %s >> p.txt' % ip)
+            online = False
+            # parse ping
+            for line in utils.swap('p.txt', True):
+                try:
+                    ping = line.split('time=')[1]
+                    online = True
+                except IndexError:
+                    pass
+            if online:
+                active.append(ip)
+    print '[*] %d Peers are active' % len(active)
+    refresh_registered_nodes()
+    return active
+
+
+def refresh_registered_nodes():
+    if not os.path.isfile('registered.txt'):
+        open('registered.txt', 'wb').write('')
+        check_active()
+        return
+    nodes = {}
+    unames = []
+    creds = {}
+    for line in utils.swap('registered.txt', False):
+        try:
+            user = line.split('@')[0]
+            ip   = line.split('@')[1].split('=')[0]
+            creds[user] = line.split('=')[1]
+            unames.append(user)
+            nodes[user] = ip
+        except IndexError:
+            pass
+
+
 def refresh_users():
     unames = {}
     os.system('ls ../*.pass >> passwords.txt')
@@ -207,6 +248,7 @@ class HttpServer:
 
     def display_peers(self, c, f, q, ci):
         refresh_users()
+        refresh_registered_nodes()
         if ci[0] in self.known.keys():
             print '[*] Showing %s active peer list' % ci[0]
             content = html_engine.show_active()
