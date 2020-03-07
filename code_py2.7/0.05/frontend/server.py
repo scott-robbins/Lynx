@@ -67,8 +67,8 @@ def run(handler):
             elif 'GET /Inbox HTTP/1.1' in query and not new_client and not os.path.isfile('messages.txt'):
                 print '[*] %s is creating their inbox' % client_addr[0]
                 client.send(open('assets/empty_inbox.html','rb').read())
-            # else: # this is only for debugging new queries
-            #     print query[0]
+            else: # this is only for debugging new queries
+                print query[0]
             # Close client connection
             client.close()
 
@@ -199,10 +199,13 @@ class HttpServer:
             c.send(forbidden)
         return c
 
-    @staticmethod
-    def show_mailbox(c,f,g,ci):
-
-        c.send(html_engine.show_inbox_in())
+    def show_mailbox(self, c,f,g,ci):
+        if ci[0] in self.known.keys():
+            c.send(html_engine.show_inbox_in())
+        else:
+            print self.known.keys()
+            forbidden = open('assets/forbidden.html', 'rb').read()
+            c.send(forbidden)
         return c
 
     @staticmethod
@@ -259,7 +262,7 @@ class HttpServer:
             registered_users = refresh_users()
             uname = request.split('username=')[1].split('&')[0]
             passwd = request.split('password=')[1]
-            if uname in registered_users.keys() and registered_users[uname].replace('\n','') == passwd:
+            if uname in registered_users.keys() and registered_users[uname].replace('\n', '') == passwd:
                 print '\033[1m[*] %s Has Logged in Successfully from %s\033[0m' % (uname, c_addr[0])
                 open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (c_addr[0], uname))
                 active_clients[uname] = [passwd]

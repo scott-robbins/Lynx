@@ -280,10 +280,9 @@ class HttpServer:
             c.send(forbidden)
         return c
 
-    @staticmethod
-    def show_mailbox(c,f,g,ci):
-
-        c.send(html_engine.show_inbox_in())
+    def show_mailbox(self, c,f,g,ci):
+        if ci[0] in self.known.keys():
+            c.send(html_engine.show_inbox_in())
         return c
 
     @staticmethod
