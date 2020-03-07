@@ -9,6 +9,7 @@ import os
 
 def refresh_registered_nodes():
     if not os.path.isfile('registered.txt'):
+
         open('registered.txt', 'wb').write('')
         check_active()
         open('registered.txt', 'wb').write('s')
@@ -347,12 +348,19 @@ def listen_alt_channel(timeout):
             running = False
 
 
+def shared_folder_init():
+    if not os.path.isdir('../SHARED'):
+        os.mkdir('../SHARED')
+    if not os.path.isdir('../SHARED/Downloadable'):
+        os.mkdir('../SHARED/Downloadable')
+
+
 if __name__ == '__main__':
     if '-l' in sys.argv and len(sys.argv) >= 3:
         timer = int(sys.argv[2])
         print '[*] Starting Backend Server'
-
         check_active()
+        shared_folder_init()
         refresh_registered_nodes()
         listen_alt_channel(timer)
 

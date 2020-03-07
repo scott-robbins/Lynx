@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LOGIN</title>
+</head>
+<div class="row"> <div ui-view="panel"> <div class="login-container">
+<form method="post" id="pm_login" name="loginForm"
+      class="pm_panel pm_panel-login alt pm_form loginForm-container ng-pristine ng-invalid ng-invalid-required"
+      novalidate="" role="form" autocomplete="on" ng-if="show === 'LOGIN'" data-username="username"
+      data-on-submit="onSubmitLogin" data-loading="loading">
+<div class="pm_panel-login__inner"> <img src="assets/img/logo.png" alt="Lynx" class="logo" height="85">
+    <h4 class="text-center margin-bottom"> <i class="fa fa-user title-icon"></i>
+<span translate-context="Title" translate="">Login with credentials created by client</span>
+</h4> <!----    Below is the meat of the login form     > <-->
+<label for="username" class="sr-only" translate-context="Label" translate="">User login</label><br>
+<input autofocus="" autocapitalize="off" autocorrect="off" type="text" ng-model="username" id="username"
+    name="username" placeholder-translate-context="login form placeholder"
+    class="margin loginForm-input-username ng-pristine ng-empty ng-invalid ng-invalid-required ng-touched" required="" placeholder="Username"><br>
+    <label for="password" class="sr-only" translate-context="Label" translate=""><br>Password</label></br>
+    <div class="margin loginForm-input-password password-container customPasswordToggler"
+         data-id="password" data-name="password" data-value="password" data-form="loginForm"
+         placeholder-translate-context="login form placeholder" placeholder="Password">
+    <input type="password" class="password-input ng-pristine ng-untouched ng-empty ng-invalid ng-invalid-required"
+           ng-model="value" autocapitalize="off" autocorrect="off" autocomplete="off" required="" data-toggle-password=""
+           id="password" name="password" placeholder="Password">
+    <div class="password-messages ng-active" ng-messages="message">  </div>
+</button></div><div class="loginForm-actions"> <div class="loginForm-actions-column">
+<button id="login_btn" type="submit" ng-disabled="loading" class="loginForm-actions-main pm_button primary primary-white pull-right loginForm-btn-submit disabled-if-network-activity" translate-context="Action" translate="">Login</button>
+<div class="loginForm-actions-new-container">
+    <div class="loginForm-actions-new-title text-notransform h4 margin-top" translate-context="title" translate="">New to Lynx?</div> <div class="loginForm-actions-create-container margin-top">
+    <a class="loginForm-link-signup-button loginForm-actions-right margin-bottom" data-link="signup" href="http://scott-robbins.github.io/Lynx">Create Account</a> </div> </div> </div> </div> </div>
+        </form>
+    <!----> <!---->
+</div></div> </div>
+
+</html>
