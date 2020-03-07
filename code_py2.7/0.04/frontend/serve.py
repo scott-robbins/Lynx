@@ -283,6 +283,8 @@ class HttpServer:
     def show_mailbox(self, c,f,g,ci):
         if ci[0] in self.known.keys():
             c.send(html_engine.show_inbox_in())
+        else:
+            c.send(open('assets/forbiddenhtml', 'rb').read())
         return c
 
     @staticmethod
