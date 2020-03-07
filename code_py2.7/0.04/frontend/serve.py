@@ -147,6 +147,7 @@ class HttpServer:
         self.actions = {'GET / HTTP/1.1': self.home_page,
                         'GET /assets/img/logo.png HTTP/1.1': self.logo,
                         'GET img/logo.png HTTP/1.1': self.logo,
+                        'GET /img/logo.png HTTP/1.1': self.logo,
                         'GET /favicon.ico HTTP/1.1': self.logo,
                         'GET /assets/img/im.jpeg HTTP/1.1': self.feed,
                         'GET img/im.jpeg HTTP/1.1': self.feed,
@@ -264,8 +265,6 @@ class HttpServer:
         users = refresh_users()
         if ci[0] in self.known.keys():
             print '[*] Showing %s active peer list' % ci[0]
-
-
             content = html_engine.show_active()
             c.send(content)
             d,l = utils.create_timestamp()

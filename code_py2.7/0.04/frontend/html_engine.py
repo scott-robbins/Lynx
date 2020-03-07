@@ -174,11 +174,15 @@ def show_inbox_in():
 
         head = '<! DOCTYPE html>\n<html lang="en">\n<head>\n' \
                '\t<meta charset="UTF-8">\n' \
-               '\t<title> Inbox </title>\n</head>\n</body>\n'
-        body = '<ul type="square">'
+               '\t<title> Mailbox </title>\n</head>\n' \
+               '<h1> Inbox </h1>'
+        inbox = '\t<ul type="square">\n'
         for message in message_headers:
-            body += '\t<li> %s </li>\n' % message
-        body += '</ul>\n'
+            inbox += '\t\t<li> %s </li>\n' % hyperlink('/Inbox/%s' % message, message)
+        inbox += '\t</ul>\n'
+        outbox = '<h1> Sent Mail </h2>\n'
+
+        body = '</body>\n' + inbox + outbox
         footer = '</body>\n</html>'
         return head + body + footer
 

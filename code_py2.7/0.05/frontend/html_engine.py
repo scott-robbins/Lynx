@@ -170,10 +170,19 @@ def show_inbox_in():
         os.system('touch inbox.txt')
         return open('assets/empty_inbox.html', 'rb').read()
     else:
+        message_headers = utils.swap('inbox.txt', False)
+
         head = '<! DOCTYPE html>\n<html lang="en">\n<head>\n' \
                '\t<meta charset="UTF-8">\n' \
-               '\t<title> Inbox </title>\n</head>\n</body>\n'
-        body = ''
+               '\t<title> Mailbox </title>\n</head>\n' \
+               '<h1> Inbox </h1>'
+        inbox = '\t<ul type="square">\n'
+        for message in message_headers:
+            inbox += '\t\t<li> %s </li>\n' % hyperlink('/Inbox/%s' % message, message)
+        inbox += '\t</ul>\n'
+        outbox = '<h1> Sent Mail </h2>\n'
+
+        body = '</body>\n' + inbox + outbox
         footer = '</body>\n</html>'
         return head + body + footer
 
