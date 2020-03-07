@@ -220,6 +220,13 @@ class HttpServer:
             print '[*] %s is downloading %s' % (ci[0], file_name)
             if os.path.isfile('..'+file_name):
                 c.send(open('..'+file_name, 'rb').read())
+            d, l = utils.create_timestamp()
+            # maintain state with a file for this client, encrypted w their public key
+            state_file = self.known[ci[0]] + '.state'
+            if not os.path.isfile(state_file):
+                open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' % (self.known[ci[0]], ci[0], d, l))
+            open(state_file,'a').write('%s [%s] is downloading %s\nUserAgent:\n%s\n' %
+                (self.known[ci[0]],ci[0],file_name.split('/')[-1],self.get_user_agent(f)))
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
             c.send(forbidden)
@@ -242,17 +249,34 @@ class HttpServer:
             success_page = html_engine.generate_success(self.known[client_ip])
             c.send(open(success_page, 'rb').read())
             os.remove(success_page)
+            state_file = self.known[client_ip[0]] + '.state'
+            if not os.path.isfile(state_file):
+                open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' %
+                                             (self.known[client_ip[0]], client_ip[0], d, l))
+            open(state_file, 'a').write('UserAgent:%s\n' % (client_ip[0]))
         else:
             c.send(open('login.html', 'rb').read())
         return c
 
     def display_peers(self, c, f, q, ci):
+<<<<<<< HEAD
         refresh_users()
         refresh_registered_nodes()
+=======
+        users = refresh_users()
+>>>>>>> fff6c4cae517f2989583323659d3cbe8b4b1a931
         if ci[0] in self.known.keys():
             print '[*] Showing %s active peer list' % ci[0]
+
+
             content = html_engine.show_active()
             c.send(content)
+            d,l = utils.create_timestamp()
+            state_file = self.known[ci[0]] + '.state'
+            if not os.path.isfile(state_file):
+                open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' % (self.known[ci[0]], ci[0], d, l))
+            open(state_file, 'a').write('%s [%s] is Checking PeerList \nUserAgent: %s\n' %
+                                        (self.known[ci[0]], ci[0], self.get_user_agent(f)))
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
             c.send(forbidden)
@@ -311,6 +335,12 @@ class HttpServer:
             return c
         print '[*] Serving %s html rendering of their local share folder' % c_addr[0]
         c.send(html_engine.render_file_structure('../SHARED/'))
+        state_file = self.known[c_addr[0]] + '.state'
+        if not os.path.isfile(state_file):
+            open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' % (self.known[c_addr[0]], c_addr[0], d, l))
+        open(state_file, 'a').write('%s [%s] is checking Shared/ Folder \nUserAgent:%s\n' %
+                                    (self.known[c_addr[0]], c_addr[0], self.get_user_agent(f)))
+
         return c
 
     def submit_login(self, c, request, active_clients, c_addr):
@@ -326,10 +356,25 @@ class HttpServer:
                 success_page = html_engine.generate_success(uname)
                 c.send(open(success_page, 'rb').read())
                 os.remove(success_page)
+
+                d, l = utils.create_timestamp()
+                # maintain state with a file for this client, encrypted w their public key
+                state_file = self.known[c_addr[0]] + '.state'
+                if not os.path.isfile(state_file):
+                    open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' %
+                                                 (self.known[c_addr[0]], c_addr[0], d, l))
+                else:
+                    open(state_file, 'a').write('%s logged in from %s [%s -%s]\n' %
+                                                (self.known[c_addr[0]], c_addr[0], d, l))
+
             else:
                 open(log_file_name, 'a').write('[!] %s FAILED to login as %s\n' % (c_addr[0], uname))
                 print '[*] Login failure for %s' % uname
-                c.send(open('login.html', 'rb').read())
+                try: 
+                    c.send(open('login.html', 'rb').read())
+                except socket.error:
+                    c.close()
+                    pass
         except IndexError:
             pass
         return c
@@ -348,6 +393,7 @@ class HttpServer:
             print '[*] %s is uploading a file to the server' % c_addr[0]
             c = html_engine.display_upload_page(c)
             time.sleep(0.1)
+
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
             c.send(forbidden)
@@ -368,6 +414,10 @@ class HttpServer:
         return c
 
     def camera_feed(self, c, f, q, c_addr):
+        if os.path.isdir('timelapse'):
+            n_frames = len(list(os.listdir('timelapse')))
+        else:
+            n_frames = 0
         if c_addr[0] in self.known.keys():
             header = '<!DOCTYPE html>\n<html>\n <body>\n' \
                      '<meta charset="UTF-8" http-equiv="refresh" content="25;url=CameraFeed">\n'
@@ -383,10 +433,15 @@ class HttpServer:
                 print '[!!] No LiveFeed Image Available'
                 body = '<img src="assets/img/logo.png" alt="FeedDown" height="400">'
             d, l = utils.create_timestamp()
-            stamp = '<h1> %s  -  %s </h1>\n' % (d, l)
+            stamp = '<h1> Under Development   [%s] </h1>\n' % d
             footer = stamp+'<body>\n</html>'
             content = header + body + footer
             c.send(content)
+            state_file = self.known[c_addr[0]] + '.state'
+            if not os.path.isfile(state_file):
+                open(state_file, 'wb').write('%s logged in from %s [%s -%s]\n' % (self.known[c_addr[0]], c_addr[0], d, l))
+            open(state_file, 'a').write('%s [%s] is watching camera feed \nUserAgent:%s\n' %
+                                        (self.known[c_addr[0]], c_addr[0], self.get_user_agent(f)))
         else:
             forbidden = open('assets/forbidden.html', 'rb').read()
             c.send(forbidden)
@@ -405,7 +460,7 @@ if __name__ == '__main__':
     print '[*] %d Registered Users ' % len(users.keys())
 
     # Start listener daemon for new user credential uploads
-    os.system('$(python engine.py -l %d) &>&1 ' % runtime)
+    #os.system('$(python engine.py -l %d) &>&1 ' % runtime)
 
     # Start a listening socket on port 80
     run(create_listener())

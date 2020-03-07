@@ -69,8 +69,8 @@ def generate_success(uname):
 def show_active():
     peers = []
     if os.path.isfile('registered.txt'):
-        peers = utils.swap('registered.txt', False)
-
+        peers = set(utils.swap('registered.txt', False))
+    print 'Active: %s' % str(peers)
     lines = {}
     for p in peers:
         try:
@@ -234,7 +234,8 @@ def btc_price_tracking():
     if mo == this_mo:
         d_days = today - day
         print 'N Days Diff: %d' % d_days
-
+    else:
+       d_days = '7+'
     meandiff_usd = current_usd_price - usd_mean
     meandiff_eur = current_eur_price - eur_mean
     meandiff_gbp = current_gbp_price - gbp_mean
@@ -281,7 +282,7 @@ def btc_price_tracking():
     header = '<!DOCTYPE html>\n<html>\n' \
              '<meta charset="UTF-8" http-equiv="refresh" content="30;url=BTC">\n'
     title = '<head>\n<title> BTC Price </title>\n</head>\n' \
-            '<h2> BTC Price Tracking \t[Running for %d Days]</h2>' % d_days
+            '<h2> BTC Price Tracking \t[Running for %s Days]</h2>' % str(d_days)
     ticker = '<div style="background-color:%s;color:%s;padding:30px;">\n' \
              '<p> $%f  - Maximum: $%f  - Mean: $%f  [%s$%d]</p>\n</div>\n' % \
              (usd_c1, usd_c2, current_usd_price, usd_maxima, usd_mean, usdd, meandiff_usd)
