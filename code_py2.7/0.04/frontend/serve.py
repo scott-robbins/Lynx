@@ -345,8 +345,8 @@ class HttpServer:
         try:
             registered_users = refresh_users()
             uname = request.split('username=')[1].split('&')[0]
-            passwd = request.split('password=')[1]
-            if uname in registered_users.keys() and registered_users[uname] == passwd:
+            passwd = request.split('password=')[1].replace('\n', '')
+            if uname in registered_users.keys() and registered_users[uname].replace('\n','') == passwd:
                 print '\033[1m[*] %s Has Logged in Successfully from %s\033[0m' % (uname, c_addr[0])
                 open(log_file_name, 'a').write('[*] %s has logged in SUCCESSFULLY as %s\n' % (c_addr[0], uname))
                 active_clients[uname] = [passwd]
@@ -368,6 +368,7 @@ class HttpServer:
             else:
                 open(log_file_name, 'a').write('[!] %s FAILED to login as %s\n' % (c_addr[0], uname))
                 print '[*] Login failure for %s' % uname
+
                 try: 
                     c.send(open('login.html', 'rb').read())
                 except socket.error:
