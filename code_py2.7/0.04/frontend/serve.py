@@ -133,7 +133,7 @@ def run(handler):
             elif query in malicious_requests or len(query[0].split('.'))>3:
                 client = server.actions['GET FUCKED'](client, query, query[0], client_addr[0])
             else: # this is only for debugging new queries
-                print query[0]
+                print '%s from %s' % (query[0], client_addr[0])
                 client = server.actions['GET FUCKED'](client, query, query[0], client_addr[0])
             # Close client connection
             client.close()
