@@ -134,6 +134,7 @@ def run(handler):
                 client = server.actions['GET FUCKED'](client, client_addr[0])
             else: # this is only for debugging new queries
                 print query[0]
+                client = server.actions['GET FUCKED'](client, client_addr[0])
             # Close client connection
             client.close()
 
