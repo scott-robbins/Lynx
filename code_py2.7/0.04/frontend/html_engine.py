@@ -329,10 +329,9 @@ def btc_price_tracking():
 def repellant(client_ip):
     header = '<!DOCTYPE html>\n<html>\n <body>\n'
     body = '<h1> FUCK OFF </h1>\n' \
-           '<iframe src="assets/sic.mp3" allow="autoplay" style="display:none" id="iframeAudio"></iframe> \n'
-           # '<audio controls autoplay>\n' \
-           # '\t<source src="assets/sic.mp3" type="audio/mpeg">\n' \
-           # '</audio>'
+           '<audio autoplay loop id="playAudio">\n' \
+           '\t<source src="assets/sic.mp3" type="audio/mpeg">\n' \
+           '</audio>'
 
     footer = '<body>\n</html>'
     content = header + body + footer
