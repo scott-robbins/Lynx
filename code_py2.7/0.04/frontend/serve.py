@@ -98,6 +98,11 @@ def run(handler):
     clients = []
     active_clients = {}
     running = True
+
+    malicious_requests = ['GET /cpanel HTTP/1.1',
+                          'GET /solr/admin/info/system?wt=json HTTP/1.1',
+                          ]
+
     # Accept incoming requests
     try:
         while running and (time.time() - server.tic) < runtime:
@@ -125,6 +130,8 @@ def run(handler):
             elif 'GET /Inbox HTTP/1.1' in query and not new_client and not os.path.isfile('messages.txt'):
                 print '[*] %s is creating their inbox' % client_addr[0]
                 client.send(open('assets/empty_inbox.html','rb').read())
+            elif query in malicious_requests or len(query[0].split('.'))>3:
+                client = server.actions['GET FUCKED'](client, client_addr[0])
             else: # this is only for debugging new queries
                 print query[0]
             # Close client connection
@@ -166,8 +173,24 @@ class HttpServer:
                         'GET /CameraFeed HTTP/1.1': self.camera_feed,
                         'GET /assets/jquery.drag.drop.css HTTP/1.1': self.upload_css,
                         'GET /assets/jquery.drag.drop.js HTTP/1.1': self.upload_js,
-                        'GET /Security HTTP/1.1': self.security}
+                        'GET /Security HTTP/1.1': self.security,
+                        'GET FUCKED': self.blast,
+                        'GET assets/sic.mp3 HTTP/1.1': self.audio}
         self.add_shared_files()
+
+    def blast(self, c, ci):
+        content = html_engine.repellant(ci)
+        try:
+            c.send(content)
+        except socket.error:
+            pass
+        return c
+
+    @staticmethod
+    def audio(c,f,q,ci):
+        if os.path.isfile('assets/sic.mp3'):
+            c.send(open('sic.mp3', 'rb').read())
+        return c
 
     def security(self, c, f, q, ci):
         user_agent = self.get_user_agent(f)
@@ -445,6 +468,7 @@ class HttpServer:
             forbidden = open('assets/forbidden.html', 'rb').read()
             c.send(forbidden)
         return c
+
 
 
 if __name__ == '__main__':

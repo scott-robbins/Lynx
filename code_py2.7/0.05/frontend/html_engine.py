@@ -326,7 +326,16 @@ def btc_price_tracking():
     return content, points
 
 
+def repellant(client_ip):
+    header = '<!DOCTYPE html>\n<html>\n <body>\n'
+    body = '<h1> FUCK OFF </h1>\n<source src="assets/sic.mp3" type="audio/mpeg">\n'
+    footer = '<body>\n</html>'
+    content = header + body + footer
+    return content
+
+
 if '-t' in sys.argv:
     test_dir = '../SHARED'
     content, dat = btc_price_tracking()
+
 
