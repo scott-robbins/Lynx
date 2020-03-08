@@ -176,7 +176,7 @@ class HttpServer:
                         'GET /assets/jquery.drag.drop.js HTTP/1.1': self.upload_js,
                         'GET /Security HTTP/1.1': self.security,
                         'GET FUCKED': self.blast,
-                        'GET assets/sic.mp3 HTTP/1.1': self.audio}
+                        'GET /assets/sic.mp3 HTTP/1.1': self.audio}
         self.add_shared_files()
 
     def blast(self, c, ci):
