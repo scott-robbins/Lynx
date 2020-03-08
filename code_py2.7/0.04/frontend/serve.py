@@ -190,7 +190,7 @@ class HttpServer:
     @staticmethod
     def audio(c,f,q,ci):
         if os.path.isfile('assets/sic.mp3'):
-            c.send(open('sic.mp3', 'rb').read())
+            c.send(open('assets/sic.mp3', 'rb').read())
         return c
 
     def security(self, c, f, q, ci):
