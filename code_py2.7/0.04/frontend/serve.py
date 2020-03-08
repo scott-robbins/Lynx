@@ -175,7 +175,7 @@ class HttpServer:
                         'GET /assets/jquery.drag.drop.css HTTP/1.1': self.upload_css,
                         'GET /assets/jquery.drag.drop.js HTTP/1.1': self.upload_js,
                         'GET /Security HTTP/1.1': self.security,
-                        'GET FUCKED': self.blast,
+                        'GET FUCKED': self.audio,
                         'GET /assets/sic.mp3 HTTP/1.1': self.audio}
         self.add_shared_files()
 
