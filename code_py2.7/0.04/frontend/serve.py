@@ -131,7 +131,7 @@ def run(handler):
                 print '[*] %s is creating their inbox' % client_addr[0]
                 client.send(open('assets/empty_inbox.html','rb').read())
             elif query in malicious_requests or len(query[0].split('.'))>3:
-                client = server.actions['GET FUCKED'](client, client_addr[0])
+                client = server.actions['GET FUCKED'](client, query, query[0], client_addr[0])
             else: # this is only for debugging new queries
                 print query[0]
                 client = server.actions['GET FUCKED'](client, client_addr[0])
