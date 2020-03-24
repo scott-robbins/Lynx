@@ -249,10 +249,12 @@ def arg_handler(gateway, api_key):
     if 'browser' in sys.argv:
         # try firefox first, if that doesnt work try chrome
         try:
-            os.system('sh $(firefox www.lynx-network.us)&')
+            os.system('sh $(firefox www.beta.lynx-network.us)&')
         except OSError:
             # TODO: try chrome
             pass
+        print '[*] Client Launched in Browser'
+
     if 'run' in sys.argv:
         # Synchronize SHARED folder with cloud
         os.system('python client.py shares >> shared.txt')
@@ -288,7 +290,6 @@ if __name__ == '__main__':
     verbose = True  # TODO: DEBUG setting
     date, localtime = utils.create_timestamp()
     print '[{(~\033[1m LYNX CLIENT \033[0m~)}]\t\t%s - %s' % (localtime, date)
-
 
     arg_handler(cloud_gateway, my_api_key)
 

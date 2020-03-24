@@ -1,10 +1,7 @@
-from Crypto.Random import get_random_bytes
 import html_engine
-import base64
 import socket
 import utils
 import time
-import sys
 import os
 
 
@@ -120,7 +117,7 @@ def run(handler):
             query = request.split('\r\n')
 
             # Login attempts
-            if 'POST / HTTP/1.1' == query[0]:
+            if 'POST / HTTP/1.1' in query[0]:
                 field = query.pop()
                 server.submit_login(client,field,active_clients,client_addr)
 
@@ -131,9 +128,6 @@ def run(handler):
                 print '[*] %s is creating their inbox' % client_addr[0]
                 client.send(open('assets/empty_inbox.html','rb').read())
             elif query in malicious_requests or len(query[0].split('.'))>3:
-                client = server.actions['GET FUCKED'](client, query, query[0], client_addr[0])
-            else: # this is only for debugging new queries
-                print '%s from %s' % (query[0], client_addr[0])
                 client = server.actions['GET FUCKED'](client, query, query[0], client_addr[0])
             # Close client connection
             client.close()
