@@ -1,3 +1,7 @@
+# LYNX FRONTEND - 3/27/2020 - S.Robbins
+# This is the bulk of the code which acts as basic HTTP Server.
+# Pages are served to clients with some locally stored files,
+# and some pages which are generated on the fly (dynamic pages).
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.PublicKey import RSA
