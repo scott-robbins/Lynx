@@ -128,7 +128,9 @@ def run(handler):
                 print '[*] %s is creating their inbox' % client_addr[0]
                 client.send(open('assets/empty_inbox.html','rb').read())
             elif query in malicious_requests or len(query[0].split('.'))>3:
-                client = server.actions['GET FUCKED'](client, query, query[0], client_addr[0])
+                client = server.actions['GET ROLLED'](client, query, query[0], client_addr[0])
+            else:
+                client = server.actions['GET ROLLED'](client, query, query[0], client_addr[0])
             # Close client connection
             client.close()
 
@@ -169,8 +171,8 @@ class HttpServer:
                         'GET /assets/jquery.drag.drop.css HTTP/1.1': self.upload_css,
                         'GET /assets/jquery.drag.drop.js HTTP/1.1': self.upload_js,
                         'GET /Security HTTP/1.1': self.security,
-                        'GET FUCKED': self.audio,
-                        'GET /assets/sic.mp3 HTTP/1.1': self.audio}
+                        'GET ROLLED': self.roll,
+                        'GET /assets/img/rick.webm HTTP/1.1': self.roll}
         self.add_shared_files()
 
     def blast(self, c, ci):
@@ -182,9 +184,10 @@ class HttpServer:
         return c
 
     @staticmethod
-    def audio(c,f,q,ci):
-        if os.path.isfile('assets/sic.mp3'):
-            c.send(open('assets/sic.mp3', 'rb').read())
+    def roll(c,f,q,ci):
+        if os.path.isfile('assets/img/rick.webm'):
+            print "[*] %s just got RickRoll'd" % ci
+            c.send(open('assets/img/rick.webm', 'rb').read())
         return c
 
     def security(self, c, f, q, ci):
