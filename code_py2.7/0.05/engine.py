@@ -15,7 +15,7 @@ import os
 
 class StunServer:
     known = []
-    actions = {'GET_EXT_IP'}
+
     clients = {'127.0.0.1': [-1]} # Keep Track of Clients who've connected
     public_key = ''
     uptime = 0.0
@@ -23,6 +23,7 @@ class StunServer:
     outbound = 32145
 
     def __init__(self, runtime):
+        actions = {'GET_EXT_IP': self.relay_ext_ip}
         # Set up STUN Server Public/Private Keypairs
         self.public_key = self.load_keys()
         # Run the key distribution/NAT traversal server
