@@ -76,7 +76,7 @@ class StunServer:
 
             if decrypted_query.replace('\n','') in self.actions.keys():
                 print '[*] Replying to %s query of %s' % (client_ip, decrypted_query)
-                client_socket = self.actions[decrypted_query](client_socket, client_id)
+                client_socket = self.actions[decrypted_query](client_socket, client_token)
             else:
                 print '[!!] Uncrecognized Query:'
                 print decrypted_query
