@@ -50,8 +50,11 @@ class StunServer:
             print '[*] Public Key received from %s' % ip
             # AES NEGOTIATION!
             iv = base64.b64encode(get_random_bytes(32))
-            client_socket.send(iv)
+            cipher_rsa = PKCS1_OAEP.new(client_public_key)
+            enc_session_key = cipher_rsa.encrypt(iv)
+            client_socket.send(enc_session_key)
             self.clients[client_public_key] = [ip, port, iv]
+            print '[*] Encrypted Session Key sent to %s' % ip
         else:
             # Load clients Public Key
             if os.path.isfile(client_file):

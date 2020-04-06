@@ -24,8 +24,9 @@ s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 s.connect((remote_server, 54123))
 remote_public_key = s.recv(4096)
 s.send(public_key_str)
+cipher_rsa = PKCS1_OAEP.new(private_key)
+session_key = cipher_rsa.decrypt(s.recv(1024))
 
-
-print 'Recieved Remote Public Key: '
-print remote_public_key
+print 'Recieved Remote Public Key and Session Key'
+print session_key
 
