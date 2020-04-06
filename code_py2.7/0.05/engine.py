@@ -39,14 +39,10 @@ class StunServer:
     def client_handler(self, client_socket, address):
         ip = address[0]
         port = str(address[1])
-        # TODO: Keep Track Of who is connecting, and assign session Keys if first time
-        #  If recognized, use the session key saved already. If recognized and no session
-        #  Key is present, then something is wrong (possible security issue)
-        client_file = ip + ':' + port
+        # Keep Track Of who is connecting, and assign session Keys if first time
         if ip not in self.known:
             client_socket.send(self.public_key)
             client_public_key = RSA.importKey(client_socket.recv(4096))
-            # open(client_file, 'wb').write(client_public_key)
 
             print '[*] Public Key received from %s' % ip        # Only for debugging
             # Negotiation - Only use PKI to encrypt key for AES
@@ -55,10 +51,9 @@ class StunServer:
             enc_session_key = cipher_rsa.encrypt(iv)
             client_socket.send(enc_session_key)
             self.clients[client_public_key.exportKey()] = [ip, port, iv]
-            print '[*] Encrypted Session Key sent to %s' % ip   # Only for debugging
-            print iv
             self.known.append(ip)
-        else:
+            print '[*] Encrypted Session Key sent to %s' % ip   # Only for debugging
+        else: # If recognized, use the session key already associated with client
             try:
                 client_public_key = RSA.importKey(client_socket.recv(4096))
                 client_addr = self.clients[client_public_key.exportKey()]
@@ -69,10 +64,10 @@ class StunServer:
                 # initialized using a negotiated
                 encrypted_query = client_socket.recv(4096)
                 decrypted_query = utils.DecodeAES(AES.new(dec_key), encrypted_query)
-                print '[*] Received Query %s from %s' % (decrypted_query, client_ip)
-                print decrypted_query
+                print '[*] Received Query from %s' % client_ip
                 # Reply to query if necessary
-
+                if decrypted_query in self.actions.keys():
+                    client_socket = self.actions[decrypted_query](client_socket, client_public_key)
             except socket.error:
                 pass
 
@@ -106,6 +101,16 @@ class StunServer:
         # Don't forget to close before leaving!
         print '[*] Shutting Down Server'
         s.close()
+
+    def relay_ext_ip(self, client_socket, client_key):
+        try:
+            [ip, port, iv] = self.clients[client_key]
+            reply = 'The reply to your query is:\n%s' % ip
+            client_socket.send(utils.EncodeAES(AES.new(base64.b64decode(iv)),reply))
+        except socket.error:
+            print '[!!] Error Replying to Query'
+            pass
+        return client_socket
 
 
 if __name__ == '__main__':
