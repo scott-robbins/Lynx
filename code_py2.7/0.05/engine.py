@@ -45,13 +45,26 @@ class StunServer:
         if client_file not in self.clients.keys():
             client_socket.send(self.public_key)
             client_public_key = client_socket.recv(4096)
-            self.clients[ip+':'+port] = client_public_key
-            # TODO: DO AES NEGOTIATION!
+            open(client_file, 'rb').write(client_public_key)
+            # Only for debugging
+            print '[*] Public Key received from %s' % ip
+            # AES NEGOTIATION!
+            iv = base64.b64encode(get_random_bytes(32))
+            client_socket.send(iv)
+            self.clients[client_public_key] = [ip, port, iv]
         else:
-            encrypted_query = client_socket.recv(4096)
-            # Decrypt the query (encrypted with clients private key) with an AES instance that is
-            # initialized using a negotiated
-
+            # Load clients Public Key
+            if os.path.isfile(client_file):
+                public_key = open(client_file,'rb').read()
+                client_addr = self.clients[public_key]
+                client_ip = client_addr[0]
+                client_port = client_addr[1]
+                dec_key = base64.b64decode(client_addr[2])
+                # Decrypt the query (encrypted with clients private key) with an AES instance that is
+                # initialized using a negotiated
+                encrypted_query = client_socket.recv(4096)
+                decrypted_query = utils.DecodeAES(AES.new(dec_key), encrypted_query)
+                print '[*] Received Query %s from %s' % (decrypted_query, client_ip)
         client_socket.close()
 
     def run_session_key_handler(self, timeout):
