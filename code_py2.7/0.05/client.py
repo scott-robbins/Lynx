@@ -55,6 +55,19 @@ def send_message(remote_server, key, eq, recipient, message):
         pass
 
 
+def add_uname(remote_server, token, key, uname):
+    cipher = AES.new(base64.b64decode(key))
+    query = token + '>>>>' + utils.EncodeAES(cipher,'ADD_UNAME')
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((remote_server, 54123))
+        s.send(query)
+        s.send(utils.EncodeAES(cipher, uname))
+    except socket.error:
+        print '[!!] Error Querying Remote Server'
+        pass
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print '[!!] No Remote Server provided'
@@ -95,3 +108,8 @@ if __name__ == '__main__':
         enc_query = token + '>>>>' + \
                           utils.EncodeAES(AES.new(base64.b64decode(session_key)),'SEND_MESSAGE')
         send_message(remote,session_key,enc_query,uname,message)
+
+    if '-a' in sys.argv and len(sys.argv)==4:
+        uname = sys.argv[3]
+        add_uname(remote, token, session_key, uname)
+

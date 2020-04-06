@@ -25,7 +25,8 @@ class StunServer:
 
     def __init__(self, runtime):
         self.actions = {'GET_EXT_IP': self.relay_ext_ip,
-                        'SEND_MESSAGE': self.send_message}
+                        'SEND_MESSAGE': self.send_message,
+                        'ADD_UNAME': self.add_username}
         # Set up STUN Server Public/Private Keypairs
         self.public_key = self.load_keys()
         # Run the key distribution/NAT traversal server
@@ -158,16 +159,30 @@ class StunServer:
             recipient = decrypted_raw.split('::::')[0]
             content = decrypted_raw.split('::::')[1]
             if recipient not in self.unames.keys():
-                print '[!!] %s is requesting to send message to Unknown Client'
+                print '[!!] %s is requesting to send message to Unknown Client' % ip
                 client_socket.send(utils.EncodeAES(cipher, 'This username is unknown'))
+                return client_socket
             else:
                 rid = self.unames[recipient]  # recipient ID
                 self.messages[rid].append([key, content])
         except socket.error:
             print '[!!] Error Replying to Query'
             pass
+        return client_socket
+
+    def add_username(self, client_socket, client_key):
+        try:
+            ip = self.clients[client_key][0]
+            key = self.clients[client_key][2]
+            cipher = AES.new(base64.b64decode(key))
+            uname = utils.DecodeAES(cipher, client_socket.recv(1028))
+            self.unames[uname] = key
+        except socket.error:
+            pass
+        return client_socket
 
     # TODO: Add a server message (deliver when client checks in for updates)
+
 
 if __name__ == '__main__':
     # Run This for a few minutes to test the other end
