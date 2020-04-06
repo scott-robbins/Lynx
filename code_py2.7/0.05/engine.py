@@ -115,8 +115,9 @@ class StunServer:
     def relay_ext_ip(self, client_socket, client_key):
         try:
             ip = self.clients[client_key][0]
+            key = self.clients[client_key][2]
             reply = 'The reply to your query is:\n%s' % ip
-            client_socket.send(utils.EncodeAES(AES.new(base64.b64decode(client_key)), reply))
+            client_socket.send(utils.EncodeAES(AES.new(base64.b64decode(key)), reply))
         except socket.error:
             print '[!!] Error Replying to Query'
             pass
