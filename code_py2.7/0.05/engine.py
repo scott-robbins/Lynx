@@ -42,11 +42,11 @@ class StunServer:
             public_key_str = self.public_key
             client_socket.send(public_key_str)
             client_public_key_str = client_socket.recv(4096)
-            print '[*] Public Key Sent and Client Public Key Received'
+
             cipher_rsa = PKCS1_OAEP.new(RSA.importKey(client_public_key_str))
             enc_key_str = cipher_rsa.encrypt(client_key)
             client_socket.send(enc_key_str)
-            print '[*] Sent client session key'
+
             open('test', 'wb').write(client_public_key_str)
             token = utils.cmd('sha256sum test').pop().split(' ')[0]
             os.remove('test')
@@ -67,14 +67,16 @@ class StunServer:
             self.clients[token] = [client_ip, client_port, client_id]
             self.known.append(client_ip)    # Add to known clients after key exchange
         else:
-            print '[*] Receiving Encrypted Query from %s:' % client_ip
             raw_query = client_socket.recv(1028)
             client_token = raw_query.split('>>>>')[0]
             if client_token in self.clients.keys():
                 client_id = self.clients[client_token][2]
             encrypted_query = raw_query.split('>>>>')[1]
-            decrypted_query = utils.DecodeAES(AES.new(base64.b64decode(client_id)),encrypted_query)
-            print '[*] %s' % decrypted_query
+            decrypted_query = utils.DecodeAES(AES.new(base64.b64decode(client_id)), encrypted_query)
+
+            if decrypted_query in self.actions.keys():
+                client_socket = self.actions[decrypted_query](client_socket, client_id)
+        # Done processing the client request, regardless of what it was
         client_socket.close()
 
     def run_session_key_handler(self, timeout):
