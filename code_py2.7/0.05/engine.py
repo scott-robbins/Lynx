@@ -16,13 +16,16 @@ import os
 class StunServer:
     known = []
     clients = {'': []}
+    messages = {'':[]}
+    unames = {'': ''}
     public_key = ''
     uptime = 0.0
     inbound = 54123
     outbound = 32145
 
     def __init__(self, runtime):
-        self.actions = {'GET_EXT_IP': self.relay_ext_ip}
+        self.actions = {'GET_EXT_IP': self.relay_ext_ip,
+                        'SEND_MESSAGE': self.send_message}
         # Set up STUN Server Public/Private Keypairs
         self.public_key = self.load_keys()
         # Run the key distribution/NAT traversal server
@@ -142,6 +145,29 @@ class StunServer:
             pass
         return client_socket
 
+    def send_message(self, client_socket, client_key):
+        try:
+            ip = self.clients[client_key][0]
+            key = self.clients[client_key][2]
+            if key not in self.unames.values():
+                print '[!!] It doesnt look like you have a user name yet...'
+            cipher = AES.new(base64.b64decode(key))
+            # Messages come with format: UserName::::Message
+            encrypted_message_raw = client_socket.recv(655335)
+            decrypted_raw = utils.DecodeAES(cipher, encrypted_message_raw)
+            recipient = decrypted_raw.split('::::')[0]
+            content = decrypted_raw.split('::::')[1]
+            if recipient not in self.unames.keys():
+                print '[!!] %s is requesting to send message to Unknown Client'
+                client_socket.send(utils.EncodeAES(cipher, 'This username is unknown'))
+            else:
+                rid = self.unames[recipient]  # recipient ID
+                self.messages[rid].append([key, content])
+        except socket.error:
+            print '[!!] Error Replying to Query'
+            pass
+
+    # TODO: Add a server message (deliver when client checks in for updates)
 
 if __name__ == '__main__':
     # Run This for a few minutes to test the other end

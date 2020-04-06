@@ -41,6 +41,19 @@ def query_stun_server(remote_server, key, query):
     return reply
 
 
+def send_message(remote_server, key, recipient, message):
+    cipher = AES.new(base64.b64decode(key))
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((remote_server, 54123))
+        msg = '%s::::%s' % (recipient, message)
+        query = utils.EncodeAES(cipher, msg)
+        s.send(query)
+    except socket.error:
+        print '[!!] Error Querying Remote Server'
+        pass
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print '[!!] No Remote Server provided'
@@ -64,14 +77,17 @@ if __name__ == '__main__':
         session_key = open('session.key', 'rb').read()
 
     if '-q' in sys.argv and len(sys.argv) >= 4:
-        clear_query = utils.arr2str(sys.argv[3:])
-        # clear_query = sys.argv[3]
+        # clear_query = utils.arr2str(sys.argv[3:])
+        clear_query = sys.argv[3]
         print '[*] Sending Query: %s' % clear_query
-    else:
-        clear_query = 'This is a test query of the system'
-    token = utils.cmd('sha256sum client_public').pop().split(' ')[0]
-    encrypted_query = token+'>>>>'+\
-                      utils.EncodeAES(AES.new(base64.b64decode(session_key)),clear_query)
-    reply = query_stun_server(remote, session_key, encrypted_query)
-    print '[*] Remote Server: \n%s' % reply
 
+        token = utils.cmd('sha256sum client_public').pop().split(' ')[0]
+        encrypted_query = token+'>>>>'+\
+                      utils.EncodeAES(AES.new(base64.b64decode(session_key)),clear_query)
+        reply = query_stun_server(remote, session_key, encrypted_query)
+        print '[*] Remote Server: \n%s' % reply
+
+    if '-m' in sys.argv and len(sys.argv) >= 5:
+        uname = sys.argv[3]
+        message = utils.arr2str(sys.argv[4:])
+        send_message(remote,session_key,uname,message)
