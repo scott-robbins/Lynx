@@ -38,7 +38,7 @@ class StunServer:
 
     def key_exchange(self, client_socket, client_key):
         try:
-            public_key_str = self.public_key.exportKey()
+            public_key_str = self.public_key
             client_socket.send(public_key_str)
             client_public_key_str = client_socket.recv(4096)
             print '[*] Public Key Sent and Client Public Key Received'
