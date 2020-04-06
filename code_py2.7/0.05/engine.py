@@ -15,6 +15,7 @@ import os
 
 class StunServer:
     known = []
+    actions = {'GET_EXT_IP'}
     clients = {'127.0.0.1': [-1]} # Keep Track of Clients who've connected
     public_key = ''
     uptime = 0.0
@@ -67,6 +68,8 @@ class StunServer:
                 encrypted_query = client_socket.recv(4096)
                 decrypted_query = utils.DecodeAES(AES.new(dec_key), encrypted_query)
                 print '[*] Received Query %s from %s' % (decrypted_query, client_ip)
+                # Reply to query if necessary
+
             except socket.error:
                 pass
 
