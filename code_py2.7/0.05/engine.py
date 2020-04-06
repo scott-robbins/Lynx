@@ -44,22 +44,21 @@ class StunServer:
         client_file = ip + ':' + port
         if client_file not in self.clients.keys():
             client_socket.send(self.public_key)
-            client_public_key = client_socket.recv(4096)
-            open(client_file, 'wb').write(client_public_key)
-            # Only for debugging
-            print '[*] Public Key received from %s' % ip
-            # AES NEGOTIATION!
+            client_public_key = RSA.importKey(client_socket.recv(4096))
+            # open(client_file, 'wb').write(client_public_key)
+
+            print '[*] Public Key received from %s' % ip        # Only for debugging
+            # Negotiation - Only use PKI to encrypt key for AES
             iv = base64.b64encode(get_random_bytes(32))
-            cipher_rsa = PKCS1_OAEP.new(RSA.importKey(open(client_file).read()))
+            cipher_rsa = PKCS1_OAEP.new(client_public_key)
             enc_session_key = cipher_rsa.encrypt(iv)
             client_socket.send(enc_session_key)
             self.clients[client_public_key] = [ip, port, iv]
-            print '[*] Encrypted Session Key sent to %s' % ip
+            print '[*] Encrypted Session Key sent to %s' % ip   # Only for debugging
         else:
-            # Load clients Public Key
-            if os.path.isfile(client_file):
-                public_key = open(client_file,'rb').read()
-                client_addr = self.clients[public_key]
+            try:
+                client_public_key = RSA.importKey(client_socket.recv(4096))
+                client_addr = self.clients[client_public_key]
                 client_ip = client_addr[0]
                 client_port = client_addr[1]
                 dec_key = base64.b64decode(client_addr[2])
@@ -68,6 +67,9 @@ class StunServer:
                 encrypted_query = client_socket.recv(4096)
                 decrypted_query = utils.DecodeAES(AES.new(dec_key), encrypted_query)
                 print '[*] Received Query %s from %s' % (decrypted_query, client_ip)
+            except socket.error:
+                pass
+
         client_socket.close()
 
     def run_session_key_handler(self, timeout):

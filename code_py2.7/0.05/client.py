@@ -10,23 +10,34 @@ import sys
 import os
 
 
-remote_server = '192.236.160.95'
-# Set up Keys
-if not os.path.isfile('client_private.pem'):
-    private_key = utils.create_rsa_key('client')
-else:
-    private_key = utils.load_private_key('client_private.pem')
+def exchange_keys(remote_server, public, private, verbose):
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((remote_server, 54123))
+        remote_public_key = s.recv(4096)
+        s.send(public)
+        cipher_rsa = PKCS1_OAEP.new(private)
+        session_key = cipher_rsa.decrypt(s.recv(1024))
+        if verbose:
+            print '[*] Recieved Remote Public Key and Session Key:'
+            print session_key
+        return session_key, remote_public_key
+    except socket.error:
+        print '[!!] Error During Key Exchange'
+        exit()
 
-public_key = private_key.publickey()
-public_key_str = public_key.exportKey()
 
-s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-s.connect((remote_server, 54123))
-remote_public_key = s.recv(4096)
-s.send(public_key_str)
-cipher_rsa = PKCS1_OAEP.new(private_key)
-session_key = cipher_rsa.decrypt(s.recv(1024))
+if __name__ == '__main__':
+    remote = '192.236.160.95'
+    # Set up Keys
+    if not os.path.isfile('client_private.pem'):
+        private_key = utils.create_rsa_key('client')
+    else:
+        private_key = utils.load_private_key('client_private.pem')
+    # Import Public/Private Key Pair
+    public_key = private_key.publickey()
+    public_key_str = public_key.exportKey()
 
-print 'Recieved Remote Public Key and Session Key'
-print session_key
+    # Exchange Keys with STUN Server
+    exchange_keys(remote, public_key_str, private_key, True)
 
