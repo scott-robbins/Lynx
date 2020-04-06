@@ -57,6 +57,7 @@ class StunServer:
             self.clients[client_public_key.exportKey()] = [ip, port, iv]
             print '[*] Encrypted Session Key sent to %s' % ip   # Only for debugging
             print iv
+            self.known.append(ip)
         else:
             try:
                 client_public_key = RSA.importKey(client_socket.recv(4096))
@@ -91,7 +92,6 @@ class StunServer:
             try:
                 # Accept incoming connections
                 client, addr = s.accept()
-                self.known.append(addr[0])
 
                 # Process the client's request (whatever it may be)
                 worker = Thread(target=self.client_handler, args=(client, addr,))
