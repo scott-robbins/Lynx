@@ -28,12 +28,11 @@ def exchange_keys(remote_server, public, private, verbose):
 
 
 def query_stun_server(remote_server, request, public, private, session, verbose):
-    encrypted_query = utils.EncodeAES(AES.new(base64.b64decode(session), request))
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((remote_server, 54123))
         s.send(public)
-        s.send(encrypted_query)
+        s.send(request)
     except socket.error:
         pass
 
@@ -52,4 +51,5 @@ if __name__ == '__main__':
     # Exchange Keys with STUN Server
     session_key, stun_key = exchange_keys(remote, public_key_str, private_key, True)
 
-    query_stun_server(remote,'this is just a test',public_key_str,private_key,session_key,True)
+    test_query = utils.EncodeAES(AES.new(base64.b64decode(session_key)), 'This is a test')
+    query_stun_server(remote,test_query,public_key_str,private_key,session_key,True)

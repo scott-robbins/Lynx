@@ -69,6 +69,7 @@ class StunServer:
                 encrypted_query = client_socket.recv(4096)
                 decrypted_query = utils.DecodeAES(AES.new(dec_key), encrypted_query)
                 print '[*] Received Query %s from %s' % (decrypted_query, client_ip)
+                print decrypted_query
                 # Reply to query if necessary
 
             except socket.error:
