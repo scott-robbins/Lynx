@@ -37,6 +37,7 @@ class StunServer:
         return key.publickey().exportKey()
 
     def key_exchange(self, client_socket, client_key):
+        token = ''
         try:
             public_key_str = self.public_key
             client_socket.send(public_key_str)
@@ -46,9 +47,13 @@ class StunServer:
             enc_key_str = cipher_rsa.encrypt(client_key)
             client_socket.send(enc_key_str)
             print '[*] Sent client session key'
+            open('test', 'wb').write(client_public_key_str)
+            token = utils.cmd('sha256sum test').pop().split(' ')[0]
+            os.remove('test')
         except socket.error:
+            print '[!!] Key Exchange FAILED'
             pass
-        return client_socket
+        return client_socket, token
 
     def client_handler(self, client_socket, address):
         client_ip = address[0]
@@ -58,12 +63,18 @@ class StunServer:
 
         if client_ip not in self.known:     # Initial Key Exchange
             client_id = base64.b64encode(get_random_bytes(32))
-            self.clients[client_id] = [client_ip, client_port]
-            client_socket = self.key_exchange(client_socket, client_id)
+            client_socket, token = self.key_exchange(client_socket, client_id)
+            self.clients[token] = [client_ip, client_port, client_id]
             self.known.append(client_ip)    # Add to known clients after key exchange
         else:
-            encrypted_query = client_socket.recv(1028)
-
+            print '[*] Receiving Encrypted Query from %s:' % client_ip
+            raw_query = client_socket.recv(1028)
+            client_token = raw_query.split('>>>>')[0]
+            if client_token in self.clients.keys():
+                client_id = self.clients[client_token]
+            encrypted_query = raw_query.split('>>>>')[1]
+            decrypted_query = utils.DecodeAES(AES.new(base64.b64decode(client_id)),encrypted_query)
+            print '[*] %s' % decrypted_query
         client_socket.close()
 
     def run_session_key_handler(self, timeout):

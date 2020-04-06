@@ -27,6 +27,20 @@ def exchange_keys(remote_server, public, private, verbose):
         exit()
 
 
+def query_stun_server(remote_server, public, private, query):
+    reply = ''
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((remote_server, 54123))
+        s.send(query)
+        encrypted_reply = s.recv(4096) # TODO: Should this buffer be larger?
+
+    except socket.error:
+        print '[!!] Error Querying Remote Server'
+        pass
+    return reply
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print '[!!] No Remote Server provided'
@@ -49,4 +63,11 @@ if __name__ == '__main__':
     else:
         session_key = open('session.key', 'rb').read()
 
-
+    if '-q' in sys.argv and len(sys.argv) > 4:
+        clear_query = utils.arr2str(sys.argv[3:])
+        print '[*] Sending Query: %s' % clear_query
+    else:
+        clear_query = 'This is a test query of the system'
+    token = utils.cmd('sha256sum client_public.pem').pop().split(' ')[0]
+    encrypted_query = token+'>>>>'+\
+                      utils.EncodeAES(AES.new(base64.b64decode(session_key)),clear_query)
