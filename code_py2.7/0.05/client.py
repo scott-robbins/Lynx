@@ -41,11 +41,12 @@ def query_stun_server(remote_server, key, query):
     return reply
 
 
-def send_message(remote_server, key, recipient, message):
+def send_message(remote_server, key, eq, recipient, message):
     cipher = AES.new(base64.b64decode(key))
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((remote_server, 54123))
+        s.send(eq)
         msg = '%s::::%s' % (recipient, message)
         query = utils.EncodeAES(cipher, msg)
         s.send(query)
@@ -88,6 +89,9 @@ if __name__ == '__main__':
         print '[*] Remote Server: \n%s' % reply
 
     if '-m' in sys.argv and len(sys.argv) >= 5:
+        token = utils.cmd('sha256sum client_public').pop().split(' ')[0]
         uname = sys.argv[3]
         message = utils.arr2str(sys.argv[4:])
-        send_message(remote,session_key,uname,message)
+        enc_query = token + '>>>>' + \
+                          utils.EncodeAES(AES.new(base64.b64decode(session_key)),'SEND_MESSAGE')
+        send_message(remote,session_key,enc_query,uname,message)
