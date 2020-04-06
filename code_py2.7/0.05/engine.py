@@ -78,7 +78,7 @@ class StunServer:
             self.known.append(client_ip)    # Add to known clients after key exchange
         else:   # Known Client, so assume it is a request
             client_socket, raw_query = self.block_til_queried(client_socket)
-            decrypted_query = self.parse_query(raw_query)
+            decrypted_query, client_token = self.parse_query(raw_query)
 
             if decrypted_query.replace('\n','') in self.actions.keys():
                 client_socket = self.actions[decrypted_query](client_socket, client_token)
@@ -100,7 +100,7 @@ class StunServer:
             decrypted_query = utils.DecodeAES(AES.new(base64.b64decode(client_id)), encrypted_query)
         except:
             pass
-        return decrypted_query
+        return decrypted_query, client_token
 
     def run_session_key_handler(self, timeout):
         t0 = time.time()
