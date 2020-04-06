@@ -64,7 +64,8 @@ if __name__ == '__main__':
         session_key = open('session.key', 'rb').read()
 
     if '-q' in sys.argv and len(sys.argv) >= 4:
-        clear_query = utils.arr2str(sys.argv[3:])
+        # clear_query = utils.arr2str(sys.argv[3:])
+        clear_query = sys.argv[3]
         print '[*] Sending Query: %s' % clear_query
     else:
         clear_query = 'This is a test query of the system'

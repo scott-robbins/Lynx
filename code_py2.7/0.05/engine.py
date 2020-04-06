@@ -74,7 +74,7 @@ class StunServer:
             encrypted_query = raw_query.split('>>>>')[1]
             decrypted_query = utils.DecodeAES(AES.new(base64.b64decode(client_id)), encrypted_query)
 
-            if decrypted_query in self.actions.keys():
+            if decrypted_query.replace('\n','') in self.actions.keys():
                 print '[*] Replying to %s query of %s' % (client_ip, decrypted_query)
                 client_socket = self.actions[decrypted_query](client_socket, client_id)
             else:
