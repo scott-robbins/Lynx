@@ -43,7 +43,7 @@ class StunServer:
         #  If recognized, use the session key saved already. If recognized and no session
         #  Key is present, then something is wrong (possible security issue)
         client_file = ip + ':' + port
-        if client_file not in self.clients.keys():
+        if ip not in self.known:
             client_socket.send(self.public_key)
             client_public_key = RSA.importKey(client_socket.recv(4096))
             # open(client_file, 'wb').write(client_public_key)
@@ -62,7 +62,7 @@ class StunServer:
                 client_public_key = RSA.importKey(client_socket.recv(4096))
                 client_addr = self.clients[client_public_key.exportKey()]
                 client_ip = client_addr[0]
-                client_port = client_addr[1]
+                print '[*] Client %s Is Making a query' % client_ip
                 dec_key = base64.b64decode(client_addr[2])
                 # Decrypt the query (encrypted with clients private key) with an AES instance that is
                 # initialized using a negotiated
