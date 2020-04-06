@@ -45,7 +45,7 @@ class StunServer:
         if client_file not in self.clients.keys():
             client_socket.send(self.public_key)
             client_public_key = client_socket.recv(4096)
-            open(client_file, 'rb').write(client_public_key)
+            open(client_file, 'wb').write(client_public_key)
             # Only for debugging
             print '[*] Public Key received from %s' % ip
             # AES NEGOTIATION!
