@@ -23,7 +23,7 @@ class StunServer:
     outbound = 32145
 
     def __init__(self, runtime):
-        actions = {'GET_EXT_IP': self.relay_ext_ip}
+        self.actions = {'GET_EXT_IP': self.relay_ext_ip}
         # Set up STUN Server Public/Private Keypairs
         self.public_key = self.load_keys()
         # Run the key distribution/NAT traversal server
