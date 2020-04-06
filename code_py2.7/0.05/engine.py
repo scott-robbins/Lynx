@@ -66,6 +66,7 @@ class StunServer:
                 encrypted_query = client_socket.recv(4096)
                 decrypted_query = utils.DecodeAES(AES.new(dec_key), encrypted_query)
                 print '[*] Received Query from %s' % client_ip
+                print decrypted_query
                 # Reply to query if necessary
                 if decrypted_query in self.actions.keys():
                     client_socket = self.actions[decrypted_query](client_socket, client_public_key)

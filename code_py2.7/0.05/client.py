@@ -63,7 +63,6 @@ if __name__ == '__main__':
         open('session.key', 'wb').write(session_key)
         test_query = utils.EncodeAES(AES.new(base64.b64decode(session_key)),
                                      'This is a test of the querying system')
-
         query_stun_server(remote, test_query, public_key_str, private_key, session_key, True)
 
     elif '-q' in sys.argv:
