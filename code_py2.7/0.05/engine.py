@@ -53,12 +53,12 @@ class StunServer:
             cipher_rsa = PKCS1_OAEP.new(client_public_key)
             enc_session_key = cipher_rsa.encrypt(iv)
             client_socket.send(enc_session_key)
-            self.clients[client_public_key] = [ip, port, iv]
+            self.clients[client_public_key.exportKey()] = [ip, port, iv]
             print '[*] Encrypted Session Key sent to %s' % ip   # Only for debugging
         else:
             try:
                 client_public_key = RSA.importKey(client_socket.recv(4096))
-                client_addr = self.clients[client_public_key]
+                client_addr = self.clients[client_public_key.exportKey()]
                 client_ip = client_addr[0]
                 client_port = client_addr[1]
                 dec_key = base64.b64decode(client_addr[2])
