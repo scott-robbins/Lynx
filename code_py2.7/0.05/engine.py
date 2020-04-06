@@ -75,7 +75,11 @@ class StunServer:
             decrypted_query = utils.DecodeAES(AES.new(base64.b64decode(client_id)), encrypted_query)
 
             if decrypted_query in self.actions.keys():
+                print '[*] Replying to %s query of %s' % (client_ip, decrypted_query)
                 client_socket = self.actions[decrypted_query](client_socket, client_id)
+            else:
+                print '[!!] Uncrecognized Query:'
+                print decrypted_query
         # Done processing the client request, regardless of what it was
         client_socket.close()
 
