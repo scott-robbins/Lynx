@@ -71,7 +71,7 @@ class StunServer:
             raw_query = client_socket.recv(1028)
             client_token = raw_query.split('>>>>')[0]
             if client_token in self.clients.keys():
-                client_id = self.clients[client_token]
+                client_id = self.clients[client_token][2]
             encrypted_query = raw_query.split('>>>>')[1]
             decrypted_query = utils.DecodeAES(AES.new(base64.b64decode(client_id)),encrypted_query)
             print '[*] %s' % decrypted_query

@@ -48,10 +48,10 @@ if __name__ == '__main__':
     else:
         remote = sys.argv[1]
     # Set up Keys
-    if not os.path.isfile('client_private.pem'):
+    if not os.path.isfile('client_private'):
         private_key = utils.create_rsa_key('client')
     else:
-        private_key = utils.load_private_key('client_private.pem')
+        private_key = utils.load_private_key('client_private')
     # Import Public/Private Key Pair
     public_key = private_key.publickey()
     public_key_str = public_key.exportKey()
@@ -68,6 +68,7 @@ if __name__ == '__main__':
         print '[*] Sending Query: %s' % clear_query
     else:
         clear_query = 'This is a test query of the system'
-    token = utils.cmd('sha256sum client_public.pem').pop().split(' ')[0]
+    token = utils.cmd('sha256sum client_public').pop().split(' ')[0]
     encrypted_query = token+'>>>>'+\
                       utils.EncodeAES(AES.new(base64.b64decode(session_key)),clear_query)
+    query_stun_server(remote,public_key,private_key,encrypted_query)
