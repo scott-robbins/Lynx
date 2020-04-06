@@ -27,21 +27,6 @@ def exchange_keys(remote_server, public, private, verbose):
         exit()
 
 
-def query_stun_server(remote_server, request, public, private, session, verbose):
-    reply = ''
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((remote_server, 54123))
-        s.send(public)
-        s.send(request)
-        print '[*] Query sent to %s' % remote_server
-        reply = s.recv(4096)
-        print '[*] Reply received: %s' % reply
-    except socket.error:
-        pass
-    return reply
-
-
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print '[!!] No Remote Server provided'
@@ -59,14 +44,9 @@ if __name__ == '__main__':
 
     if not os.path.isfile('session.key'):
         # Exchange Keys with STUN Server
-        session_key, stun_key = exchange_keys(remote, public_key_str, private_key, True)
+        session_key, stun_public = exchange_keys(remote, public_key_str, private_key, True)
         open('session.key', 'wb').write(session_key)
-        test_query = utils.EncodeAES(AES.new(base64.b64decode(session_key)),
-                                     'This is a test of the querying system')
-        query_stun_server(remote, test_query, public_key_str, private_key, session_key, True)
-
-    elif '-q' in sys.argv:
+    else:
         session_key = open('session.key', 'rb').read()
-        query = utils.EncodeAES(AES.new(base64.b64decode(session_key)),
-                                utils.arr2str(sys.argv[3:]))
-        query_stun_server(remote, query, public_key_str, private_key, session_key, True)
+
+

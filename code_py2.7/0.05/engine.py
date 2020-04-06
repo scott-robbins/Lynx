@@ -16,7 +16,7 @@ import os
 class StunServer:
     known = []
 
-    clients = {'127.0.0.1': [-1]} # Keep Track of Clients who've connected
+    clients = {'': []} # Keep Track of Clients who've connected
     public_key = ''
     uptime = 0.0
     inbound = 54123
@@ -36,46 +36,33 @@ class StunServer:
             key = utils.load_private_key('stun_private.pem')
         return key.publickey().exportKey()
 
-    # TODO: Determine if self is public routable or behind nat?
-    def client_handler(self, client_socket, address):
-        ip = address[0]
-        port = str(address[1])
-        # Keep Track Of who is connecting, and assign session Keys if first time
-        if ip not in self.known:
-            client_socket.send(self.public_key)
-            client_public_key = RSA.importKey(client_socket.recv(4096))
+    def key_exchange(self, client_socket, client_key):
+        try:
+            public_key_str = self.public_key.exportKey()
+            client_socket.send(public_key_str)
+            client_public_key_str = client_socket.recv(4096)
+            print '[*] Public Key Sent and Client Public Key Received'
+            cipher_rsa = PKCS1_OAEP.new(RSA.importKey(client_public_key_str))
+            enc_key_str = cipher_rsa.encrypt(client_key)
+            client_socket.send(enc_key_str)
+            print '[*] Sent client session key'
+        except socket.error:
+            pass
+        return client_socket
 
-            print '[*] Public Key received from %s' % ip        # Only for debugging
-            # Negotiation - Only use PKI to encrypt key for AES
-            iv = base64.b64encode(get_random_bytes(24))
-            cipher_rsa = PKCS1_OAEP.new(client_public_key)
-            enc_session_key = cipher_rsa.encrypt(iv)
-            client_socket.send(enc_session_key)
-            self.clients[client_public_key.exportKey()] = [ip, port, iv]
-            self.known.append(ip)
-            print '[*] Encrypted Session Key sent to %s' % ip   # Only for debugging
-        else: # If recognized, use the session key already associated with client
-            try:
-                client_public_key = RSA.importKey(client_socket.recv(4096))
-                key_str = client_public_key.exportKey()
-                client_ip = ip
-                if key_str in self.clients.keys():
-                    print '[*] Client %s Is Making a query' % client_ip
-                    dec_key = base64.b64decode(self.clients[key_str][2])
-                else:
-                    print '[!!] Known client %s is presenting Uncrecognized Key %s' %\
-                          (ip, client_public_key)
-                # Decrypt the query (encrypted with clients private key) with an AES instance that is
-                # initialized using a negotiated
-                encrypted_query = client_socket.recv(4096)
-                decrypted_query = utils.DecodeAES(AES.new(dec_key), encrypted_query)
-                print '[*] Received Query from %s' % client_ip
-                print decrypted_query
-                # Reply to query if necessary
-                if decrypted_query in self.actions.keys():
-                    client_socket = self.actions[decrypted_query](client_socket, client_public_key)
-            except socket.error:
-                pass
+    def client_handler(self, client_socket, address):
+        client_ip = address[0]
+        client_port = str(address[1])
+        '''    This is where the critical task of evaluating and responding (correctly)
+             to clients and any/all of there queries will first occur. Keep it CLEAN and NEAT. '''
+
+        if client_ip not in self.known:     # Initial Key Exchange
+            client_id = base64.b64encode(get_random_bytes(32))
+            self.clients[client_id] = [client_ip, client_port]
+            client_socket = self.key_exchange(client_socket, client_id)
+            self.known.append(client_ip)    # Add to known clients after key exchange
+        else:
+            encrypted_query = client_socket.recv(1028)
 
         client_socket.close()
 
@@ -110,9 +97,9 @@ class StunServer:
 
     def relay_ext_ip(self, client_socket, client_key):
         try:
-            [ip, port, iv] = self.clients[client_key]
+            ip = self.clients[client_key][0]
             reply = 'The reply to your query is:\n%s' % ip
-            client_socket.send(utils.EncodeAES(AES.new(base64.b64decode(iv)),reply))
+            client_socket.send(utils.EncodeAES(AES.new(base64.b64decode(client_key)), reply))
         except socket.error:
             print '[!!] Error Replying to Query'
             pass
