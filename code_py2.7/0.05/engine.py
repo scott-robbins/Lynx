@@ -55,6 +55,17 @@ class StunServer:
             pass
         return client_socket, token
 
+    def block_til_queried(self, client_socket):
+        queried = False
+        tic = time.time()
+        dt = 2
+        while not queried and (time.time() - tic) < dt:
+            raw = client_socket.recv(1028)
+            queried = True
+        if not queried:
+            print '[!!] Timeout While waiting for request'
+        return client_socket, raw
+
     def client_handler(self, client_socket, address):
         client_ip = address[0]
         client_port = str(address[1])
@@ -66,8 +77,8 @@ class StunServer:
             client_socket, token = self.key_exchange(client_socket, client_id)
             self.clients[token] = [client_ip, client_port, client_id]
             self.known.append(client_ip)    # Add to known clients after key exchange
-        else:
-            raw_query = client_socket.recv(1028)
+        else:   # Known Client, so assume it is a request
+            client_socket, raw_query = self.block_til_queried(client_socket)
             client_token = raw_query.split('>>>>')[0]
             if client_token in self.clients.keys():
                 client_id = self.clients[client_token][2]
@@ -75,11 +86,9 @@ class StunServer:
             decrypted_query = utils.DecodeAES(AES.new(base64.b64decode(client_id)), encrypted_query)
 
             if decrypted_query.replace('\n','') in self.actions.keys():
-                print '[*] Replying to %s query of %s' % (client_ip, decrypted_query)
                 client_socket = self.actions[decrypted_query](client_socket, client_token)
             else:
                 print '[!!] Uncrecognized Query:'
-                print decrypted_query
         # Done processing the client request, regardless of what it was
         client_socket.close()
 
