@@ -56,6 +56,7 @@ class StunServer:
             client_socket.send(enc_session_key)
             self.clients[client_public_key.exportKey()] = [ip, port, iv]
             print '[*] Encrypted Session Key sent to %s' % ip   # Only for debugging
+            print iv
         else:
             try:
                 client_public_key = RSA.importKey(client_socket.recv(4096))
