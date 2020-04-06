@@ -57,10 +57,13 @@ class StunServer:
         else: # If recognized, use the session key already associated with client
             try:
                 client_public_key = RSA.importKey(client_socket.recv(4096))
-                client_addr = self.clients[client_public_key.exportKey()]
-                client_ip = client_addr[0]
-                print '[*] Client %s Is Making a query' % client_ip
-                dec_key = base64.b64decode(client_addr[2])
+                client_ip = ip
+                if client_public_key in self.clients.keys():
+                    print '[*] Client %s Is Making a query' % client_ip
+                    dec_key = base64.b64decode(self.clients[client_public_key][2])
+                else:
+                    print '[!!] Known client %s is presenting Uncrecognized Key %s' %\
+                          (ip, client_public_key)
                 # Decrypt the query (encrypted with clients private key) with an AES instance that is
                 # initialized using a negotiated
                 encrypted_query = client_socket.recv(4096)

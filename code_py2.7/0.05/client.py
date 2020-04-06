@@ -69,4 +69,4 @@ if __name__ == '__main__':
         session_key = open('session.key', 'rb').read()
         query = utils.EncodeAES(AES.new(base64.b64decode(session_key)),
                                 utils.arr2str(sys.argv[3:]))
-        query_stun_server(remote,query,public_key_str,private_key,session_key, True)
+        query_stun_server(remote, query, public_key_str, private_key, session_key, True)
