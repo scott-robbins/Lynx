@@ -38,7 +38,11 @@ def query_stun_server(remote_server, request, public, private, session, verbose)
 
 
 if __name__ == '__main__':
-    remote = '192.236.160.95'
+    if len(sys.argv) < 2:
+        print '[!!] No Remote Server provided'
+        exit()
+    else:
+        remote = sys.argv[1]
     # Set up Keys
     if not os.path.isfile('client_private.pem'):
         private_key = utils.create_rsa_key('client')
@@ -51,5 +55,6 @@ if __name__ == '__main__':
     # Exchange Keys with STUN Server
     session_key, stun_key = exchange_keys(remote, public_key_str, private_key, True)
 
-    test_query = utils.EncodeAES(AES.new(base64.b64decode(session_key)), 'This is a test')
+    test_query = utils.EncodeAES(AES.new(base64.b64decode(session_key)),
+                                 'This is a test of the querying system')
     query_stun_server(remote,test_query,public_key_str,private_key,session_key,True)

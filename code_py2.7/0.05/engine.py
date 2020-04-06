@@ -50,7 +50,7 @@ class StunServer:
 
             print '[*] Public Key received from %s' % ip        # Only for debugging
             # Negotiation - Only use PKI to encrypt key for AES
-            iv = base64.b64encode(get_random_bytes(32))
+            iv = base64.b64encode(get_random_bytes(24))
             cipher_rsa = PKCS1_OAEP.new(client_public_key)
             enc_session_key = cipher_rsa.encrypt(iv)
             client_socket.send(enc_session_key)
