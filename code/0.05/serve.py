@@ -19,7 +19,7 @@ class P2PHandler:
         if client_addr not in self.known_peers:
             client_sock = self.add_client(client_sock, client_addr)
             client_sock.close()
-
+            return
         # Handler (blocks!)
         raw_request = client_sock.recv(4096)
 
