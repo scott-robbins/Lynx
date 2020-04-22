@@ -4,7 +4,6 @@ import socket
 import utils
 import time
 import sys
-import os
 
 
 class P2PHandler:

@@ -27,6 +27,7 @@ class Hub:
         self.shutdown()
 
     def run(self, m):
+        self.running = True
         tic = time.time()
         handler = serve.P2PHandler()
         while self.running and (time.time()-tic) < m['runtime']:
