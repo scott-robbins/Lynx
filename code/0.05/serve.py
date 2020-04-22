@@ -49,6 +49,7 @@ class P2PHandler:
         # Make Sure the name isn't already taken
         if requested_uname not in self.clients.keys():
             self.clients[requested_uname] = token
+            print '[*] %s has signed up as %s' % (addr, requested_uname)
             sock.send(token)
             self.known_peers.append(addr)
         else:
