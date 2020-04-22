@@ -28,6 +28,7 @@ def create_account():
             else:
                 print '[!!] That username is taken...' # TODO: write server side logic for retry
                 exit()
+            break
     except socket.error:
         print '[!!] Unable to connect to remote server...'
         print '** Are you running as root?'
