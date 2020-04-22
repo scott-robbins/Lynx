@@ -22,6 +22,7 @@ def create_account():
         recvd = False; dt = time.time()
         while not recvd and (time.time()-dt)<3:
             reply = s.recv(1024)
+            print reply
             if '[!!]' not in reply.split(' '):
                 open('UserData/%s.token'%username, 'wb').write(reply)
             else:
