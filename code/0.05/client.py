@@ -12,11 +12,11 @@ def create_account():
     # print ''
     # print ''
     username = raw_input('Enter a username: ')
-
+    os.mkdir('UserData')
     # See if it's available
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('beta.lynx-network.us', 80))
+        s.connect(('beta.lynx-network.us', 54123))
         s.send(username)
         # wait a few seconds for a reply
         recvd = False; dt = time.time()
@@ -29,6 +29,7 @@ def create_account():
                 exit()
     except socket.error:
         print '[!!] Unable to connect to remote server...'
+        print '** Are you running as root?'
         return
 
 

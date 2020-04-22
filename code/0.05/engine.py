@@ -35,6 +35,7 @@ class Hub:
             client_socket, client = self.server_socket.accept()
             worker = Thread(target=handler.client_handler, args=(client_socket, client[0]))
             worker.daemon = True
+            worker.start()
             worker.join()
         return
 
