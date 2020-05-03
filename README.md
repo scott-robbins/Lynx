@@ -72,4 +72,4 @@ it will know which other node does because of this distributed hashing system).
 
 __________________________________________________________________________________
 
-This project is currently under development     **Last Updated February 2020**
+This project is currently under development     **Last Updated May 2020**
