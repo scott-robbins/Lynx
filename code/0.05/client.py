@@ -32,11 +32,15 @@ def create_account():
     except socket.error:
         print '[!!] Unable to connect to remote server...'
         print '** Are you running as root?'
-        return
+        exit()
+    return reply, username
+
+
 
 
 if __name__ == '__main__':
     new_user = False
     # Check for UserProfile
     if not os.path.isdir('UserData'):
-        create_account()
+        user_token, username = create_account()
+

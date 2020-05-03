@@ -11,10 +11,21 @@ class P2PHandler:
     known_peers = []
 
     def __init__(self):
-        self.actions = {'echo'}
+        self.actions = {'show_peers': self.show_peers}
+
+    def parse_request(self, raw_req):
+        try:
+            cid = raw_req.split('????')[0]
+            raw_query = raw_req.split('????')[1]
+            qA = raw_query.split('::::')[0]
+            qB = raw_query.split('::::')[1]
+        except IndexError:
+            return False, '', ''
+        return cid, qA, qB
 
     def client_handler(self, client_sock, client_addr):
         """ Client handler for engine """
+
         # Register new clients
         if client_addr not in self.known_peers:
             client_sock = self.add_client(client_sock, client_addr)
@@ -23,17 +34,17 @@ class P2PHandler:
         # Handler (blocks!)
         raw_request = client_sock.recv(4096)
 
-        # Process Request
-        client_id = raw_request.split('????')[0]
-        raw_query = raw_request.split('????')[1]
-        q = raw_query.split('::::')[0]
-        query = raw_query.split('::::')[1]
-
-        # Reply to the request
-        if client_id not in self.clients.keys():
-            client_sock.close()
-        if client_id in self.clients.keys() and q in self.actions.keys():
-            client_sock = self.actions[query](client_sock, client_id, query)
+        try:
+            # Process Request
+            client_id, q, query = self.parse_request(raw_request)
+            # Reply to the request
+            if client_id not in self.clients.keys():
+                client_sock.close()
+            if client_id in self.clients.keys() and q in self.actions.keys():
+                client_sock = self.actions[query](client_sock, client_id, query)
+        except IndexError:
+            print '[!!] Bad query from %s ' % str(client_addr[0])
+            pass
 
         # Close socket when finished!!
         client_sock.close()
@@ -56,11 +67,10 @@ class P2PHandler:
             sock.send('[!!] Username Taken')
         return sock
 
-    # TODO: Test method for development only!!
-    def echo(self, c, id, q):
-        try:
-            c.send(q)
-        except socket.error:
-            pass
-        return c
+    def show_peers(self, sock, addr, request):
+        clear_content = ''
+        for peername in self.clients.keys():
+            clear_content += '[*] User: %s\n' % peername
+        sock.send(clear_content)    # TODO: Encrypt with session key
+        return sock
 
