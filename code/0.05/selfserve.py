@@ -14,17 +14,23 @@ def register():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        # TODO: If username exists have user choose another!!!
+        if os.path.isdir(os.getcwd()+'LynxData'):
+        	# TODO: If username exists have user choose another!!!
+        	unames_raw = utils.cmd('ls LynxData/*.key')
+        	for name in unames_raw:
+        		uname = name.replace('.key','')
+        		if uname == username:
+        			return redirect(request.url)
         # REGISTER USER
         client.save_credentials(username, password)
         # FORWARD TO SUCCESS PAGE
-        return redirect(request.url+'/enter/'+username)
+        return redirect(request.url+'success/'+username)
 
     if not os.path.isdir('LynxData'):
     	return render_template("sign_up.html")
     else:  # User is already registered, so serve dash
     	username, addr, pword = client.get_credentials()
-    	return redirect(request.url+'/enter/%s' % username)
+    	return redirect(request.url+'enter/%s' % username)
 
 @app.route('/success/<name>')
 def success(name):
