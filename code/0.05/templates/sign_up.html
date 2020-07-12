@@ -1,0 +1,32 @@
+{% block title %}Sign up{% endblock %}
+
+{% block main %}
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+
+      <h1>Register for Lynx Network</h1>
+      <hr>
+
+      <form action="/" method="POST">
+
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" class="form-control" id="username" name="username" placeholder="Select a username">
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Create a password">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Sign up</button>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
