@@ -16,10 +16,13 @@ def check_status(ip_addr):
 		# TODO: Add encryption/handshake here
 		msg = 'API_REQUEST_BASIC' 
 		s.send('STATUS ???? %s' % msg)
-		token = s.recv(1024)
 		# status heck simply wants to see this token echoed back
-		if s.recv(1024) == msg:
+		reply = s.recv(1024)
+		if reply == msg:
 			connected = True
+		else:
+			print 'Sent: %s' % msg
+			print 'Got: %s' % reply
 		s.close()
 	except:
 		print '[!!] Error Making API Request'
