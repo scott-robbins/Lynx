@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request
 import base64
 import client
+import utils
 import os
 
 app = Flask(__name__)
@@ -34,14 +35,43 @@ def register():
 
 @app.route('/success/<name>')
 def success(name):
+	'''
+	SUCCESS directs users to splash screen
+	'''
 	username, addr, pword = client.get_credentials()
 	return render_template('welcome.html', name=name)
 
 @app.route('/enter/<user>')
 def home(user):
 	print '[*] %s has Logged In' % user
-	return render_template('user_dash.html', username=user)
+	has_shares = False
+	if os.path.isdir('LynxData/Shared'):
+		has_shares = True
+	return render_template('user_dash.html',
+						   username=user,
+						   share_files=has_shares)
 
+@app.route('/shares')
+def show_local_shares():
+	if os.path.isdir(os.getcwd()+'LynxData/Shares'):
+		shared, hashes = utils.crawl_dir(os.getcwd()+'LynxData/Shares')
+	else:
+		os.mkdir('LynxData/Shares')
+		shared, hashes = utils.crawl_dir(os.getcwd()+'LynxData/Shares')
+	return render_template('file_system.html', shares=shared)
+
+
+@app.route('/favicon.ico')
+def icon():
+	return open('assets/logo.png', 'rb').read()
+
+@app.route('/logo.png')
+def logo():
+	return open('assets/logo.png', 'rb').read()
+
+@app.route('/bar.png')
+def bar_logo():
+	return open('assets/bar.png', 'rb').read()
 
 if __name__ == '__main__':
    app.run(port=80)

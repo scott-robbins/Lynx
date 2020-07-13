@@ -109,3 +109,26 @@ DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
 # ##############  ###### ~ LAMBDA DEFINITIONS END ~ ######  ############## #
 
 
+def crawl_dir(file_path, hash, verbose):
+    directory = {'dir': [], 'file': []}
+    hashes = {}
+    folders = [file_path]
+    while len(folders) > 0:
+        direct = folders.pop()
+        if verbose:
+            print 'Exploring %s' % direct
+        try:
+            for item in os.listdir(direct):
+                if os.path.isfile(direct + '/' + item):
+                    file_name = direct + "/" + item
+                    directory['file'].append(file_name)
+                    if hash:
+                        hashes['"' + file_name + '"'] = get_sha256_sum(file_name, False)
+                    if verbose:
+                        print '\033[3m- %s Added to Shared Folder\033[0m' % file_name
+                else:
+                    directory['dir'].append(direct + '/' + item)
+                    folders.append(direct + '/' + item)
+        except OSError:
+            pass
+    return directory, hashes
