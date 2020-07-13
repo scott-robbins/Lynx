@@ -80,7 +80,7 @@ class BackendLynxAPI:
 		self.server.close()
 
 
-	def status_check(c, ci, req):
+	def status_check(self, c, ci, req):
 		"""
 		Most basic API request, to simplify notify remote end that they have connected
 		successully to the server and API request was handled okay. 

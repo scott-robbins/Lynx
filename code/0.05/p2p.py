@@ -32,4 +32,7 @@ def get_server_addr():
 
 if 'status' in sys.argv:
 	# do a status check
-	check_status(get_server_addr())
+	if check_status(get_server_addr()):
+		print '[o] Connected to Remote Server'
+	else:
+		print '[x] Failled to Connect to Server'
