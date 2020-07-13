@@ -86,13 +86,8 @@ class BackendLynxAPI:
 		successully to the server and API request was handled okay. 
 		"""
 		# TODO: encrypt reply with session key!
-		reply = 'OK, Message Recieved'
-		c.send('%s' % self.session_secret)
-		result = c.recv(1024)
-		if result == self.session_secret:
-			c.send(reply)
-		else:
-			c.send('That does not sound correct!')
+		c.send(req)
+		print '[*] Sending Reply %s' % req
 		return c
 
 

@@ -13,12 +13,12 @@ def check_status(ip_addr):
 	try:
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((ip_addr, 54123))
-		# TODO: Add encryption/handshake here 
-		s.send('STATUS ???? API_REQUEST_BASIC')
+		# TODO: Add encryption/handshake here
+		msg = 'API_REQUEST_BASIC' 
+		s.send('STATUS ???? %s' % msg)
 		token = s.recv(1024)
 		# status heck simply wants to see this token echoed back
-		s.send(token)
-		if s.recv(1024) == 'OK, Message Recieved':
+		if s.recv(1024) == msg:
 			connected = True
 		s.close()
 	except:
