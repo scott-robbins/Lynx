@@ -25,7 +25,7 @@ class BackendLynxAPI:
 		self.run()
 		
 
-	def start_listener():
+	def start_listener(self):
 		"""
 		START_LISTENER
 		"""
@@ -38,7 +38,7 @@ class BackendLynxAPI:
 			return []
 		return s
 
-	def run(): 
+	def run(self): 
  		"""
  		RUN
  		"""
