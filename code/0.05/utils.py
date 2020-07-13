@@ -57,7 +57,6 @@ def load_credentials(filepath):
 		pass
 	return username, ip, passwd
 
-
 def cmd(command, verbose):
 	os.system('%s >> cmd.txt' % command)
 	if verbose:	
@@ -131,4 +130,15 @@ def crawl_dir(file_path, hash, verbose):
                     folders.append(direct + '/' + item)
         except OSError:
             pass
-    return directory, hashes
+    return directory, hashe
+
+def start_listener(port):
+	try:
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.bind(port)
+		s.listen(5)
+	except socket.error:
+		print '[!!] Error Creating Listener'
+		return []
+	return s
+
