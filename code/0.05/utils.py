@@ -2,7 +2,10 @@ from Crypto.Random import get_random_bytes
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES
 from threading import Thread
-import paramiko
+try:
+	import paramiko
+except ImportError:
+	print '[!!] Cannot use Paramiko'
 import warnings
 import base64
 import time
