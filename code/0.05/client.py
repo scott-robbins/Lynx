@@ -3,6 +3,8 @@ from Crypto.Cipher import AES
 import base64
 import socket 
 import utils 
+import p2p
+import sys
 import os 
 
 def get_credentials():
@@ -32,3 +34,39 @@ def load_key(uname):
 		return ''
 	else:
 		return base64.b64decode(open(os.getcwd()+'/LynxData/%s.key'%uname,'rb').read())
+
+def request_credentials():
+	uname = raw_input('Enter Username:\n')
+	cmd = "#!/bin/bash\n echo 'Enter Password:'; read -s PASS; echo $PASS >> cmd.txt\n#EOF"
+	open('tmp.sh','wb').write(cmd)
+	os.system('bash tmp.sh; rm tmp.sh')
+	password = utils.swap('cmd.txt', True).pop()
+	return uname, password
+
+
+def start_headless():
+	# Create a username and password
+	u, p = request_credentials()
+	save_credentials(u, p)
+
+	# check in with mothership
+	if check_status(get_server_addr()):
+		print '[o] Connected to Remote Server'
+		# try to register username with remote server
+		
+	else:
+		print '[x] Failled to Connect to Server'
+
+	# display commands like checking for peers, or uploading shares
+
+
+
+def main():
+
+	if '-headless' in sys.argv:
+		# run setup and service from commandline (no browser)
+		start_headless()
+
+
+if __name__ == '__main__':
+	main()
