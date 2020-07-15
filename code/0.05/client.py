@@ -50,10 +50,10 @@ def start_headless():
 	save_credentials(u, p)
 
 	# check in with mothership
-	if check_status(get_server_addr()):
+	if p2p.check_status(p2p.get_server_addr()):
 		print '[o] Connected to Remote Server'
 		# try to register username with remote server
-		
+
 	else:
 		print '[x] Failled to Connect to Server'
 
