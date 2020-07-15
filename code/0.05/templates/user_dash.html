@@ -5,28 +5,49 @@
 </head>
 <img src="/bar.png" alt="Icon" width="128" height="128">
 <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bungee%20Outline">
 <style>
-  /* Header/Blog Title */
+/* ==== ------------------- CSS Layout Data  -------------------  ==== */
+body {
+  font-family: Arial;
+  padding: 10px;
+  background: #f1f1f1;
+}
+
+.card {
+  background-color: #eee;
+  padding: 10px;
+  margin-top: 10px;
+}
+
 .header {
-  padding: 30px;
+  padding: 10px;
+  font-family: "Bungee Outline";
   text-align: center;
-  background: white;
+  background: #deaddd;
 }
 
 .header h1 {
-  font-size: 50px;
+  font-size: 55px;
   color: blue;
 }
+
 img {
-  width: 42%;
-  height: 10%;
+  width: 35%;
+  height: 15%;
 }
+
+img.resize{
+  width: 50px;
+  height: 35px;
+}
+
 ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #333;
+  background-color: #bbaadd;
 }
 
 li {
@@ -47,34 +68,33 @@ li a {
 }
 
 li a:hover:not(.active) {
-  background-color: #111;
+  background-color: #0FADED;
 }
 
 .active {
   background-color: #4CAF50;
 }
 
-
-/* Create two unequal columns that floats next to each other */
-/* Left column */
-.leftcolumn {   
+/* Right column */
+.leftcolumn {
   float: left;
   width: 75%;
+  background-color: #f1f1f1;
+  padding-left: 5px;
 }
 
-/* Right column */
 .rightcolumn {
-  float: left;
+  float: right;
   width: 25%;
   background-color: #f1f1f1;
-  padding-left: 20px;
 }
+
 /* Footer */
 .footer {
-  padding: 20px;
+  padding: 5px;
   text-align: center;
-  background: #ddd;
-  margin-top: 20px;
+  background: #bbaadd;
+  margin-top: 10px;
 }
 
 .dropdown {
@@ -95,25 +115,104 @@ li a:hover:not(.active) {
 .dropdown:hover .dropdown-content {
   display: block;
 }
-</style>
-<body>
-  <div class="header">
-  <h1> {{ username }} </h1>
-  <p><i> Welcome to Lynx </i></p>    
-  </div>
-</head>
-<body>
 
+/* Fake image */
+.fakeimg {
+  background-color: #aaa;
+  width: 50%;
+  padding: 10px;
+}
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.button1 {
+  background-color: white;
+  color: black;
+  border: 2px solid #1A5325; /* Green */
+}
+.button {
+  transition-duration: 0.4s;
+}
+
+.button:hover {
+  background-color: #4CAF50; /* Green */
+  color: #deaddd;
+}
+
+</style>
+  <div class="header">
+  <h1> {{ username }} </h1>    
+  </div>
+<!-- Create Navbar -->
 <ul>
-  <li><a href="#Shares">Shares</a></li>
-  <li><a href="#Peers">Peers</a></li>
-  <li><a href="#Downloads">Downloads</a></li>
-  <li><a href="#Info"> </a></li> 
+  <li><a href="/Upload">Upload</a></li>
+  <li><a href="/Peers">Peers</a></li>
+  <li><a href="/Downloads">Downloads</a></li>
+  <li><a href="/Status"> Network Connected:
+      {% block content %}
+          {% if connected %}
+              <i class='fas fa-check-circle' style='font-size:18px;color:green'></i>
+          {% else %}
+              <i class='fas fa-ban' style='font-size:18px;color:red'></i>
+          {% endif %}
+      {% endblock content %}
+  </a></li>
 </ul>
-</body>
-Connected <i class='fas fa-check-circle' style='font-size:24px;color: green;'></i>
-<div class="footer">
-  <h2><i> Lynx 2020 </i></h2>
+<body>
+<div class="rightcolumn">
+  <div class="card">
+    <div class="dropdown">
+  <button id="myBtn" class="button1">Messaging</button>
+  <div id="myDropdown" class="dropdown-content">
+    <ul>
+      <li><a href="#Inbox">Inbox</a></li>
+      <li><a href="#Sent"> Sent </a></li>
+      <li><a href="#contacts">Contacts</a></li> 
+      <li><a href="#Drafts">Drafts</a></li> 
+    </ul>
+    
+  </div>
+</div>
+   <div class="dropdown">
+     <button id="myBtn" class="button1"> Find Files</button>
+     <div id="myDropdown" class="dropdown-content">
+       <ul>
+          <li><a href="#LocalShares">Local Shares</a>
+          <li><a href="#RemoteShares">Remote Shares</a></li>
+       </ul>
+     </div>
+   </div>
 </div>
 
+<script>
+// Get the button, and when the user clicks on it, execute myFunction
+document.getElementById("myBtn").onclick = function() {myFunction()};
+
+/* myFunction toggles between adding and removing the show class, which is used to hide and show the dropdown content */
+function myFunction() {
+  document.getElementById("myDropdown").classList.toggle("show");
+}
+</script>
+</div>
+<div class="leftcoulmn">
+    <div class="card">
+      <h2> Hello, {{ username }} </h2>
+      <h4>{{ date }}  -  {{ time }} </h4>
+      <div class="fakeimg" style="height:200px;">Image</div>
+          {% if not share_files %}
+          <p> No Files in <i>Shared Folder</i> </p>        
+          {% endif %}
+    </div>
+  </div>
+
+
+</body>
+<!-- Footer -->
+<div class="footer">
+  <h4><i> Lynx 2020 </i> <img class="resize" src="/logo.png"> </h4>
+</div>
 </html>

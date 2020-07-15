@@ -33,9 +33,14 @@ def get_server_addr():
 	addr = utils.cmd('host beta.lynx-network.us', False).pop().split(' address ')[1]
 	return addr
 
-if 'status' in sys.argv:
-	# do a status check
-	if check_status(get_server_addr()):
-		print '[o] Connected to Remote Server'
-	else:
-		print '[x] Failled to Connect to Server'
+def main():
+	if 'status' in sys.argv:
+		# do a status check
+		if check_status(get_server_addr()):
+			print '[o] Connected to Remote Server'
+		else:
+			print '[x] Failled to Connect to Server'
+
+
+if __name__ == '__main__':
+	main()

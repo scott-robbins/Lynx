@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request
 import base64
 import client
 import utils
+import p2p
 import os
 
 app = Flask(__name__)
@@ -47,9 +48,15 @@ def home(user):
 	has_shares = False
 	if os.path.isdir('LynxData/Shared'):
 		has_shares = True
+	locald, localt = utils.create_timestamp()
+	# check in with backend server 
+	status = p2p.check_status(p2p.get_server_addr())
 	return render_template('user_dash.html',
-						   username=user,
-						   share_files=has_shares)
+						   username=user.upper(),
+						   share_files=has_shares,
+						   connected=status,
+						   date=locald,
+						   time=localt)
 
 @app.route('/shares')
 def show_local_shares():
@@ -72,6 +79,24 @@ def logo():
 @app.route('/bar.png')
 def bar_logo():
 	return open('assets/bar.png', 'rb').read()
+
+@app.route('/Upload')
+def uploads():
+	if not os.path.isdir('LynxData/Shares'):
+		os.mkdir('LynxData/Shares')
+	return render_template('upload.html')
+
+@app.route("/handleUpload", methods=['POST'])
+def handleFileUpload():
+    if 'upload' in request.files:
+        upload = request.files['upload']
+        if upload.filename != '':            
+            print '[*] File %s uploaded' % upload.filename
+            upload.save(os.path.join(os.getcwd()+'/LynxData/Shares/', upload.filename))
+    
+    	
+	return redirect('/')
+
 
 if __name__ == '__main__':
    app.run(port=80)
