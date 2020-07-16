@@ -1,5 +1,6 @@
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
+import numpy as np
 import base64
 import socket 
 import utils 
@@ -16,10 +17,10 @@ def get_credentials():
 	os.remove('tmp.cred')
 	return username, ip, passwd
 
-def save_credentials(uname, pword):
+def save_credentials(uname, pword, addr):
 	if not os.path.isdir(os.getcwd()+'LynxData'):
 		os.mkdir('LynxData')
-	data = '%s ...\n%s@null' % (pword, uname)
+	data = '%s ...\n%s@%s' % (pword, uname, addr)
 	key = get_random_bytes(32)
 	open('LynxData/%s.key'%uname,'wb').write(base64.b64encode(key))
 	encrypted_data = utils.EncodeAES(AES.new(key), data)
@@ -49,23 +50,41 @@ def start_headless():
 	u, p = request_credentials()
 	save_credentials(u, p)
 
-	# check in with mothership
-	if p2p.check_status(p2p.get_server_addr()):
-		print '[o] Connected to Remote Server'
-		# try to register username with remote server
 
-	else:
-		print '[x] Failled to Connect to Server'
-
-	# display commands like checking for peers, or uploading shares
-
-
+def welcome():
+	lynx=  '\033[1m _                      \n'\
+		  '| | \033[3m Welcome To   \033[0m\033[1m          \n'\
+		  '| |    _   _ _ __ __  __\n'\
+		  "| |   | | | | '_ \\\\ \\/ /\n"\
+		  '| |___| |_| | | | |>  < \n'\
+		  '\\_____/\\__, |_| |_/_/\\_\\\n'\
+		  '        __/ |           \n'\
+		  '       |___/            \033[0m'
+	print lynx
 
 def main():
 
 	if '-headless' in sys.argv:
+		welcome()
 		# run setup and service from commandline (no browser)
-		start_headless()
+		if not os.path.isdir(os.getcwd()+'/LynxData'):
+			start_headless()
+		else:
+			username, ip, passwd = get_credentials()
+			print '[o] Successfully Logged in as \033[1m\033[32m%s\033[0m' % username
+		# check in with mothership
+		if p2p.check_status(p2p.get_server_addr()):
+			print '[o] Connected to Remote Server'
+			# TODO: try to register username with remote server
+			latency = np.mean(p2p.check_ping())
+			print '[o] Mean Ping time: %fms' % latency
+		else:
+			print '[x] Failled to Connect to Server'
+
+		# display commands like checking for peers, or uploading shares
+
+	if '-stat' in sys.argv:
+		p2p.check_ping()
 
 
 if __name__ == '__main__':

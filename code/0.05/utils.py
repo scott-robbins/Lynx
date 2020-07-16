@@ -22,6 +22,15 @@ def swap(filename, destroy):
 		os.remove(filename)
 	return data
 
+def arr2str(content):
+	result = ''
+	for element in content:
+		result += element + '\n'
+	return result
+
+def get_ext_ip():
+	return cmd('GET https://api.ipify.org',False).pop()
+
 def create_timestamp():
     date = time.localtime(time.time())
     mo = str(date.tm_mon)

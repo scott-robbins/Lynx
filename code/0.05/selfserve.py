@@ -24,7 +24,7 @@ def register():
         		if uname == username:
         			return redirect(request.url)
         # REGISTER USER
-        client.save_credentials(username, password)
+        client.save_credentials(username, utils.get_ext_ip(), password)
         # FORWARD TO SUCCESS PAGE
         return redirect(request.url+'success/'+username)
 
@@ -80,6 +80,12 @@ def logo():
 def bar_logo():
 	return open('assets/bar.png', 'rb').read()
 
+@app.route('/Status')
+def display_network_status():
+	# Show basic connectivity with lynx-network
+	ping = p2p.check_ping()
+	return render_template('network_status.html', ping_data=ping)
+
 @app.route('/Upload')
 def uploads():
 	if not os.path.isdir('LynxData/Shares'):
@@ -93,8 +99,6 @@ def handleFileUpload():
         if upload.filename != '':            
             print '[*] File %s uploaded' % upload.filename
             upload.save(os.path.join(os.getcwd()+'/LynxData/Shares/', upload.filename))
-    
-    	
 	return redirect('/')
 
 

@@ -41,6 +41,17 @@ def main():
 		else:
 			print '[x] Failled to Connect to Server'
 
+def check_ping():
+	latency = []
+	cmd = 'ping -c 3 %s' % get_server_addr()
+	for line in utils.cmd(cmd, False):
+		try:
+			stats =  line.split('64 bytes from ')[1].split(': ')[1].split(' ')
+			latency.append(int(stats[2].replace('time=','')))
+		except IndexError:
+			pass
+	return latency
+
 
 if __name__ == '__main__':
 	main()
