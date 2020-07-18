@@ -47,7 +47,7 @@ def request_credentials():
 def start_headless():
 	# Create a username and password
 	u, p = request_credentials()
-	save_credentials(u, p)
+	save_credentials(u, p, utils.get_ext_ip())
 
 def welcome():
 	lynx=  '\033[1m _                      \n'\
