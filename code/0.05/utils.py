@@ -143,7 +143,7 @@ def crawl_dir(file_path, hash, verbose):
                     folders.append(direct + '/' + item)
         except OSError:
             pass
-    return directory, hashe
+    return directory, hashes
 
 def start_listener(port):
 	try:
@@ -154,4 +154,15 @@ def start_listener(port):
 		print '[!!] Error Creating Listener'
 		return []
 	return s
+
+def get_sha256_sum(file_name, verbose):
+    if len(file_name.split("'"))>=2:
+        file_name = ("{!r:}".format(file_name))
+        os.system("sha256sum "+file_name + ' >> out.txt')
+    else:
+        os.system("sha256sum '%s' >> out.txt" % file_name)
+        sum_data = swap('out.txt', True).pop().split(' ')[0]
+    if verbose:
+        print sum_data
+    return sum_data
 

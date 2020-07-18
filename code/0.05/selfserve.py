@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, request
+import numpy as np
 import base64
 import client
 import utils
@@ -45,18 +46,25 @@ def success(name):
 @app.route('/enter/<user>')
 def home(user):
 	print '[*] %s has Logged In' % user
-	has_shares = False
-	if os.path.isdir('LynxData/Shared'):
-		has_shares = True
+	has_shares = 'False'
+	shared = {}
+	if os.path.isdir(os.getcwd()+'/LynxData/Shares'):
+		has_shares = 'True'
+		dirdata, hashes = utils.crawl_dir('LynxData/Shares', True, False)
+		shared['n'] = len(dirdata['file'])
+		print dirdata
 	locald, localt = utils.create_timestamp()
 	# check in with backend server 
 	status = p2p.check_status(p2p.get_server_addr())
+	latency = np.mean(p2p.check_ping())
 	return render_template('user_dash.html',
 						   username=user.upper(),
 						   share_files=has_shares,
 						   connected=status,
 						   date=locald,
-						   time=localt)
+						   time=localt,
+						   delay=latency,
+						   share=shared)
 
 @app.route('/shares')
 def show_local_shares():

@@ -203,8 +203,10 @@ function myFunction() {
       <h2> Hello, {{ username }} </h2>
       <h4>{{ date }}  -  {{ time }} </h4>
       <div class="fakeimg" style="height:200px;">Image</div>
-          {% if not share_files %}
-          <p> No Files in <i>Shared Folder</i> </p>        
+          {% if share_files == 'True' %}
+          <p> You have uploaded <b> {{ share['n'] }} </b> files</p>        
+          {% else %}
+          <p> No Files in <i>Shared Folder</i> </p>
           {% endif %}
     </div>
   </div>

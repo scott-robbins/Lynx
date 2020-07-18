@@ -44,12 +44,10 @@ def request_credentials():
 	password = utils.swap('cmd.txt', True).pop()
 	return uname, password
 
-
 def start_headless():
 	# Create a username and password
 	u, p = request_credentials()
 	save_credentials(u, p)
-
 
 def welcome():
 	lynx=  '\033[1m _                      \n'\
@@ -61,6 +59,14 @@ def welcome():
 		  '        __/ |           \n'\
 		  '       |___/            \033[0m'
 	print lynx
+
+def view_local_shares():
+	shares = {}
+	dirdata, hashes = utils.crawl_dir('LynxData/Shares', True, False)
+	for name in hashes.keys():
+		shares[name.replace('"', '')] = hashes[name]
+	print shares
+	return shares
 
 def main():
 
@@ -80,8 +86,11 @@ def main():
 			print '[o] Mean Ping time: %fms' % latency
 		else:
 			print '[x] Failled to Connect to Server'
-
+		# Look at any existing shared files 
+		my_shares = view_local_shares()
+		print '[o] %d local files being Shared' % len(my_shares.keys())
 		# display commands like checking for peers, or uploading shares
+
 
 	if '-stat' in sys.argv:
 		p2p.check_ping()
