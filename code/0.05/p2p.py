@@ -47,7 +47,7 @@ def check_ping():
 	for line in utils.cmd(cmd, False):
 		try:
 			stats =  line.split('64 bytes from ')[1].split(': ')[1].split(' ')
-			latency.append(int(stats[2].replace('time=','')))
+			latency.append(float(stats[2].replace('time=','')))
 		except IndexError:
 			pass
 	return latency
