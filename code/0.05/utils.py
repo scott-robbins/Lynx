@@ -29,7 +29,7 @@ def arr2str(content):
 	return result
 
 def get_ext_ip():
-	return cmd('GET https://api.ipify.org',False).pop()
+	return cmd('curl -s https://api.ipify.org',False).pop()
 
 def create_timestamp():
     date = time.localtime(time.time())
