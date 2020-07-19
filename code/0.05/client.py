@@ -105,6 +105,17 @@ def main():
 			else:
 				print '[!!] Failed to send message to %s' % recipient
 
+	if '-send_custom' in sys.argv:
+		if len(sys.argv) <3:
+			print '!! Incorrect Usage'
+		else:
+			recipient = sys.argv[2]
+			if not os.path.isfile(sys.argv[3]):
+				print '[!!] Cannot send %s because it doesnt exist' % sys.argv[3]
+			else:
+				custom = utls.get_sha256_sum(sys.argv[3], False)
+				p2p.send_message_custom_header(recipient, custom)	
+
 	if '-check_msg' in sys.argv:
 		p2p.check_msg()
 

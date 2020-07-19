@@ -69,6 +69,8 @@ class BackendLynxAPI:
 						client = self.actions[api_fcn](client, client_info, api_req)
 				except IndexError:
 					print '[!!] Malformed API reequest from %s' % client_ip
+					print raw_request
+					# ^^^^ ONLY FOR DEBUGGING!!!
 					pass
 				# Close connection after handling
 				client.close()
