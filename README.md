@@ -9,7 +9,7 @@ cd Lynx/code/0.05
 ```
 Get started with:
 ```
-python client.py -headless.py
+python client.py -headless
 sudo python selfserve.py
 ```
 ## Design
