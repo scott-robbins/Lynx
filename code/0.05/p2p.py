@@ -43,7 +43,17 @@ def send_message(recipient, message_file):
 			sent = True
 	except socket.error:
 		print '[!!] Error Sending message'
-	return sent 
+	return sent
+
+def send_message_custom_header(recipient, message_file, header):
+	sent = False
+	try:
+		middle_man = get_server_addr()
+		data = open(message_file, 'rb').read()
+		api_request = 'SEND ???? %s :::: %s ;;;; %s' % (recipient, data, header)
+	except socket.error:
+		print '[!!] Error Sending Message'
+	return sent
 
 def check_msg():
 	recieved = False
