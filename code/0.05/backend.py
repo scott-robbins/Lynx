@@ -87,7 +87,7 @@ class BackendLynxAPI:
 					pass
 				pass
 
-		print '[*] Shutting Down BackendLynxAPI Server [*]'
+		print '\n\033[1m\033[31m[*] Shutting Down BackendLynxAPI Server [*]\033[0m'
 		self.server.close()
 
 
@@ -144,7 +144,7 @@ class BackendLynxAPI:
 		return c
 
 def main():
-	print '[*] Starting LYNX Backend Server [*]'
+	print '\033[1m[*]\033[32m Starting LYNX Backend Server\033[0m\033[1m [*]\033[0m'
 	backend_api = BackendLynxAPI()
 
 if __name__ == '__main__':
