@@ -38,18 +38,18 @@ some things are working better than others. For example file upload/download has
 actually and quite slow (everything is encrypted with AES in transit though). Here's an example
 of file upload usage for a 500 Kb text file: 
 
-![upload](https://raw.githubusercontent.com/scott-robbins/Lynx/master/code_py2.7/lynx_file_upload.png)
+![upload](https://raw.githubusercontent.com/scott-robbins/Lynx/master/code/lynx_file_upload.png)
 
 I'm also trying to add a web component to this. Once you've downloaded the client and signed in 
 to the remote server from your browser, you will see the following page:
 
-![dash](https://raw.githubusercontent.com/scott-robbins/Lynx/master/code_py2.7/lynx_dash.png)
+![dash](https://raw.githubusercontent.com/scott-robbins/Lynx/master/code/lynx_dash.png)
 
 You view available Shared files from the browser, or with the client using the command 'shares', 
 and then download that file (hash sums for the file will be displayed serverside on webpage, and
 then the file downloaded with show a hash sum too) using the client like this: 
 
-![download](https://raw.githubusercontent.com/scott-robbins/Lynx/master/code_py2.7/lynx_file_download.png)
+![download](https://raw.githubusercontent.com/scott-robbins/Lynx/master/code/lynx_file_download.png)
 
 
 ## Scaling 
