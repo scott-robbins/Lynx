@@ -108,6 +108,7 @@ class BackendLynxAPI:
 		if len(req.split(' ;;;; ')[0]) > 1:
 			title = '%sFOR%s' % (req.split(' ;;;; ')[1], ci[0].replace('.','-'))
 		else:
+			print 'Alt'
 			title = '%sFOR%s' % (ci[0].replace('.','-'),recipient.replace('.','-'))
 		if not os.path.isfile(os.getcwd()+'/LynxData/Messages/%s' % title):
 			open(os.getcwd()+'/LynxData/Messages/%s' % title,'wb').write(message)
