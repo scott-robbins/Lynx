@@ -20,7 +20,8 @@ class BackendLynxAPI:
 	def __init__(self):
 		self.actions = {'STATUS': self.status_check,
 						'SEND': self.client_log_send,
-						'RECV': self.client_read_msg}
+						'RECV': self.client_read_msg,
+						'CHECK': self.client_check_msg}
 		# TODO: Load Known Peers?
 		self.setup()
 		self.server = self.start_listener()
@@ -117,6 +118,19 @@ class BackendLynxAPI:
 			c.send('No Message Found')
 		else:
 			c.send(open(os.getcwd()+'/LynxData/Messages/%s' % title, 'rb').read())
+		return c
+
+	def client_check_msg(self, c, ci, req):
+		ip = ci[0]
+		cmd = 'ls LynxData/Messages/*FOR%s' % ip.replace('.','-')
+		messages = utils.cmd(cmd,False)
+		if messages[0].split(' ')[0] == ls:
+			c.send('You have no new messages')
+		else:
+			result = ''
+			for msg in messages:
+				result += msg + '\n'
+			c.send('You Have %d Messages\n%s' % (len(messages), result))
 		return c
 
 def main():
