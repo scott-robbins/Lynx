@@ -1,5 +1,11 @@
 <html>
 <title> Peers </title>
-
-
+<h1>
+    Peer List
+</h1>
+<ul>
+    {% for address in peers %}
+    <li> {{ address }} </li>
+    {% endfor %}
+</ul>
 </html>

@@ -155,8 +155,9 @@ def create_message_form():
 
 @app.route('/Peers')
 def show_peers():
-
-    return render_template('peers.html')
+    success, names = p2p.get_peers()
+    names.pop(-1)
+    return render_template('peers.html', peers=names)
 
 if __name__ == '__main__':
     app.run(port=80)
