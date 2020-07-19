@@ -113,7 +113,7 @@ class BackendLynxAPI:
 	def client_read_msg(self, c, ci, req):
 		sender = req.split(' :::: ')[0]
 		recipient = ci[0]
-		title = '%sFOR%s' % (ci[0].replace('.','-'), sender.replace('.','-'))
+		title = '%s' % (ci[0].replace('.','-'), sender.replace('.','-'))
 		if not os.path.isfile(os.getcwd()+'/LynxData/Messages/%s' % title):
 			print os.getcwd()+'/LynxData/Messages/%s' % title
 			c.send('No Message Found')
