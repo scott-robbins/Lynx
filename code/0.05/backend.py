@@ -124,7 +124,7 @@ class BackendLynxAPI:
 		ip = ci[0]
 		cmd = 'ls LynxData/Messages/*FOR%s' % ip.replace('.','-')
 		messages = utils.cmd(cmd,False)
-		if utils.cmd('echo $?',False).replace('\n','') != '0':
+		if utils.cmd('echo $?',False).pop().replace('\n','') != '0':
 			c.send('You have no new messages')
 		else:
 			result = ''
