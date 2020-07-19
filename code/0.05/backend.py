@@ -103,7 +103,7 @@ class BackendLynxAPI:
 
 	def client_log_send(self, c, ci, req):
 		recipient = req.split(' :::: ')[0]
-		message = req.split(' :::: ')[1]
+		message = req.split(' :::: ')[1].split(' ;;;; ')[0]
 			
 		if len(req.split(' ;;;; ')[0]) > 1:
 			title = '%sFOR%s' % (req.split(' ;;;; ')[1], ci[0].replace('.','-'))
