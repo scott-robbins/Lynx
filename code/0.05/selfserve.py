@@ -66,13 +66,13 @@ def home(user):
 						   delay=latency,
 						   share=shared)
 
-@app.route('/shares')
+@app.route('/Shares')
 def show_local_shares():
-	if os.path.isdir(os.getcwd()+'LynxData/Shares'):
-		shared, hashes = utils.crawl_dir(os.getcwd()+'LynxData/Shares')
-	else:
+	if not os.path.isdir(os.getcwd()+'/LynxData/Shares'):
 		os.mkdir('LynxData/Shares')
-		shared, hashes = utils.crawl_dir(os.getcwd()+'LynxData/Shares')
+	
+	shared, hashes = utils.crawl_dir(os.getcwd()+'/LynxData/Shares', True, False)
+	print shared
 	return render_template('file_system.html', shares=shared)
 
 

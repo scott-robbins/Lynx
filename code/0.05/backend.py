@@ -18,12 +18,19 @@ class BackendLynxAPI:
 	sessions = {}
 
 	def __init__(self):
-		self.actions = {'STATUS': self.status_check}
+		self.actions = {'STATUS': self.status_check,
+						'SEND': self.client_log_send,
+						'RECV': self.client_read_msg}
 		# TODO: Load Known Peers?
+		self.setup()
 		self.server = self.start_listener()
 		self.running = True
 		self.run()
-		
+	
+	def setup():
+		# Create the inbox for p2p messages
+		if not os.path.isdir(os.getcwd()+'/LynxData/Messages'):
+			os.mkdir(os.getcwd()+'/LynxData/Messages')
 
 	def start_listener(self):
 		"""
@@ -31,6 +38,7 @@ class BackendLynxAPI:
 		"""
 		try:
 			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 			s.bind(('0.0.0.0', self.inbound))
 			s.listen(5)
 		except socket.error:
@@ -57,7 +65,7 @@ class BackendLynxAPI:
 					# if the api function requested exists, handle request
 					if api_fcn in self.actions.keys():
 						print '[o] %s is requesting API Action: %s' % (client_ip, api_fcn)
-						client = self.actions[api_fcn](client, client_ip, api_req)
+						client = self.actions[api_fcn](client, client_info, api_req)
 				except IndexError:
 					print '[!!] Malformed API reequest from %s' % client_ip
 					pass
@@ -90,6 +98,25 @@ class BackendLynxAPI:
 		print '[*] Sending Reply %s' % req
 		return c
 
+	def client_log_send(self, c, ci, req):
+		recipient = req.split(' :::: ')[0]
+		message = req.split(' :::: ')[1]
+		title = '%sFOR%s' % (ci[0].replace('.','-'),recipient.replace('.','-'))
+		if not os.path.isfile(os.getcwd()+'/LynxData/Messages/%s' % title):
+			open(os.getcwd()+'/LynxData/Messages/%s' % title,'wb').write(message)
+		else:
+			open(os.getcwd()+'/LynxData/Messages/%s' % title,'a').write(message)
+		return c
+
+	def client_read_msg(self, c, ci, req):
+		sender = req.split(' :::: ')[0]
+		recipient = ci[0]
+		title = '%sFOR%s' % (ci[0].replace('.','-'), sender.replace('.','-'))
+		if not os.path.isfile(os.getcwd()+'/LynxData/Messages/%s' % title):
+			c.send('No Message Found')
+		else:
+			c.send(open(os.getcwd()+'/LynxData/Messages/%s' % title, 'rb').read())
+		return c
 
 def main():
 	backend_api = BackendLynxAPI()
