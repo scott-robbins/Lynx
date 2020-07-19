@@ -64,8 +64,8 @@ def check_msg():
 def read_msg(sender):
 	found = False
 	try:
-		localaddr = utils.get_ext_ip()
-		msgfile = '%sFOR%s' % (sender, localaddr)
+		localaddr = utils.get_ext_ip().replace('.','-')
+		msgfile = '%sFOR%s' % (sender.replace('.','-'), localaddr)
 		api_request = 'READ ???? %s' % msgfile
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((get_server_addr(), 54123))

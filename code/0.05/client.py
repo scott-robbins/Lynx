@@ -109,7 +109,7 @@ def main():
 		p2p.check_msg()
 
 	if '-read_from' in sys.argv and len(sys.argv) > 2:
-		sender = sys.argv[1]
+		sender = sys.argv[2]
 		p2p.read_msg(sender)
 
 if __name__ == '__main__':

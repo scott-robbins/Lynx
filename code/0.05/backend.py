@@ -115,10 +115,11 @@ class BackendLynxAPI:
 		recipient = ci[0]
 		title = req
 		if not os.path.isfile(os.getcwd()+'/LynxData/Messages/%s' % title):
-			print os.getcwd()+'/LynxData/Messages/%s' % title
 			c.send('No Message Found')
 		else:
 			c.send(open(os.getcwd()+'/LynxData/Messages/%s' % title, 'rb').read())
+		# DELETE?
+		os.remove(os.getcwd()+'/LynxData/Messages/%s' % title)
 		return c
 
 	def client_check_msg(self, c, ci, req):
