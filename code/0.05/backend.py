@@ -146,11 +146,8 @@ class BackendLynxAPI:
         return c
 
     def peer_list(self, c, ci, req):
-        clients = ''
-        peers = list(set(self.peers))
-        for peer in peers:
-            clients += peer + '\n'
-        c.send(clients)
+        peers = dump_peers(self.peers)
+        c.send(peers)
         return c
 
     def start_p2p(self, c, ci, req):
@@ -171,7 +168,7 @@ def dump_peers(clients):
     for a in known_clients:
         dump += a +'\n'
     open(os.getcwd()+'/LynxData/clients.txt', 'wb').write(dump)
-
+    return dump
 
 def main():
     print '\033[1m[*]\033[32m Starting LYNX Backend Server\033[0m\033[1m [*]\033[0m'
