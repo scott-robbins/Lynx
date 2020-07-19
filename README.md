@@ -5,10 +5,13 @@ A simple peer to peer file sharing and messaging application.
 Download the source with git using:
 ```
 git clone https://github.com/scott-robbins/Lynx
-cd Lynx/code_py2.7/
-python client.py
+cd Lynx/code/0.05
 ```
-
+Get started with:
+```
+python client.py -headless.py
+sudo python selfserve.py
+```
 ## Design
 Running the client will generate some files locally, including a private key
 which will be used (along with a public key derived from private key) to encrypt
