@@ -107,7 +107,7 @@ class BackendLynxAPI:
 			
 		if len(req.split(' ;;;; ')[0].split(' ')) > 2:
 			print 'Alt'
-			title = '%sFOR%s' % (req.split(' ;;;; ')[1], ci[0].replace('.','-'))
+			title = '%sFOR%s' % (req.split(' ;;;; ')[1], recipient.replace('.','-')
 		else:
 			title = '%sFOR%s' % (ci[0].replace('.','-'),recipient.replace('.','-'))
 		print title
@@ -144,6 +144,7 @@ class BackendLynxAPI:
 		return c
 
 def main():
+	print '[*] Starting LYNX Backend Server [*]'
 	backend_api = BackendLynxAPI()
 
 if __name__ == '__main__':
