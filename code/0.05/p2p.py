@@ -49,7 +49,7 @@ def check_msg():
 	recieved = False
 	try:
 		middle_man = get_server_addr()
-		api_request = 'CHECK ???? Messages'
+		api_request = 'CHECK ???? ::::'
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((middle_man, 54123))
 		s.send(api_request)
