@@ -41,6 +41,7 @@ def send_message(recipient, message_file):
 		reply = s.recv(1028)
 		if reply == 'SUCCESS':
 			sent = True
+		s.close()
 	except socket.error:
 		print '[!!] Error Sending message'
 	return sent
@@ -52,6 +53,12 @@ def send_message_custom_header(recipient, message_file, header):
 		data = open(message_file, 'rb').read()
 		api_request = 'SEND ???? %s :::: %s ;;;; %s' % (recipient, data, header)
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.connect((middle_man, 54123))
+		s.send(api_request)
+		reply = s.recv(1028)
+		if reply == 'SUCCESS':
+			sent = True
+		s.close()
 	except socket.error:
 		print '[!!] Error Sending Message'
 	return sent

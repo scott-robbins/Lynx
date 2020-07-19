@@ -114,7 +114,10 @@ def main():
 				print '[!!] Cannot send %s because it doesnt exist' % sys.argv[3]
 			else:
 				custom = utils.get_sha256_sum(sys.argv[3], False)
-				p2p.send_message_custom_header(recipient, sys.argv[3], custom)	
+				if p2p.send_message_custom_header(recipient, sys.argv[3], custom):
+					print '[*] Message Delivered'
+				else:
+					print '[!!] Failed to send message to %s' % recipient						
 
 	if '-check_msg' in sys.argv:
 		p2p.check_msg()
