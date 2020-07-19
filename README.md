@@ -31,25 +31,7 @@ primary nodes in a Lynx network which are configured to face the public internet
 
 * Media Sharing (Live Camera Feeds, Audio Streaming)
 
-## Usage 
-Using the client, there are a few features that allow you to connect with the remote server(s) 
-available, and other peers (hopefully). Everything is still under development... and so far 
-some things are working better than others. For example file upload/download has been very hard
-actually and quite slow (everything is encrypted with AES in transit though). Here's an example
-of file upload usage for a 500 Kb text file: 
-
-![upload](https://raw.githubusercontent.com/scott-robbins/Lynx/master/code/lynx_file_upload.png)
-
-I'm also trying to add a web component to this. Once you've downloaded the client and signed in 
-to the remote server from your browser, you will see the following page:
-
-![dash](https://raw.githubusercontent.com/scott-robbins/Lynx/master/code/lynx_dash.png)
-
-You view available Shared files from the browser, or with the client using the command 'shares', 
-and then download that file (hash sums for the file will be displayed serverside on webpage, and
-then the file downloaded with show a hash sum too) using the client like this: 
-
-![download](https://raw.githubusercontent.com/scott-robbins/Lynx/master/code/lynx_file_download.png)
+![dash](https://raw.githubusercontent.com/scott-robbins/Lynx/origin/code/lynx_dash.png)
 
 
 ## Scaling 
