@@ -157,7 +157,7 @@ class BackendLynxAPI:
 
 def dump_peers(clients):
     if os.path.isfile(os.getcwd()+'/LynxData/clients.txt'):
-        known_clients = utils.swap('clients.txt', True)
+        known_clients = utils.swap(os.getcwd()+'/LynxData/clients.txt', True)
     else:
         known_clients = []
     known_clients = list(set(known_clients))
