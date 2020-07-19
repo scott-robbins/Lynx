@@ -102,7 +102,11 @@ class BackendLynxAPI:
 	def client_log_send(self, c, ci, req):
 		recipient = req.split(' :::: ')[0]
 		message = req.split(' :::: ')[1]
-		title = '%sFOR%s' % (ci[0].replace('.','-'),recipient.replace('.','-'))
+			
+		if req.split(' !!!! ')[0] == 'CUSTOM':
+			title = '%sFOR%s' % (req.split(' !!!! ')[1], ci[0].replace('.','-'))
+		else:
+			title = '%sFOR%s' % (ci[0].replace('.','-'),recipient.replace('.','-'))
 		if not os.path.isfile(os.getcwd()+'/LynxData/Messages/%s' % title):
 			open(os.getcwd()+'/LynxData/Messages/%s' % title,'wb').write(message)
 		else:
