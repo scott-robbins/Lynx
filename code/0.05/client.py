@@ -135,7 +135,11 @@ def main():
 		p2p.read_msg(sender)
 
 	if '-peers' in sys.argv:
-		p2p.get_peers()
+		recvd, peers = p2p.get_peers()
+		if recvd:
+			print '[*] Received the following list of peers:'
+			print peers
+
 
 if __name__ == '__main__':
 	main()

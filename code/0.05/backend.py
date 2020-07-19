@@ -90,7 +90,7 @@ class BackendLynxAPI:
                 pass
 
         print '\n\033[1m\033[31m[*] Shutting Down BackendLynxAPI Server [*]\033[0m'
-        dump_peers(self.peers.values())
+        dump_peers(self.peers)
         self.server.close()
 
     def status_check(self, c, ci, req):
@@ -165,7 +165,7 @@ def dump_peers(clients):
         known_clients = []
     known_clients = list(set(known_clients))
     for addr in clients:
-        if addr not in known_clients:
+        if addr not in known_clients and len(addr) > 1:
             known_clients.append(addr)
     dump = ''
     for a in known_clients:
