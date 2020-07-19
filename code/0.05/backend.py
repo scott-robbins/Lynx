@@ -60,8 +60,6 @@ class BackendLynxAPI:
 				# TODO: If new client do a handshake to set up encryption!
 				# Handle Clients
 				raw_request = client.recv(2048)
-				print raw_request
-				# ^^^^ ONLY FOR DEBUGGING!!!
 				try:
 					api_fcn = raw_request.split(' ???? ')[0]
 					api_req = raw_request.split(' ???? ')[1]
@@ -71,7 +69,7 @@ class BackendLynxAPI:
 						client = self.actions[api_fcn](client, client_info, api_req)
 				except IndexError:
 					print '[!!] Malformed API reequest from %s' % client_ip
-					#print raw_request
+					print raw_request
 					# ^^^^ ONLY FOR DEBUGGING!!!
 					pass
 				# Close connection after handling
@@ -108,10 +106,11 @@ class BackendLynxAPI:
 		message = req.split(' :::: ')[1].split(' ;;;; ')[0]
 			
 		if len(req.split(' ;;;; ')[0].split(' ')) > 2:
+			print 'Alt'
 			title = '%sFOR%s' % (req.split(' ;;;; ')[1], ci[0].replace('.','-'))
 		else:
-			print 'Alt'
 			title = '%sFOR%s' % (ci[0].replace('.','-'),recipient.replace('.','-'))
+		print title
 		if not os.path.isfile(os.getcwd()+'/LynxData/Messages/%s' % title):
 			open(os.getcwd()+'/LynxData/Messages/%s' % title,'wb').write(message)
 		else:
