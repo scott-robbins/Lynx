@@ -169,8 +169,8 @@ li a:hover:not(.active) {
   <button id="myBtn" class="button1">Messaging</button>
   <div id="myDropdown" class="dropdown-content">
     <ul>
-      <li><a href="#Inbox">Inbox</a></li>
-      <li><a href="#Sent"> Sent </a></li>
+      <li><a href="/Messages">Inbox</a></li>
+      <li><a href="/Compose"> Send </a></li>
       <li><a href="#contacts">Contacts</a></li> 
       <li><a href="#Drafts">Drafts</a></li> 
     </ul>
@@ -202,14 +202,18 @@ function myFunction() {
     <div class="card">
       <h2> Hello, {{ username }} </h2>
       <h4>{{ date }}  -  {{ time }} </h4>
-      <div class="fakeimg" style="height:200px;">Image</div>
           {% if share_files == 'True' %}
-          <p> You have uploaded <b> {{ share['n'] }} </b> files</p>        
+              <p> You have uploaded <b> {{ share['n'] }} </b> files</p>
           {% else %}
-          <p> No Files in <i>Shared Folder</i> </p>
+              <p> No Files in <i>Shared Folder</i> </p>
+          {% endif %}
+          {% if new_messages %}
+              <p> You have <b> New Messages </b>in your Inbox</p>
+          {% else %}
+              <p> You have No New Messages </p>
           {% endif %}
     </div>
-  </div>
+</div>
 
 
 </body>

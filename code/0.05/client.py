@@ -8,6 +8,7 @@ import p2p
 import sys
 import os 
 
+
 def get_credentials():
 	local_key = base64.b64decode(open(utils.cmd('ls LynxData/*.key',False).pop(),'rb').read())
 	enc_local = open(utils.cmd('ls LynxData/*.cred',False).pop(), 'rb').read()
@@ -17,6 +18,7 @@ def get_credentials():
 	os.remove('tmp.cred')
 	return username, ip, passwd
 
+
 def save_credentials(uname, pword, addr):
 	if not os.path.isdir(os.getcwd()+'LynxData'):
 		os.mkdir('LynxData')
@@ -25,6 +27,7 @@ def save_credentials(uname, pword, addr):
 	open('LynxData/%s.key'%uname,'wb').write(base64.b64encode(key))
 	encrypted_data = utils.EncodeAES(AES.new(key), data)
 	open('LynxData/%s.cred'%uname,'wb').write(encrypted_data)
+
 
 def load_key(uname):
 	if not os.path.isdir('LynxData'):
@@ -36,6 +39,7 @@ def load_key(uname):
 	else:
 		return base64.b64decode(open(os.getcwd()+'/LynxData/%s.key'%uname,'rb').read())
 
+
 def request_credentials():
 	uname = raw_input('Enter Username:\n')
 	cmd = "#!/bin/bash\n echo 'Enter Password:'; read -s PASS; echo $PASS >> cmd.txt\n#EOF"
@@ -44,10 +48,12 @@ def request_credentials():
 	password = utils.swap('cmd.txt', True).pop()
 	return uname, password
 
+
 def start_headless():
 	# Create a username and password
 	u, p = request_credentials()
 	save_credentials(u, p, utils.get_ext_ip())
+
 
 def welcome():
 	lynx=  '\033[1m _                      \n'\
@@ -60,6 +66,7 @@ def welcome():
 		  '       |___/            \033[0m'
 	print lynx
 
+
 def view_local_shares():
 	shares = {}
 	dirdata, hashes = utils.crawl_dir('LynxData/Shares', True, False)
@@ -67,6 +74,7 @@ def view_local_shares():
 		shares[name.replace('"', '')] = hashes[name]
 	print shares
 	return shares
+
 
 def main():
 
@@ -91,7 +99,7 @@ def main():
 		print '[o] %d local files being Shared' % len(my_shares.keys())
 		# display commands like checking for peers, or uploading shares
 
-
+	# Display ping time
 	if '-stat' in sys.argv:
 		p2p.check_ping()
 
@@ -125,6 +133,7 @@ def main():
 	if '-read_from' in sys.argv and len(sys.argv) > 2:
 		sender = sys.argv[2]
 		p2p.read_msg(sender)
+
 
 if __name__ == '__main__':
 	main()

@@ -1,0 +1,12 @@
+<html>
+    {% if not new_messages %}
+        <p> {{ message }} </p>
+    {% else %}
+        <p> {{ content[0] }} </p>
+        <ul>
+        {% for message in content[1:] %}
+            <li><a href="/read_message/{{ message.split('/')[-1].split('FOR')[0] }}">{{  message.split('/')[-1].split('FOR')[0] }}</a></li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+</html>

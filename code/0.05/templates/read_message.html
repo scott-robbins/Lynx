@@ -1,0 +1,12 @@
+<html>
+<body>
+{% if msg_found %}
+<h1> From {{ title }}:</h1>
+{% for line in msg_data.split('\n') %}
+<p> {{ line }} </p>
+{% endfor %}
+{% else %}
+<h1> Could Not Find This Message !?!? </h1>
+{% endif %}
+</body>
+</html>
