@@ -106,6 +106,7 @@ class BackendLynxAPI:
 			open(os.getcwd()+'/LynxData/Messages/%s' % title,'wb').write(message)
 		else:
 			open(os.getcwd()+'/LynxData/Messages/%s' % title,'a').write(message)
+		c.send('SUCCESS')
 		return c
 
 	def client_read_msg(self, c, ci, req):
