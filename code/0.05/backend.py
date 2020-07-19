@@ -27,7 +27,7 @@ class BackendLynxAPI:
 		self.running = True
 		self.run()
 	
-	def setup():
+	def setup(self):
 		# Create the inbox for p2p messages
 		if not os.path.isdir(os.getcwd()+'/LynxData/Messages'):
 			os.mkdir(os.getcwd()+'/LynxData/Messages')
