@@ -29,17 +29,44 @@ def check_status(ip_addr):
 		pass
 	return connected
 
+def send_message(recipient, message_file):
+	sent = False
+	try:
+		middle_man = get_server_addr()
+		data = open(message_file, 'rb').read()
+		api_request = 'SEND ???? %s :::: %s' % (recipient, data)
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.connect((middle_man, 54123))
+		s.send(api_request)
+		reply = s.recv(1028)
+		if reply == 'SUCCESS':
+			sent = True
+	except socket.error:
+		print '[!!] Error Sending message'
+	return sent 
+
+def check_msg():
+	recieved = False
+	try:
+		middle_man = get_server_addr()
+		api_request = 'CHECK ???? Messages'
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.connect((middle_man, 54123))
+		s.send(api_request)
+		reply = s.recv(65535)
+		s.close()
+		print reply
+		if reply != 'You have no new messages':
+			recieved = True
+		print reply
+	except socket.error:
+ 		print '[!!] Unable to Check Messages'
+		exit()
+	return recieved
+
 def get_server_addr():
 	addr = utils.cmd('host beta.lynx-network.us', False).pop().split(' address ')[1]
 	return addr
-
-def main():
-	if 'status' in sys.argv:
-		# do a status check
-		if check_status(get_server_addr()):
-			print '[o] Connected to Remote Server'
-		else:
-			print '[x] Failled to Connect to Server'
 
 def check_ping():
 	latency = []
@@ -52,6 +79,13 @@ def check_ping():
 			pass
 	return latency
 
+def main():
+	if 'status' in sys.argv:
+		# do a status check
+		if check_status(get_server_addr()):
+			print '[o] Connected to Remote Server'
+		else:
+			print '[x] Failled to Connect to Server'
 
 if __name__ == '__main__':
 	main()

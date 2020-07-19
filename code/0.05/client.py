@@ -95,6 +95,21 @@ def main():
 	if '-stat' in sys.argv:
 		p2p.check_ping()
 
+	if '-send' in sys.argv and len(sys.argv) > 3:
+		recipient = sys.argv[2]
+		if not os.path.isfile(sys.argv[3]):
+			print '[!!] Cannot send %s because it doesnt exist' % sys.argv[3]
+		else:
+			if p2p.send_message(recipient, sys.argv[3]):
+				print '[*] Message Delivered'
+			else:
+				print '[!!] Failed to send message to %s' % recipient
+
+	if '-check_msg' in sys.argv:
+		if p2p.check_msg():
+			print 'You Have New Messages'
+		else:
+			print 'No New Messages'
 
 if __name__ == '__main__':
 	main()
