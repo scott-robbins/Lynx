@@ -34,12 +34,12 @@ def send_message(recipient, message_file):
 	try:
 		middle_man = get_server_addr()
 		data = open(message_file, 'rb').read()
-		api_request = 'SEND ???? %s :::: ;;;; %s ' % (recipient, data)
+		api_request = 'SEND ???? %s :::: %s ;;;; ' % (recipient, data)
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((middle_man, 54123))
 		s.send(api_request)
-		title = '%sFOR%s' % (api_request.split(' ???? ')[1].split(' ;;;; ')[1], utils.get_ext_ip().replace('.','-'))
-		print title
+		# title = '%sFOR%s' % (api_request.split(' ???? ')[1].split(' ;;;; ')[1], utils.get_ext_ip().replace('.','-'))
+		# print title
 		reply = s.recv(1028)
 		if reply == 'SUCCESS':
 			sent = True
