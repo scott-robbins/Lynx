@@ -105,7 +105,7 @@ class BackendLynxAPI:
 		recipient = req.split(' :::: ')[0]
 		message = req.split(' :::: ')[1]
 			
-		if len(req.split(' ;;;; ')[0]) >= 1:
+		if len(req.split(' ;;;; ')[0]) > 1:
 			title = '%sFOR%s' % (req.split(' ;;;; ')[1], ci[0].replace('.','-'))
 		else:
 			title = '%sFOR%s' % (ci[0].replace('.','-'),recipient.replace('.','-'))

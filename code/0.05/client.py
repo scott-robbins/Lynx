@@ -113,8 +113,8 @@ def main():
 			if not os.path.isfile(sys.argv[3]):
 				print '[!!] Cannot send %s because it doesnt exist' % sys.argv[3]
 			else:
-				custom = utls.get_sha256_sum(sys.argv[3], False)
-				p2p.send_message_custom_header(recipient, custom)	
+				custom = utils.get_sha256_sum(sys.argv[3], False)
+				p2p.send_message_custom_header(recipient, sys.argv[3], custom)	
 
 	if '-check_msg' in sys.argv:
 		p2p.check_msg()

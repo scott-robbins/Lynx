@@ -34,7 +34,7 @@ def send_message(recipient, message_file):
 	try:
 		middle_man = get_server_addr()
 		data = open(message_file, 'rb').read()
-		api_request = 'SEND ???? %s :::: %s' % (recipient, data)
+		api_request = 'SEND ???? %s :::: %s ;;;;' % (recipient, data)
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((middle_man, 54123))
 		s.send(api_request)
@@ -51,6 +51,7 @@ def send_message_custom_header(recipient, message_file, header):
 		middle_man = get_server_addr()
 		data = open(message_file, 'rb').read()
 		api_request = 'SEND ???? %s :::: %s ;;;; %s' % (recipient, data, header)
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	except socket.error:
 		print '[!!] Error Sending Message'
 	return sent
