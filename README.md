@@ -31,7 +31,7 @@ primary nodes in a Lynx network which are configured to face the public internet
 
 * Media Sharing (Live Camera Feeds, Audio Streaming)
 
-![dash](https://raw.githubusercontent.com/scott-robbins/Lynx/origin/code/lynx_dash.png)
+![dash](https://raw.githubusercontent.com/scott-robbins/Lynx/origin/dash.png)
 
 
 ## Scaling 
