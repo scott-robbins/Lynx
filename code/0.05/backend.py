@@ -115,6 +115,7 @@ class BackendLynxAPI:
 		recipient = ci[0]
 		title = '%sFOR%s' % (ci[0].replace('.','-'), sender.replace('.','-'))
 		if not os.path.isfile(os.getcwd()+'/LynxData/Messages/%s' % title):
+			print os.getcwd()+'/LynxData/Messages/%s' % title
 			c.send('No Message Found')
 		else:
 			c.send(open(os.getcwd()+'/LynxData/Messages/%s' % title, 'rb').read())
