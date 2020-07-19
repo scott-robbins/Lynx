@@ -13,7 +13,7 @@ class BackendLynxAPI:
     inbound = 54123
     outbound = 32145
     running = False
-    peers = {}
+    peers = []
     sessions = {}
 
     def __init__(self):
@@ -21,7 +21,8 @@ class BackendLynxAPI:
                         'SEND': self.client_log_send,
                         'READ': self.client_read_msg,
                         'CHECK': self.client_check_msg,
-                        'CONNECT': self.start_p2p}
+                        'CONNECT': self.start_p2p,
+                        'PEERS': self.peer_list}
         # TODO: Load Known Peers?
         self.setup()
         self.server = self.start_listener()
@@ -65,6 +66,7 @@ class BackendLynxAPI:
                     api_req = raw_request.split(' ???? ')[1]
                     # if the api function requested exists, handle request
                     if api_fcn in self.actions.keys():
+                        self.peers.append(client_ip+':'+str(client_info[1]))
                         print '[o] %s is requesting API Action: %s' % (client_ip, api_fcn)
                         client = self.actions[api_fcn](client, client_info, api_req)
                 except IndexError:
@@ -88,6 +90,7 @@ class BackendLynxAPI:
                 pass
 
         print '\n\033[1m\033[31m[*] Shutting Down BackendLynxAPI Server [*]\033[0m'
+        dump_peers(self.peers.values())
         self.server.close()
 
     def status_check(self, c, ci, req):
@@ -142,10 +145,32 @@ class BackendLynxAPI:
             c.send('You Have %d Messages\n%s' % (len(messages), result))
         return c
 
-    def start_p2p(self, c, ci, req):
-        rmt_port = c.getpeername()[1];
-
+    def peer_list(self, c, ci, req):
+        clients = ''
+        peers = list(set(self.peers))
+        for peer in peers:
+            clients += peer + '\n'
+        c.send(clients)
         return c
+
+    def start_p2p(self, c, ci, req):
+        rmt_port = c.getpeername()[1]
+        return c
+
+
+def dump_peers(clients):
+    if os.path.isfile(os.getcwd()+'/LynxData/clients.txt'):
+        known_clients = utils.swap('clients.txt', True)
+    else:
+        known_clients = []
+    known_clients = list(set(known_clients))
+    for addr in clients:
+        if addr not in known_clients:
+            known_clients.append(addr)
+    dump = ''
+    for a in known_clients:
+        dump += a +'\n'
+    open(os.getcwd()+'/LynxData/clients.txt', 'wb').write(dump)
 
 
 def main():

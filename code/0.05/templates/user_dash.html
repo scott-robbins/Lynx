@@ -142,7 +142,28 @@ li a:hover:not(.active) {
   background-color: #4CAF50; /* Green */
   color: #deaddd;
 }
+.collapsible {
+  background-color: #0FADED;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
 
+.active, .collapsible:hover {
+  background-color: #00C0DE;
+}
+
+.content {
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
 </style>
   <div class="header">
   <h1> {{ username }} </h1>    
@@ -161,6 +182,7 @@ li a:hover:not(.active) {
           {% endif %}
       {% endblock content %}
   </a></li>
+  <li><a href="/Settings">Settings</a></li>
 </ul>
 <body>
 <div class="rightcolumn">
@@ -172,7 +194,7 @@ li a:hover:not(.active) {
       <li><a href="/Messages">Inbox</a></li>
       <li><a href="/Compose"> Send </a></li>
       <li><a href="#contacts">Contacts</a></li> 
-      <li><a href="#Drafts">Drafts</a></li> 
+      <li><a href="#Drafts">Drafts</a></li>
     </ul>
     
   </div>
@@ -181,8 +203,8 @@ li a:hover:not(.active) {
      <button id="myBtn" class="button1"> Find Files</button>
      <div id="myDropdown" class="dropdown-content">
        <ul>
-          <li><a href="/Shares">Local Shares</a>
-          <li><a href="#RemoteShares">Remote Shares</a></li>
+           <li><a href="/Shares">Local Shares</a></li>
+           <li><a href="/RemoteShares">Remote Shares</a></li>
        </ul>
      </div>
    </div>
@@ -215,7 +237,30 @@ function myFunction() {
     </div>
 </div>
 
+<!-- Provide a window for a group messaging window -->
 
+<button type="button" class="collapsible"> View Group Chat </button>
+<div class="content">
+  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+</div>
+
+
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+</script>
 </body>
 <!-- Footer -->
 <div class="footer">

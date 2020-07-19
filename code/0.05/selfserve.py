@@ -57,6 +57,7 @@ def home(user):
         dirdata, hashes = utils.crawl_dir('LynxData/Shares', True, False)
         shared['n'] = len(dirdata['file'])
         print dirdata
+    # Get Current Date and Time
     locald, localt = utils.create_timestamp()
 
     # check in with backend server
@@ -106,6 +107,12 @@ def display_network_status():
     return render_template('network_status.html', ping_data=ping)
 
 
+@app.route('/Settings')
+def user_settings():
+    username, addr, pword = client.get_credentials()
+    return render_template('settings.html', username=username)
+
+
 @app.route('/Upload')
 def uploads():
     if not os.path.isdir('LynxData/Shares'):
@@ -132,6 +139,7 @@ def show_messages():
                            new_messages=have_new,
                            content=lines)
 
+
 @app.route('/read_message/<msg_id>')
 def read_message(msg_id):
     found, data = p2p.read_msg(msg_id)
@@ -141,8 +149,14 @@ def read_message(msg_id):
 
 @app.route('/Compose')
 def create_message_form():
+    # TODO: Create this template!
     return render_template('create_message.html')
 
+
+@app.route('/Peers')
+def show_peers():
+
+    return render_template('peers.html')
 
 if __name__ == '__main__':
     app.run(port=80)

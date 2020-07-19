@@ -23,10 +23,27 @@ def check_status(ip_addr):
             print 'Sent: %s' % msg
             print 'Got: %s' % reply
         s.close()
-    except:
+    except socket.error:
         print '[!!] Error Making API Request'
         pass
     return connected
+
+
+def get_peers():
+    transferred = False
+    peers = []
+    stun = get_server_addr()
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((stun, 54123))
+        s.send('PEERS ???? GetPeers')
+        peers = s.recv(65535).split('\n')
+        s.close()
+        transferred = True
+    except socket.error:
+        print '[!!] Unable to complete API request'
+        pass
+    return transferred, peers
 
 
 def send_message(recipient, message_file):

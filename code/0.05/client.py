@@ -134,6 +134,8 @@ def main():
 		sender = sys.argv[2]
 		p2p.read_msg(sender)
 
+	if '-peers' in sys.argv:
+		p2p.get_peers()
 
 if __name__ == '__main__':
 	main()
