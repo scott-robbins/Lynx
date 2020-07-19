@@ -20,7 +20,7 @@ class BackendLynxAPI:
 	def __init__(self):
 		self.actions = {'STATUS': self.status_check,
 						'SEND': self.client_log_send,
-						'RECV': self.client_read_msg,
+						'READ': self.client_read_msg,
 						'CHECK': self.client_check_msg}
 		# TODO: Load Known Peers?
 		self.setup()

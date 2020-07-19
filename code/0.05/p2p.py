@@ -54,15 +54,29 @@ def check_msg():
 		s.connect((middle_man, 54123))
 		s.send(api_request)
 		reply = s.recv(65535)
+		print reply
 		s.close()
-		print reply
-		if reply != 'You have no new messages':
-			recieved = True
-		print reply
 	except socket.error:
  		print '[!!] Unable to Check Messages'
 		exit()
 	return recieved
+
+def read_msg(sender):
+	found = False
+	try:
+		localaddr = utils.get_ext_ip()
+		msgfile = '%sFOR%s' % (sender, localaddr)
+		api_request = 'READ ???? %s' % msgfile
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.connect((get_server_addr(), 54123))
+		s.send(api_request)
+		reply = s.recv(65535)
+		s.close()
+		print reply
+	except socket.error:
+		print '[!!] Unable to retrieve message'
+		exit()
+	return found
 
 def get_server_addr():
 	addr = utils.cmd('host beta.lynx-network.us', False).pop().split(' address ')[1]

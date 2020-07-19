@@ -106,10 +106,11 @@ def main():
 				print '[!!] Failed to send message to %s' % recipient
 
 	if '-check_msg' in sys.argv:
-		if p2p.check_msg():
-			print 'You Have New Messages'
-		else:
-			print 'No New Messages'
+		p2p.check_msg()
+
+	if '-read_from' in sys.argv and len(sys.argv) > 2:
+		sender = sys.argv[1]
+		p2p.read_msg(sender)
 
 if __name__ == '__main__':
 	main()
