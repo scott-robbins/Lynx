@@ -159,5 +159,12 @@ def show_peers():
     names.pop(-1)
     return render_template('peers.html', peers=names)
 
+
+@app.route('/chat/send/<data>')
+def send_quick_message(data):
+    content = data.split('msg?=')[1:]
+    print 'Chat Messge: %s' % content
+    return redirect(request.url)
+
 if __name__ == '__main__':
     app.run(port=80)

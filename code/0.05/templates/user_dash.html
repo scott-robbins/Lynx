@@ -142,27 +142,75 @@ li a:hover:not(.active) {
   background-color: #4CAF50; /* Green */
   color: #deaddd;
 }
-.collapsible {
-  background-color: #0FADED;
+
+/* Button used to open the chat form - fixed at the bottom of the page */
+.open-button {
+  background-color: #555;
   color: white;
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
+  padding: 16px 20px;
   border: none;
-  text-align: left;
-  outline: none;
-  font-size: 15px;
+  cursor: pointer;
+  opacity: 0.8;
+  position: fixed;
+  bottom: 23px;
+  right: 28px;
+  width: 280px;
 }
 
-.active, .collapsible:hover {
-  background-color: #00C0DE;
-}
-
-.content {
-  padding: 0 18px;
+/* The popup chat - hidden by default */
+.chat-popup {
   display: none;
-  overflow: hidden;
-  background-color: #f1f1f1;
+  position: fixed;
+  bottom: 0;
+  left: 15px;
+  border: 3px solid #f1f1f1;
+  z-index: 9;
+}
+
+/* Add styles to the form container */
+.form-container {
+  max-width: 300px;
+  padding: 10px;
+  background-color: white;
+}
+
+/* Full-width textarea */
+.form-container textarea {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  border: none;
+  background: #f1f1f1;
+  resize: none;
+  min-height: 200px;
+}
+
+/* When the textarea gets focus, do something */
+.form-container textarea:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* Set a style for the submit/send button */
+.form-container .btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom:10px;
+  opacity: 0.8;
+}
+
+/* Add a red background color to the cancel button */
+.form-container .cancel {
+  background-color: red;
+}
+
+/* Add some hover effects to buttons */
+.form-container .btn:hover, .open-button:hover {
+  opacity: 1;
 }
 </style>
   <div class="header">
@@ -238,29 +286,29 @@ function myFunction() {
 </div>
 
 <!-- Provide a window for a group messaging window -->
+<button class="open-button" onclick="openForm()">Chat</button>
+<div class="chat-popup" id="myForm">
+  <form action="/chat/send/" class="form-container">
+    <h1>Chat</h1>
 
-<button type="button" class="collapsible"> View Group Chat </button>
-<div class="content">
-  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+    <label for="msg"><b>Message</b></label>
+    <textarea placeholder="" name="msg" required></textarea>
+
+    <button type="submit" class="btn">Send</button>
+    <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+  </form>
 </div>
 
-
 <script>
-var coll = document.getElementsByClassName("collapsible");
-var i;
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+}
 
-for (i = 0; i < coll.length; i++) {
-  coll[i].addEventListener("click", function() {
-    this.classList.toggle("active");
-    var content = this.nextElementSibling;
-    if (content.style.display === "block") {
-      content.style.display = "none";
-    } else {
-      content.style.display = "block";
-    }
-  });
+function closeForm() {
+  document.getElementById("myForm").style.display = "none";
 }
 </script>
+
 </body>
 <!-- Footer -->
 <div class="footer">
