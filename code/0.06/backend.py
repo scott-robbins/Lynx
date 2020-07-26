@@ -66,7 +66,7 @@ class BackendAPI:
 						reply = '%s **** %s' % (public_key.exportKey(), base64.b64encode(sess_key))
 						client.send(reply)
 						self.tokens[username] = sess_key 
-						self.crypto[sess_key] = AES.new(base64.b64decode(sess_key))
+						self.crypto[sess_key] = AES.new(sess_key)
 					except IndexError:
 						print '!! Malformed API request'
 						pass
