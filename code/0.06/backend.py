@@ -86,6 +86,8 @@ class BackendAPI:
 					if api_fcn in self.actions.keys():
 						print '[*] Handling API request %s' % api_fcn
 						client = self.actions[api_fcn](client, client_info, api_req, uname)
+					else:
+						print api_fcn
 					# Close the connection 
 					client.close()
 		except KeyboardInterrupt:
