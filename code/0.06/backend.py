@@ -56,46 +56,51 @@ class BackendAPI:
 				# Check whether new client
 				client_ip = client_info[0]
 				# Check whether IP is known (Diff. peers can have same IP tho! bc NAT)
-				# Every Client gets a unique session_id for encrypting
-				sess_key = get_random_bytes(16)
-
-				# New Clients will be sending their public key first
-				rmt_pub = client.recv(2050)
-				print '[*] Received %s Public Key' % (client_ip)
-				# New Client so exchange Public Key Crypto
-				encrypted_reply = PKCS1_OAEP.new(RSA.importKey(rmt_pub)).encrypt(sess_key)
-				print '[*] Sending %s a unique session key ' % client_ip
-				client.send(encrypted_reply)
-				enc_name = client.recv(2048)
-				# log this session key for the username they reply with 
-				client_username = utils.DecodeAES(AES.new(sess_key), enc_name).replace(' ', '')
-				print '[*] %s is registering as: %s' % (client_ip, client_username)
-				self.known.append(client_ip)
-				
-				enc_query = client.recv(2048)
-				uname = enc_query.split(' !!!! ')[0]
-				skey = self.tokens[uname]
-				dec_query = utils.DecodeAES(AES.new(skey), enc_query.split(uname)[1])
-				if uname not in self.tokens.keys():
-					self.tokens[name] = sess_key 
-					self.crypto[sess_key] = AES.new(sess_key)
-				try:	
-					# parse the query
-					api_fcn = dec_query.split(' ???? ')[0]
-					api_req = dec_query.split(' ???? ')[1]
+				if client_info[0] not in self.known:
+					# Every Client gets a unique session_id for encrypting
+					sess_key = get_random_bytes(16)
+					# New Clients will be sending their public key first
+					rmt_pub = client.recv(2050)
+					print '[*] Received %s Public Key' % (client_ip)
+					# New Client so exchange Public Key Crypto
+					encrypted_reply = PKCS1_OAEP.new(RSA.importKey(rmt_pub)).encrypt(sess_key)
+					print '[*] Sending %s a unique session key ' % client_ip
+					client.send(encrypted_reply)
+					enc_name = client.recv(2048)
+					# log this session key for the username they reply with 
+					client_username = utils.DecodeAES(AES.new(sess_key), enc_name).replace(' ', '')
+					print '[*] %s is registering as: %s' % (client_ip, client_username)
+					self.known.append(client_ip)
+					if client_username not in self.users.keys():
+						self.users[client_username] = client_ip
+						self.tokens[client_username] = sess_key
+						self.crypto[sess_key] = AES.new(sess_key)
+						client.send('OK')
+					else:
+						client.send('Username taken!')
+				else:	# else it is a known client so try and handle api request
+					enc_query = client.recv(2048)
+					uname = enc_query.split(' !!!! ')[0]
+					skey = self.tokens[uname]
+					dec_query = utils.DecodeAES(AES.new(skey), enc_query.split(uname)[1])
+					
+					try:	
+						# parse the query
+						api_fcn = dec_query.split(' ???? ')[0]
+						api_req = dec_query.split(' ???? ')[1]
 						
-					# if api_fcn is recognized, handle it 
-					if api_fcn in self.actions.keys():
-						print '[*] Handling API request %s' % api_fcn
-						client = self.actions[api_fcn](client, client_info, api_req, uname)
+						# if api_fcn is recognized, handle it 
+						if api_fcn in self.actions.keys():
+							print '[*] Handling API request %s' % api_fcn
+							client = self.actions[api_fcn](client, client_info, api_req, uname)
 					
-				except IndexError:
-					print '[!!] Malformed API request from %s' % client_ip
-					dec_query
-					pass
+					except IndexError:
+						print '[!!] Malformed API request from %s' % client_ip
+						dec_query
+						pass
 					
-				# Close the connection 
-				client.close()
+					# Close the connection 
+					client.close()
 		except KeyboardInterrupt:
 			self.shutdown
 			try:
@@ -104,16 +109,13 @@ class BackendAPI:
 				pass
 
 	def check_in(self, c, ci, req, name):
-		logged = False; tries = 0
-		while not logged and tries < 3:
-			clear_reply ='Hello, %s' % name 
-			
-			c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
+		clear_reply ='Hello, %s' % name 
+		c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
 		return c 
 
 	def show_peers(self, c, ci, req, name):
 		clear_reply = self.dump_peers(self.users.keys())
-		c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
+		print clear_reply
 		return c
 
 	def dump_peers(cs):
