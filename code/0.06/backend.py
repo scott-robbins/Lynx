@@ -60,7 +60,7 @@ class BackendAPI:
 				if len(raw_data.split('-----BEGIN PUBLIC KEY-----'))> 1:
 					try: 
 						# This is a new client trying to setup keys 
-						user_public_key = raw_data.split(' **** ')[0]
+						user_public_key = RSA.importKey(raw_data.split(' **** ')[0])
 						username = raw_data.split(' **** ')[1]
 						print '[*] Recieved Public Key from User %s' % username
 						enc_sess_key = PKCS1_OAEP.new(user_public_key).encrypt(base64.b64encode(sess_key))
