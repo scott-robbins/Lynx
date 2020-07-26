@@ -64,7 +64,7 @@ class BackendAPI:
 					client.send(encrypted_reply)
 					enc_name = client.recv(2048)
 					# log this session key for the username they reply with 
-					client_username = utils.DecodeAES(AES.new(sess_key), enc_name)
+					client_username = utils.DecodeAES(AES.new(sess_key), enc_name).replace(' ', '')
 					print '[*] %s is registering as: %s' % (client_ip, client_username)
 					self.known.append(client_ip)
 					if client_username not in self.users.keys():
