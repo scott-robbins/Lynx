@@ -75,7 +75,7 @@ class BackendAPI:
 					enc_req = raw_data.split(' !!!! ')[1]
 					# make sure user is known before trying to decrypt api request
 					if username in self.tokens.keys():
-						dec_req = utils.DecodeAES(AES.new(base64.b64decode(self.tokens[username])), enc_req)
+						dec_req = utils.DecodeAES(AES.new(self.tokens[username]), enc_req)
 						api_fcn = dec_req.split(' ???? ')[0]
 						api_req = dec_req.split(" ???? ")[0]
 						print '[*] %s is requesting to %s' % (username, api_fcn)
