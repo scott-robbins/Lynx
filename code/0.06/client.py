@@ -136,7 +136,7 @@ def main():
 	if '-check_in' in sys.argv:
 		name, addr, creds, p_key = load_credentials()
 		pbk = p_key.publickey()
-		skey = handshake(name, pbk)
+		skey = handshake(name, pbk, True)
 
 
 if __name__ == '__main__':
