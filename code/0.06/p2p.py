@@ -39,16 +39,17 @@ def connection_benchmark(uname, skey, verbose):
 	dt = 0.0; secured = False; tries = 0
 	try:
 		t0 = time.time()
-		while tries < 3 and not secured:
+		while tries < 3 or not secured:
 			s = utils.create_tcp_socket(False)
 			s.connect((utils.get_server_addr(), 54123))
 			api_test = 'TEST ???? Hello!'
-			s.send(name +' !!!! '+utils.EncodeAES(AES.new(skey), api_test))
+			s.send(uname +' !!!! '+utils.EncodeAES(AES.new(skey), api_test))
 			enc_reply = s.recv(2048)
 			s.close()
 			dt = time.time()-t0
 			dec_reply = utils.DecodeAES(AES.new(skey), enc_reply)
 			if dec_reply == ('Hello, %s' % uname):
+				print '[*] Checkin Complete'
 				secured = True
 			else:
 				print '!! Security WARNING: %s != %s' % (dec_reply, 'Hello, %s' % uname)
