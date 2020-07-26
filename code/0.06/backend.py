@@ -144,7 +144,7 @@ class BackendAPI:
 			message = req.split(' :::: ')[1].split(' :::: ')[0]
 			print '%s is sending a message for %s at %s - %s:' % (name, recvr, date, ltime)
 			print '%s' % message
-			c.send(len(message))
+			c.send(str(len(message)))
 		except IndexError:
 			print '[!!] Error receivng message'
 			print req
