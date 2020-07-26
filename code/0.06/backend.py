@@ -13,6 +13,7 @@ class BackendAPI:
 	inbound = 54123
 	users = {}
 	tokens = {}
+	crypto = {}
 	known = []
 	running = False
 
@@ -57,7 +58,7 @@ class BackendAPI:
 					sess_key = get_random_bytes(16)
 					# New Clients will be sending their public key first
 					rmt_pub = client.recv(2050)
-					print '[*] Received %s Public Key:\n%s' % (client_ip, rmt_pub)
+					print '[*] Received %s Public Key' % (client_ip)
 					# New Client so exchange Public Key Crypto
 					encrypted_reply = PKCS1_OAEP.new(RSA.importKey(rmt_pub)).encrypt(sess_key)
 					print '[*] Sending %s a unique session key ' % client_ip
@@ -70,6 +71,7 @@ class BackendAPI:
 					if client_username not in self.users.keys():
 						self.users[client_username] = client_ip
 						self.tokens[client_username] = sess_key
+						self.crypto[sess_key] = AES.new(sess_key)
 						client.send('OK')
 					else:
 						client.send('Username taken!')
@@ -78,16 +80,22 @@ class BackendAPI:
 					uname = enc_query.split(' !!!! ')[0]
 					skey = self.tokens[uname]
 					dec_query = utils.DecodeAES(AES.new(skey), enc_query.split(uname)[1])
-					# parse the query
-					api_fcn = dec_query.split(' ???? ')[0]
-					api_req = dec_query.split(' ???? ')[1]
 					
-					# if api_fcn is recognized, handle it 
-					if api_fcn in self.actions.keys():
-						print '[*] Handling API request %s' % api_fcn
-						client = self.actions[api_fcn](client, client_info, api_req, uname)
-					else:
-						print api_fcn
+					try:	
+						# parse the query
+						api_fcn = dec_query.split(' ???? ')[0]
+						api_req = dec_query.split(' ???? ')[1]
+						
+						# if api_fcn is recognized, handle it 
+						if api_fcn in self.actions.keys():
+							print '[*] Handling API request %s' % api_fcn
+							client = self.actions[api_fcn](client, client_info, api_req, uname)
+					
+					except IndexError:
+						print '[!!] Malformed API request from %s' % client_ip
+						dec_query
+						pass
+					
 					# Close the connection 
 					client.close()
 		except KeyboardInterrupt:
@@ -98,7 +106,7 @@ class BackendAPI:
 				pass
 
 	def check_in(self, c, ci, req, name):
-		c.send('TESTING 123. Hello, %s' % name)
+		c.send('Hello, %s' % name)
 		return c 
 				
 

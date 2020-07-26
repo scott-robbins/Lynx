@@ -1,9 +1,7 @@
-from Crypto.Random import get_random_bytes
-from Crypto.Cipher import AES, PKCS1_OAEP
-from Crypto.PublicKey import RSA
 import socket 
 import utils 
-import time 
+import time
+import p2p 
 import sys 
 import os 
 
@@ -51,7 +49,6 @@ def register():
 		os.mkdir('LynxData')
 	uname, pword = create_credentials()
 
-
 def create_credentials():
 	uname = raw_input('Enter Username:\n')
 	matched = False
@@ -88,7 +85,6 @@ def create_credentials():
 
 	return uname, password	
 
-
 def load_credentials():
 	if not os.path.isdir(os.getcwd()+'/LynxData/'):
 		print '[!!] No credentials Found. Plese Register First!'
@@ -104,51 +100,20 @@ def load_credentials():
 	password = raw_creds.split(':')[1]
 	return uname, ip_addr, password, private_key
 
-def rsa_decrypt(enc_data):
-	get_key = 'ls LynxData/*.pem'
-	key_name = utils.cmd(get_key, False).pop()
-	cred_name = key_name.split('.pem')[0]+'.creds'
-	private_key = RSA.importKey(open(os.getcwd()+'/%s' % key_name).read())
-	return PKCS1_OAEP.new(private_key).decrypt(enc_data)
-
-def handshake(uname, pbkey,verbose):
-	success = False
-	c = utils.create_tcp_socket(False)
-	c.connect((utils.get_server_addr(), 54123))
-	if verbose:
-		print '[*] Connected to remote server'
-	c.send(pbkey.exportKey())
-	if verbose:
-		print '[*] Sent Public Key'
-	encrypted_session_key = c.recv(2040)
-	session_key = rsa_decrypt(encrypted_session_key)
-	if verbose:
-		print '[*] Recieved %d byte session key' % len(session_key)
-	c.send(utils.EncodeAES(AES.new(session_key), uname))
-	if c.recv(128)=='OK':
-		success = True
-	c.close()
-	return success, session_key
-
 def main():
-	if '-headless' in sys.argv:
+	# Sign up Via the Commandline 
+	if '-register' in sys.argv:
 		welcome()
 		if not os.path.isdir(os.getcwd()+'/LynxData'):
 			register()
 
-
 	if '-check_in' in sys.argv:
 		name, addr, creds, p_key = load_credentials()
 		pbk = p_key.publickey()
-		good, skey = handshake(name, pbk, True)
+		good, skey = p2p.handshake(name, pbk, True)
 		if good:
 			print '[*] Encrypted Communication Successful with Remote Server'	
-		s = utils.create_tcp_socket(False)
-		s.connect((utils.get_server_addr(), 54123))
-		api_test = 'TEST ???? Hello!'
-		s.send(name +' !!!! '+utils.EncodeAES(AES.new(skey), api_test))
-		print s.recv(2048)
-		s.close()
+			secure, nx_latency = p2p.connection_benchmark(name, skey, verbose=True)
 
 
 if __name__ == '__main__':
