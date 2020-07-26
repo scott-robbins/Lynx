@@ -147,7 +147,7 @@ def crawl_dir(file_path, hash, verbose):
     return directory, hashes
 
 def get_server_addr():
-	addr = utils.cmd('host beta.lynx-network.us', False).pop().split(' address ')[1]
+	addr = cmd('host beta.lynx-network.us', False).pop().split(' address ')[1]
 	return addr
 
 
@@ -176,7 +176,7 @@ def get_sha256_sum(file_name, verbose):
 def create_tcp_socket(verbose):
 	s = []
 	try:
-		s = socket.socket(sock.AF_INET, socket.SOCK_STREAM)
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	except socket.error:
 		if verbose:
 			print '!! Unable to create socket'

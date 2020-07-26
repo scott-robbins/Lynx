@@ -12,6 +12,7 @@ import os
 class BackendAPI:
 	inbound = 54123
 	users = {}
+	known = []
 	running = False
 
 	def __init__ (self):

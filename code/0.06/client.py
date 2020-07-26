@@ -102,7 +102,7 @@ def load_credentials():
 	uname = raw_creds.split('@')[0]
 	ip_addr = raw_creds.split('@')[1].split(':')[0]
 	password = raw_creds.split(':')[1]
-	return uname, ip_addr, password
+	return uname, ip_addr, password, private_key
 
 def rsa_decrypt(enc_data):
 	get_key = 'ls LynxData/*.pem'
@@ -123,7 +123,7 @@ def main():
 
 	if '-check_in' in sys.argv:
 		name, addr, creds, p_key = load_credentials()
-		pbk = p_key.publicKey()
+		pbk = p_key.publickey()
 		c = utils.create_tcp_socket(False)
 		c.connect((utils.get_server_addr(), 54123))
         print '[*] Connected to remote server'
