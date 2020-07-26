@@ -106,18 +106,21 @@ def load_credentials():
 
 def main():
 	# Sign up Via the Commandline 
-	if '-register' in sys.argv:
+	if not os.path.isdir(os.getcwd()+'/LynxData') or '-register' in sys.argv:
 		welcome()
-		if not os.path.isdir(os.getcwd()+'/LynxData'):
-			register()
+		register()
 
-	if '-check_in' in sys.argv:
-		name, addr, creds, p_key = load_credentials()
-		pbk = p_key.publickey()
-		good, skey = p2p.handshake(name, pbk, True)
-		if good:
-			print '[*] Encrypted Communication Successful with Remote Server'	
-			secure, nx_latency = p2p.connection_benchmark(name, skey, verbose=True)
+	# These will be used for basically any operation so do it once at top
+	name, addr, creds, p_key = load_credentials()
+	pub = p_key.publickey()
+	good, skey = p2p.handshake(name, pub, True)
+	if good:
+		print '[*] Encrypted Communication Successful with Remote Server'
+	if '-check_in' in sys.argv:			
+		secure, nx_latency = p2p.connection_benchmark(name, skey, verbose=True)
+
+	if '-peers' in sys.argv:
+		peer_list = p2p.get_peers(name, skey, True)
 
 
 if __name__ == '__main__':

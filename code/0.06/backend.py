@@ -113,15 +113,33 @@ class BackendAPI:
 		c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
 		return c 
 
+	def show_peers(self, c, ci, req, name):
+		clear_reply = self.dump_peers(self.users.keys())
+		c.send(utils.EncodeAES(self.crypto[name], clear_reply))
+		return c
+
 	def dump_peers(cs):
 		if os.path.isfile(os.getcwd()+'/LynxData/clients.txt'):
 			known_clients = utils.swap(os.getcwd()+'/LynxData/clients.txt', True)
-				
+		else:
+			known_clients = []
+		known_clients = list(set(known_clients))
+		for addr in cs:
+			if addr not in known_clients and len(addr) > 1:
+				known_clients.append(addr)
+		# Now dump it to txt file
+		dump = ''
+		for ln in cs:
+			dump += ln + '\n'
+		# Rewrite the data because we erased old file and added new clients
+		open(os.getcwd()+'/LynxData/clients.txt', 'wb').write(dump)
+		return	dump
 
 	def shutdown(self):
 		self.running = False
 		self.serve.close()
 		end_t, end_d = utils.create_timestamp()
+		self.dump_peers(self.tokens.keys())
 		print '[!!] Server Killed [%s - %d]' % (end_d, end_t)
 
 def main():

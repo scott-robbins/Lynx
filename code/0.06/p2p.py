@@ -76,8 +76,15 @@ def get_peers(uname, skey, verbose):
 		payload = utils.EncodeAES(cipher, 'PEERS ???? Please')
 		api_req = '%s !!!! %s' % (uname, payload)
 		s.send(api_req)
-		
-	except
+		peers = utils.DecodeAES(cipher, s.recv(65535)).split('\n')
+		s.close(); n = 1
+		if verbose:
+			for peer in peers:
+				print '[%d] %s' % (n, peer)
+				n += 1
+		transferred = True
+	except socket.error:
 		print '[!!] Unable to complete API request'
-        pass
-    return transferred, peers
+		pass
+	return transferred, peers
+
