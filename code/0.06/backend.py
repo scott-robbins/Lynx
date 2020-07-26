@@ -17,7 +17,7 @@ class BackendAPI:
 	running = False
 
 	def __init__ (self):
-		self.actions = {'STATUS': self.check_in}
+		self.actions = {'TEST': self.check_in}
 		self.serve = utils.start_listener(self.inbound)
 		self.k = self.setup()
 		self.run()
