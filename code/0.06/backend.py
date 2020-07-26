@@ -14,7 +14,7 @@ class BackendAPI:
 	users = {}
 	tokens = {}
 	crypto = {}
-	known = []
+	known_clients = []
 	running = False
 
 	def __init__ (self):

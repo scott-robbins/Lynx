@@ -79,7 +79,8 @@ def show_peers(uname, srvr, verbose):
 		s = utils.create_tcp_socket(False)
 		s.connect((srvr, 54123))
 		enc_dat = utils.EncodeAES(AES.new(base64.b64decode(session_key)), 'PEERS ???? List')
-		s.send(enc_dat)
+		api_req = '%s !!!! %s' % (uname, enc_dat)
+		s.send(api_req)
 		peer_list = utils.DecodeAES(AES.new(base64.b64decode(session_key)), s.recv(15535)).split('\n')
 		print peer_list
 		success = True
