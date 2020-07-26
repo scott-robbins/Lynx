@@ -27,7 +27,7 @@ def handshake(uname,srvr, pbkey,verbose):
 		reply = c.recv(1028)
 		if len(reply.split('-----BEGIN PUBLIC KEY-----')) > 1:
 			server_public_key = reply.split(' **** ')[0]
-			session_key = PKCS1_OAEP.new(RSA.importKey(server_public_key)).decrypt(reply.split(' **** ')[1])
+			session_key = rsa_decrypt(reply.split(' **** ')[1])
 			print '[*] Received Public Key and Session Key'
 			success = True
 		c.close()
@@ -36,7 +36,7 @@ def handshake(uname,srvr, pbkey,verbose):
 	return success, session_key, server_public_key
 
 def rsa_decrypt(enc_data):
-	get_key = 'ls LynxData/*.pem'
+	get_key = 'ls LynxData/Creds/*.pem'
 	key_name = utils.cmd(get_key, False).pop()
 	cred_name = key_name.split('.pem')[0]+'.creds'
 	private_key = RSA.importKey(open(os.getcwd()+'/%s' % key_name).read())

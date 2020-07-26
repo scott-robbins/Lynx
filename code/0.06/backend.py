@@ -63,7 +63,7 @@ class BackendAPI:
 						user_public_key = raw_data.split(' **** ')[0]
 						username = raw_data.split(' **** ')[1]
 						print '[*] Recieved Public Key from User %s' % username
-						enc_sess_key = PKCS1_OAEP.new(self.k).encrypt(base64.b64encode(sess_key))
+						enc_sess_key = PKCS1_OAEP.new(user_public_key).encrypt(base64.b64encode(sess_key))
 						reply = '%s **** %s' % (public_key.exportKey(), enc_sess_key)
 						client.send(reply)
 						self.tokens[username] = sess_key 
