@@ -77,7 +77,7 @@ class BackendAPI:
 					enc_query = client.recv(2048)
 					uname = enc_query.split(' !!!! ')[0]
 					skey = self.tokens[uname]
-					dec_query = utils.DecodeAES(AES.new(skey), enc_query)
+					dec_query = utils.DecodeAES(AES.new(skey), enc_query.split(uname)[1])
 					# parse the query
 					api_fcn = dec_query.split(' ???? ')[0]
 					api_req = dec_query.split(' ???? ')[1]
