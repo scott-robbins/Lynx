@@ -16,6 +16,7 @@ class BackendAPI:
 	def __init__ (self):
 		self.actions = {}
 		self.serve = utils.start_listener(self.inbound)
+		self.setup()
 		self.run()
 
 	def setup():
