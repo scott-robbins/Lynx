@@ -42,14 +42,18 @@ def rsa_decrypt(enc_data):
 	private_key = RSA.importKey(open(os.getcwd()+'/%s' % key_name).read())
 	return PKCS1_OAEP.new(private_key).decrypt(enc_data)
 
-def check_connection(uname, srvr, verbose):
-	success = False
-	timer = 0.0; start = time.time()
+def load_sess_key():
 	if os.path.isfile(os.getcwd()+'/LynxData/Creds/session'):
-		session_key = open(os.getcwd()+'/LynxData/Creds/session', 'rb').read()
+		skey = open(os.getcwd()+'/LynxData/Creds/session', 'rb').read()
 	else:
 		print '[!!] NO Session Key Found'
 		exit()
+	return skey
+
+def check_connection(uname, srvr, verbose):
+	success = False
+	timer = 0.0; start = time.time()
+	session_key = load_sess_key()
 	try:
 		s = utils.create_tcp_socket(False)
 		s.connect((srvr, 54123))
@@ -70,11 +74,7 @@ def check_connection(uname, srvr, verbose):
 
 def show_peers(uname, srvr, verbose):
 	success = False
-	if os.path.isfile(os.getcwd()+'/LynxData/Creds/session'):
-		session_key = open(os.getcwd()+'/LynxData/Creds/session', 'rb').read()
-	else:
-		print '[!!] NO Session Key Found'
-		exit()
+	session_key = load_sess_key()
 	try:
 		s = utils.create_tcp_socket(False)
 		s.connect((srvr, 54123))
@@ -88,3 +88,22 @@ def show_peers(uname, srvr, verbose):
 		print 'Error Making API Request'
 		pass
 	return success, peer_list		
+
+def message_peer(uname, srvr, recipient, payload, verbose):
+	completed = False
+	session_key = load_sess_key()
+	locald, localt = utils.create_timestamp()
+	try:
+		s = utils.create_tcp_socket(False)
+		s.connect((srvr, 54123))
+		cmesg = 'POKES ???? %s @ %s - %s :::: %s ;;;;' % (recipient, locald, localt, payload)
+		enc_dat = utils.EncodeAES(AES.new(base64.b64decode(session_key)), cmesg)
+		api_req = '%s !!!! %s' % (uname, enc_dat)
+		s.send(api_req)
+		sum = int(s.recv(100))
+		if sum == len(payload):
+			completed = True
+	except socket.error:	
+		print 'Error Making API Request'
+		pass	
+	return completed

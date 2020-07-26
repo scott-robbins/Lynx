@@ -18,8 +18,11 @@ class BackendAPI:
 	running = False
 
 	def __init__ (self):
-		self.actions = {'TEST': self.check_in,
-						'PEERS': self.show_peers}
+		# Define API Functions 
+		self.actions = {'TEST':  self.check_in,
+						'PEERS': self.show_peers,
+						'POKES': self.poke_client}
+		# Setup the server
 		self.serve = utils.start_listener(self.inbound)
 		self.k = self.setup()
 		self.run()
@@ -103,7 +106,6 @@ class BackendAPI:
 
 	def show_peers(self, c, ci, req, name):
 		clear_reply = self.dump_peers(self.known_clients)
-		print clear_reply
 		c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
 		return c
 
@@ -117,6 +119,7 @@ class BackendAPI:
 			if addr not in known_clients and len(addr) > 1:
 				known_clients.append(addr)
 		# Now dump it to txt file
+		cs.pop(-1)
 		dump = ''
 		for ln in cs:
 			dump += ln + '\n'
@@ -130,6 +133,18 @@ class BackendAPI:
 		end_t, end_d = utils.create_timestamp()
 		self.dump_peers(self.tokens.keys())
 		print '[!!] Server Killed [%s - %d]' % (end_d, end_t)
+
+	def poke_client(self, c, ci, req, name):
+		if not os.path.isdir(os.getcwd()+'/LynxData/messaging'):
+			os.mkdir(os.getcwd()+'/LynxData/messaging')
+		recvr = req.split(' @ ')[0]
+		date = req.split(' - ')[0].split(recvr)[1]
+		ltime = req.split(' - ')[1].split(' :::: ')[0]
+		message = req.split(' :::: ')[1].split(' :::: ')[0]
+		print '%s is sending a message for %s at %s - %s:'
+		print '%s'
+		c.send(len(message))
+		return c
 
 def main():
 	BackendAPI()

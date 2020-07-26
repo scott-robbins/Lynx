@@ -120,12 +120,24 @@ def main():
 		print '[*] Encrypted Communication Successful with Remote Server'
 		# Save the Session Key for now 
 		open('LynxData/Creds/session', 'wb').write(skey)
+
 	if '-peers' in sys.argv:
 		p2p.show_peers(name, rmt_endpt, True)
 		exit()
 
 	if '-check' in sys.argv:
 		p2p.check_connection(name, rmt_endpt, True)
+
+	if '-send' in sys.argv and len(sys.argv) > 3:
+		recv = sys.argv[2]
+		msg_file = sys.argv[3]
+		if not os.path.isfile(msg_file):
+			print 'Cannot Find %s' % msg_file
+			exit()
+		content = utils.arr2str(utils.swap(msg_file, False))
+		t0 = time.time()
+		if p2p.message_peer(name, rmt_endpt, recv, content, True):
+			print '[*] Message Delivered [%ss Elapsed]' % str(time.time()-t0)
 
 if __name__ == '__main__':
 	main()
