@@ -106,7 +106,8 @@ class BackendAPI:
 				pass
 
 	def check_in(self, c, ci, req, name):
-		c.send('Hello, %s' % name)
+		clear_reply ='Hello, %s' % name 
+		c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
 		return c 
 				
 
