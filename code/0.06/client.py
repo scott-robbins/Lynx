@@ -50,6 +50,7 @@ def welcome():
 def register():
 	if not os.path.isdir(os.getcwd()+'/LynxData/'):
 		os.mkdir('LynxData')
+		os.mkdir('LynxData/Creds')
 	uname, pword = create_credentials()
 
 def create_credentials():
@@ -76,7 +77,7 @@ def create_credentials():
 	key = RSA.generate(2048)
 	private_key = key.exportKey()
 	public_key = key.publickey()
-	file_out = open(os.getcwd()+"/LynxData/%s.pem" % uname, "wb")
+	file_out = open(os.getcwd()+"/LynxData/Creds/%s.pem" % uname, "wb")
 	file_out.write(key.exportKey('PEM'))
 	file_out.close()
 

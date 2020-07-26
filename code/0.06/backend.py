@@ -24,18 +24,21 @@ class BackendAPI:
 		self.run()
 
 	def setup(self):
+		# Create Initial LynxData folder if not present
 		if not os.path.isdir(os.getcwd()+'/LynxData'):
 			os.mkdir('LynxData')
-		if not os.path.isfile(os.getcwd()+'/LynxData/server.pem'):
+			os.mkdir('LynxData/Creds')
+		if not os.path.isfile(os.getcwd()+'/LynxData/Creds/server.pem'):
 			k = RSA.generate(2048)
-			file_out = open(os.getcwd()+'/LynxData/server.pem', 'wb')
+			file_out = open(os.getcwd()+'/LynxData/Creds/server.pem', 'wb')
 			file_out.write(k.exportKey('PEM'))
 		else:
 			k = self.load_server_key()
+
 		return k 
 
 	def load_server_key(self):
-		return RSA.importKey(open(os.getcwd()+'/LynxData/server.pem').read())
+		return RSA.importKey(open(os.getcwd()+'/LynxData/Creds/server.pem').read())
 
 	def run(self):
 		self.running = True 
@@ -109,6 +112,10 @@ class BackendAPI:
 		clear_reply ='Hello, %s' % name 
 		c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
 		return c 
+
+	def dump_peers(cs):
+		if os.path.isfile(os.getcwd()+'/LynxData/clients.txt'):
+			known_clients = utils.swap(os.getcwd()+'/LynxData/clients.txt', True)
 				
 
 	def shutdown(self):

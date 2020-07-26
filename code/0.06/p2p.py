@@ -11,21 +11,25 @@ import os
 
 def handshake(uname, pbkey,verbose):
 	success = False
-	c = utils.create_tcp_socket(False)
-	c.connect((utils.get_server_addr(), 54123))
-	if verbose:
-		print '[*] Connected to remote server'
-	c.send(pbkey.exportKey())
-	if verbose:
-		print '[*] Sent Public Key'
-	encrypted_session_key = c.recv(2040)
-	session_key = rsa_decrypt(encrypted_session_key)
-	if verbose:
-		print '[*] Recieved %d byte session key' % len(session_key)
-	c.send(utils.EncodeAES(AES.new(session_key), uname))
-	if c.recv(128)=='OK':
-		success = True
-	c.close()
+	session_key = ''
+	try:
+		c = utils.create_tcp_socket(False)
+		c.connect((utils.get_server_addr(), 54123))
+		if verbose:
+			print '[*] Connected to remote server'
+		c.send(pbkey.exportKey())
+		if verbose:
+			print '[*] Sent Public Key'
+		encrypted_session_key = c.recv(2040)
+		session_key = rsa_decrypt(encrypted_session_key)
+		if verbose:
+			print '[*] Recieved %d byte session key' % len(session_key)
+		c.send(utils.EncodeAES(AES.new(session_key), uname))
+		if c.recv(128)=='OK':
+			success = True
+		c.close()
+	except socket.error:
+		print '!! CONNECTION ERROR: Handshake Failed '
 	return success, session_key
 
 def rsa_decrypt(enc_data):
@@ -39,7 +43,7 @@ def connection_benchmark(uname, skey, verbose):
 	dt = 0.0; secured = False; tries = 0
 	try:
 		t0 = time.time()
-		while tries < 3 or not secured:
+		while not secured and tries < 3:
 			s = utils.create_tcp_socket(False)
 			s.connect((utils.get_server_addr(), 54123))
 			api_test = 'TEST ???? Hello!'
@@ -58,3 +62,22 @@ def connection_benchmark(uname, skey, verbose):
 	except socket.error:
 		print '[!!] Connection Error during API Request'
 	return dt, secured
+
+
+def get_peers(uname, skey, verbose):
+	transferred = False
+	peers = []
+	cipher = AES.new(skey)
+	stun = utils.get_server_addr()
+	
+	try:
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.connect((stun, 54123))
+		payload = utils.EncodeAES(cipher, 'PEERS ???? Please')
+		api_req = '%s !!!! %s' % (uname, payload)
+		s.send(api_req)
+		
+	except
+		print '[!!] Unable to complete API request'
+        pass
+    return transferred, peers
