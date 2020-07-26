@@ -42,7 +42,7 @@ class BackendAPI:
 		
 
 		while self.running:
-			public_key = self.k.publicKey()
+			public_key = self.k.publickey()
 			server_crypto = PKCS1_OAEP.new(public_key)
 			try:
 				# Accept A Client connection (Blocks Here Until recieivng a client!!)
