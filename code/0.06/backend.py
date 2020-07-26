@@ -1,6 +1,7 @@
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.PublicKey import RSA
+import base64
 import socket 
 import utils 
 import time 
@@ -40,13 +41,26 @@ class BackendAPI:
 		
 
 		while self.running:
+			public_key = k.publicKey()
+			server_crypto = PKCS1_OAEP.new(public_key)
 			try:
 				# Accept A Client connection (Blocks Here Until recieivng a client!!)
 				client, client_info = self.serve.accept()
+				# Check whether new client
 				client_ip = client_info[0]
 				# Check whether IP is known (Diff. peers can have same IP tho! bc NAT)
-				
-				#
+				if client_info[0] not in self.known or users[client_info]['ip']:
+					# Every Client gets a unique session_id for encrypting
+					sess_key = get_random_bytes(16)
+					# New Clients will be sending their public key first
+					rmt_pub = client.recv(2050)
+					print '[*] Received %s Public Key' % client_ip
+					# New Client so exchange Public Key Crypto
+					encrypted_reply = PKCS1_OAEP.new(rmt_pub).encrypt(sess_key)
+					print '[*] Sending %s a unique session key ' % client_ip
+					client.send(encrypted_reply)
+					# log this session key for the username they reply with 
+				# else it is a known client so try and handle api request
 
 				#
 
