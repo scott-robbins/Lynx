@@ -97,11 +97,12 @@ class BackendAPI:
 
 	def check_in(self, c, ci, req, name):
 		clear_reply ='Hello, %s' % name 
+		self.known_clients.append(name)
 		c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
 		return c 
 
 	def show_peers(self, c, ci, req, name):
-		clear_reply = self.dump_peers(self.tokens.keys())
+		clear_reply = self.dump_peers(self.known_clients)
 		c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
 		return c
 

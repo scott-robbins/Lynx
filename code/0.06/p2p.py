@@ -81,8 +81,9 @@ def show_peers(uname, srvr, verbose):
 		enc_dat = utils.EncodeAES(AES.new(base64.b64decode(session_key)), 'PEERS ???? List')
 		s.send(enc_dat)
 		peer_list = utils.DecodeAES(AES.new(base64.b64decode(session_key)), s.recv(15535)).split('\n')
+		print peer_list
 		success = True
 	except socket.error:	
 		print 'Error Making API Request'
 		pass
-	return success, peers		
+	return success, peer_list		
