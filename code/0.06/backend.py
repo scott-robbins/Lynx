@@ -77,6 +77,7 @@ class BackendAPI:
 						dec_req = utils.DecodeAES(AES.new(self.tokens[username]), enc_req)
 						api_fcn = dec_req.split(' ???? ')[0]
 						api_req = dec_req.split(" ???? ")[0]
+						print '[*] %s is requesting to %s' % (username, api_fcn)
 						# known fcn run it 
 						if api_fcn in self.actions.keys():
 							client = self.actions[api_fcn](client, client_info, api_req, username)

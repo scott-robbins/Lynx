@@ -119,7 +119,7 @@ def main():
 		print '[*] Encrypted Communication Successful with Remote Server'
 		# Save the Session Key for now 
 		open('LynxData/Creds/session', 'wb').write(rmy_key)
-
+		p2p.check_connection(name, rmt_endpt, True)
 
 if __name__ == '__main__':
 	main()
