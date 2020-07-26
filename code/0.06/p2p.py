@@ -25,7 +25,6 @@ def handshake(uname,srvr, pbkey,verbose):
 		# TODO: FINISH
 		# GET SERVERS PUBLIC KEY FOR FURTHER COMMUNICATIONS
 		reply = c.recv(1028)
-		print reply
 		if len(reply.split('-----BEGIN PUBLIC KEY-----')) > 1:
 			server_public_key = reply.split(' **** ')[0]
 			session_key = reply.split(' **** ')[1]
@@ -55,15 +54,15 @@ def check_connection(uname, srvr, verbose):
 	try:
 		s = utils.create_tcp_socket(False)
 		s.connect((srvr, 54123))
-		print session_key
 		enc_dat = utils.EncodeAES(AES.new(base64.b64decode(session_key)),'TEST ???? Hello')
 		api_req = '%s !!!! %s' % (uname, enc_dat)
 		s.send(api_req)
-		print utils.DecodeAES(AES.new(base64.b64decode(session_key)), s.recv(4096))
-		success = True
-		timer = time.time() - start
-		if verbose:
-			print '[*] API Request Replied to in %s seconds' % str(timer)
+		reply = utils.DecodeAES(AES.new(base64.b64decode(session_key)), s.recv(1025))
+		if reply == 'Hello, %s' % uname:
+			success = True
+			timer = time.time() - start
+			if verbose:
+				print '[*] API Request Replied to in %s seconds' % str(timer)
 	except socket.error:
 		print 'Error Making API Request'
 		pass
