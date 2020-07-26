@@ -17,15 +17,17 @@ def handshake(uname, pbkey,verbose):
 		c.connect((utils.get_server_addr(), 54123))
 		if verbose:
 			print '[*] Connected to remote server'
-		c.send(pbkey.exportKey())
+		key_exch = pbkey + ' **** ' + uname
+		c.send(key_exch)
 		if verbose:
 			print '[*] Sent Public Key'
-		encrypted_session_key = c.recv(2040)
-		session_key = rsa_decrypt(encrypted_session_key)
-		if verbose:
-			print '[*] Recieved %d byte session key' % len(session_key)
-		c.send(utils.EncodeAES(AES.new(session_key), uname))
-		if c.recv(128)=='OK':
+		# TODO: FINISH
+		# GET SERVERS PUBLIC KEY FOR FURTHER COMMUNICATIONS
+		reply = c.recv(1028)
+		if len(reply).split('-----BEGIN PUBLIC KEY-----') > 1:
+			server_public_key = reply.split(' **** ')[0]
+			session_key = reply.split(' ***** ')[1]
+			print '[*] Received Public Key and Session Key'
 			success = True
 		c.close()
 	except socket.error:
@@ -38,53 +40,4 @@ def rsa_decrypt(enc_data):
 	cred_name = key_name.split('.pem')[0]+'.creds'
 	private_key = RSA.importKey(open(os.getcwd()+'/%s' % key_name).read())
 	return PKCS1_OAEP.new(private_key).decrypt(enc_data)
-
-def connection_benchmark(uname, skey, verbose):
-	dt = 0.0; secured = False; tries = 0
-	try:
-		t0 = time.time()
-		while not secured and tries < 3:
-			s = utils.create_tcp_socket(False)
-			s.connect((utils.get_server_addr(), 54123))
-			api_test = 'TEST ???? Hello!'
-			s.send(uname +' !!!! '+utils.EncodeAES(AES.new(skey), api_test))
-			enc_reply = s.recv(2048)
-			s.close()
-			dt = time.time()-t0
-			dec_reply = utils.DecodeAES(AES.new(skey), enc_reply)
-			if dec_reply == ('Hello, %s' % uname):
-				print '[*] Checkin Complete'
-				secured = True
-			else:
-				print '!! Security WARNING: %s != %s' % (dec_reply, 'Hello, %s' % uname)
-			if verbose:
-				print '[o] Round Trip Time: %s seconds' % str(dt)
-	except socket.error:
-		print '[!!] Connection Error during API Request'
-	return dt, secured
-
-
-def get_peers(uname, skey, verbose):
-	transferred = False
-	peers = []
-	cipher = AES.new(skey)
-	stun = utils.get_server_addr()
-	
-	try:
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		s.connect((stun, 54123))
-		payload = utils.EncodeAES(cipher, 'PEERS ???? Please')
-		api_req = '%s !!!! %s' % (uname, payload)
-		s.send(api_req)
-		peers = utils.DecodeAES(cipher, s.recv(65535)).split('\n')
-		s.close(); n = 1
-		if verbose:
-			for peer in peers:
-				print '[%d] %s' % (n, peer)
-				n += 1
-		transferred = True
-	except socket.error:
-		print '[!!] Unable to complete API request'
-		pass
-	return transferred, peers
 

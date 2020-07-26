@@ -116,12 +116,7 @@ def main():
 	good, skey = p2p.handshake(name, pub, True)
 	if good:
 		print '[*] Encrypted Communication Successful with Remote Server'
-	if '-check_in' in sys.argv:			
-		secure, nx_latency = p2p.connection_benchmark(name, skey, verbose=True)
-
-	if '-peers' in sys.argv:
-		peer_list = p2p.get_peers(name, skey, True)
-
+	
 
 if __name__ == '__main__':
 	main()

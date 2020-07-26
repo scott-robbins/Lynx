@@ -47,60 +47,30 @@ class BackendAPI:
 			  ' Server %s - %s [*]\033[0m' % (start_d, start_t)
 		
 		try:
+			public_key = self.k.publickey()
+			server_crypto = PKCS1_OAEP.new(public_key)
 			while self.running:
-				public_key = self.k.publickey()
-				server_crypto = PKCS1_OAEP.new(public_key)
-			
+				sess_key = get_random_bytes(32)
 				# Accept A Client connection (Blocks Here Until recieivng a client!!)
 				client, client_info = self.serve.accept()
 				# Check whether new client
 				client_ip = client_info[0]
-				# Check whether IP is known (Diff. peers can have same IP tho! bc NAT)
-				if client_info[0] not in self.known:
-					# Every Client gets a unique session_id for encrypting
-					sess_key = get_random_bytes(16)
-					# New Clients will be sending their public key first
-					rmt_pub = client.recv(2050)
-					print '[*] Received %s Public Key' % (client_ip)
-					# New Client so exchange Public Key Crypto
-					encrypted_reply = PKCS1_OAEP.new(RSA.importKey(rmt_pub)).encrypt(sess_key)
-					print '[*] Sending %s a unique session key ' % client_ip
-					client.send(encrypted_reply)
-					enc_name = client.recv(2048)
-					# log this session key for the username they reply with 
-					client_username = utils.DecodeAES(AES.new(sess_key), enc_name).replace(' ', '')
-					print '[*] %s is registering as: %s' % (client_ip, client_username)
-					self.known.append(client_ip)
-					if client_username not in self.users.keys():
-						self.users[client_username] = client_ip
-						self.tokens[client_username] = sess_key
-						self.crypto[sess_key] = AES.new(sess_key)
-						client.send('OK')
-					else:
-						client.send('Username taken!')
-				else:	# else it is a known client so try and handle api request
-					enc_query = client.recv(2048)
-					uname = enc_query.split(' !!!! ')[0]
-					skey = self.tokens[uname]
-					dec_query = utils.DecodeAES(AES.new(skey), enc_query.split(uname)[1])
-					
-					try:	
-						# parse the query
-						api_fcn = dec_query.split(' ???? ')[0]
-						api_req = dec_query.split(' ???? ')[1]
-						
-						# if api_fcn is recognized, handle it 
-						if api_fcn in self.actions.keys():
-							print '[*] Handling API request %s' % api_fcn
-							client = self.actions[api_fcn](client, client_info, api_req, uname)
-					
+
+				raw_data = client.recv(4096)
+				if len(raw_data).split('-----BEGIN PUBLIC KEY-----') > 1:
+					try: 
+						# This is a new client trying to setup keys 
+						user_public_key = raw_data.split(' **** ')[0]
+						username = raw_data.split(' ****')[1]
+						print '[*] Recieved Public Key from User %s' % username
+						reply = '%s **** %s' % (public_key, base64.b64encode(sess_key))
+						c.send(reply)
 					except IndexError:
-						print '[!!] Malformed API request from %s' % client_ip
-						dec_query
+						print '!! Malformed API request'
 						pass
 					
-					# Close the connection 
-					client.close()
+				# Close the connection 
+				client.close()
 		except KeyboardInterrupt:
 			self.shutdown
 			try:
