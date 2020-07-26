@@ -12,11 +12,12 @@ import os
 class BackendAPI:
 	inbound = 54123
 	users = {}
+	tokens = {}
 	known = []
 	running = False
 
 	def __init__ (self):
-		self.actions = {}
+		self.actions = {'STATUS' }
 		self.serve = utils.start_listener(self.inbound)
 		self.k = self.setup()
 		self.run()
@@ -68,13 +69,22 @@ class BackendAPI:
 					self.known.append(client_ip)
 					if client_username not in self.users.keys():
 						self.users[client_username] = client_ip
+						self.tokens[sess_key] = client_username
 						client.send('OK')
 					else:
 						client.send('Username taken!')
-					# else it is a known client so try and handle api request
-
-					#
-
+				else:	# else it is a known client so try and handle api request
+					enc_query = client.recv(2048)
+					dec_query = utils.DecodeAES(AES.new(skey), enc_query)
+					# parse the query
+					api_fcn = dec_query.split(' !!!! ')[1].split(' ???? ')[0]
+					api_req = dec_query.split(' ???? ')[1]
+					uname = dec_query.split(' !!!! ')[0]
+					skey = self.tokens[uname]
+					# if api_fcn is recognized, handle it 
+					if api_fcn in self.actions.keys():
+						print '[*] Handling API request %s' % api_fcn
+						client = self.actions[api_fcn](client, client_info, api_req)
 					# Close the connection 
 					client.close()
 		except KeyboardInterrupt:
@@ -84,7 +94,9 @@ class BackendAPI:
 			except socket.error:
 				pass
 
-				
+	def check_in(self, c, ci, req, name):
+		c.send('TESTING 123. Hello, %s' % name)
+		return c 
 				
 
 	def shutdown(self):

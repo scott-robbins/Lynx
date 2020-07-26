@@ -125,7 +125,7 @@ def handshake(uname, pbkey,verbose):
 	if verbose:
 		print '[*] Recieved %d byte session key' % len(session_key)
 	c.send(utils.EncodeAES(AES.new(session_key), uname))
-	if c.recv('OK'):
+	if c.recv(128)=='OK':
 		success = True
 	c.close()
 	return success, session_key
@@ -136,12 +136,20 @@ def main():
 		if not os.path.isdir(os.getcwd()+'/LynxData'):
 			register()
 
+
 	if '-check_in' in sys.argv:
 		name, addr, creds, p_key = load_credentials()
 		pbk = p_key.publickey()
 		good, skey = handshake(name, pbk, True)
 		if good:
 			print '[*] Encrypted Communication Successful with Remote Server'	
+		s = utils.create_tcp_socket(False)
+		s.connect(utils.get_server_addr(), 54123)
+		api_test = '%s !!!! TEST ???? Hello'
+		s.send(utils.EncodeAES(AES.new(skey), api_test))
+		print s.recv(2048)
+		s.close()
+
 
 if __name__ == '__main__':
 	main()
