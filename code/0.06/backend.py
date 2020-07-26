@@ -19,7 +19,7 @@ class BackendAPI:
 		self.setup()
 		self.run()
 
-	def setup():
+	def setup(self):
 		if not os.path.isdir(os.getcwd()+'/LynxData'):
 			os.mkdir('LynxData')
 		if not os.path.isfile(os.getcwd()+'/LynxData/server.pem'):
