@@ -137,13 +137,17 @@ class BackendAPI:
 	def poke_client(self, c, ci, req, name):
 		if not os.path.isdir(os.getcwd()+'/LynxData/messaging'):
 			os.mkdir(os.getcwd()+'/LynxData/messaging')
-		recvr = req.split(' @ ')[0]
-		date = req.split(' - ')[0].split(recvr)[1]
-		ltime = req.split(' - ')[1].split(' :::: ')[0]
-		message = req.split(' :::: ')[1].split(' :::: ')[0]
-		print '%s is sending a message for %s at %s - %s:'
-		print '%s'
-		c.send(len(message))
+		try:
+			recvr = req.split(' @ ')[0]
+			date = req.split(' - ')[0].split(recvr)[1]
+			ltime = req.split(' - ')[1].split(' :::: ')[0]
+			message = req.split(' :::: ')[1].split(' :::: ')[0]
+			print '%s is sending a message for %s at %s - %s:'
+			print '%s'
+			c.send(len(message))
+		except IndexError:
+			print '[!!] Error receivng message'
+			print req
 		return c
 
 def main():

@@ -103,6 +103,8 @@ def message_peer(uname, srvr, recipient, payload, verbose):
 		sum = int(s.recv(100))
 		if sum == len(payload):
 			completed = True
+		else:
+			print sum
 	except socket.error:	
 		print 'Error Making API Request'
 		pass	
