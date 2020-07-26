@@ -58,6 +58,7 @@ class BackendAPI:
 				# Check whether IP is known (Diff. peers can have same IP tho! bc NAT)
 				# Every Client gets a unique session_id for encrypting
 				sess_key = get_random_bytes(16)
+
 				# New Clients will be sending their public key first
 				rmt_pub = client.recv(2050)
 				print '[*] Received %s Public Key' % (client_ip)
@@ -75,7 +76,9 @@ class BackendAPI:
 				uname = enc_query.split(' !!!! ')[0]
 				skey = self.tokens[uname]
 				dec_query = utils.DecodeAES(AES.new(skey), enc_query.split(uname)[1])
-					
+				if uname not in self.tokens.keys():
+					self.tokens[name] = sess_key 
+					self.crypto[sess_key] = AES.new(sess_key)
 				try:	
 					# parse the query
 					api_fcn = dec_query.split(' ???? ')[0]
@@ -101,13 +104,16 @@ class BackendAPI:
 				pass
 
 	def check_in(self, c, ci, req, name):
-		clear_reply ='Hello, %s' % name 
-		c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
+		logged = False; tries = 0
+		while not logged and tries < 3:
+			clear_reply ='Hello, %s' % name 
+			
+			c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
 		return c 
 
 	def show_peers(self, c, ci, req, name):
 		clear_reply = self.dump_peers(self.users.keys())
-		c.send(utils.EncodeAES(self.crypto[name], clear_reply))
+		c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
 		return c
 
 	def dump_peers(cs):
