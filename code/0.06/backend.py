@@ -75,12 +75,13 @@ class BackendAPI:
 						client.send('Username taken!')
 				else:	# else it is a known client so try and handle api request
 					enc_query = client.recv(2048)
+					uname = enc_query.split(' !!!! ')[0]
+					skey = self.tokens[uname]
 					dec_query = utils.DecodeAES(AES.new(skey), enc_query)
 					# parse the query
-					api_fcn = dec_query.split(' !!!! ')[1].split(' ???? ')[0]
+					api_fcn = dec_query.split(' ???? ')[0]
 					api_req = dec_query.split(' ???? ')[1]
-					uname = dec_query.split(' !!!! ')[0]
-					skey = self.tokens[uname]
+					
 					# if api_fcn is recognized, handle it 
 					if api_fcn in self.actions.keys():
 						print '[*] Handling API request %s' % api_fcn

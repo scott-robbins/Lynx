@@ -144,9 +144,9 @@ def main():
 		if good:
 			print '[*] Encrypted Communication Successful with Remote Server'	
 		s = utils.create_tcp_socket(False)
-		s.connect(utils.get_server_addr(), 54123)
-		api_test = '%s !!!! TEST ???? Hello'
-		s.send(utils.EncodeAES(AES.new(skey), api_test))
+		s.connect((utils.get_server_addr(), 54123))
+		api_test = 'TEST ???? Hello!'
+		s.send(name +' !!!!'+utils.EncodeAES(AES.new(skey), api_test))
 		print s.recv(2048)
 		s.close()
 
