@@ -57,7 +57,7 @@ class BackendAPI:
 				client_ip = client_info[0]
 
 				raw_data = client.recv(4096)
-				if len(raw_data).split('-----BEGIN PUBLIC KEY-----') > 1:
+				if len(raw_data.split('-----BEGIN PUBLIC KEY-----'))> 1:
 					try: 
 						# This is a new client trying to setup keys 
 						user_public_key = raw_data.split(' **** ')[0]
