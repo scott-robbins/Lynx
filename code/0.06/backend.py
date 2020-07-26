@@ -17,7 +17,7 @@ class BackendAPI:
 	def __init__ (self):
 		self.actions = {}
 		self.serve = utils.start_listener(self.inbound)
-		self.setup()
+		self.k = self.setup()
 		self.run()
 
 	def setup(self):
@@ -29,6 +29,7 @@ class BackendAPI:
 			file_out.write(k.exportKey('PEM'))
 		else:
 			k = self.load_server_key()
+		return k 
 
 	def load_server_key(self):
 		return RSA.importKey(open(os.getcwd()+'/LynxData/server.pem').read())
@@ -41,7 +42,7 @@ class BackendAPI:
 		
 
 		while self.running:
-			public_key = k.publicKey()
+			public_key = self.k.publicKey()
 			server_crypto = PKCS1_OAEP.new(public_key)
 			try:
 				# Accept A Client connection (Blocks Here Until recieivng a client!!)
