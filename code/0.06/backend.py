@@ -137,9 +137,9 @@ class BackendAPI:
 	def poke_client(self, c, ci, req, name):
 		if not os.path.isdir(os.getcwd()+'/LynxData/messaging'):
 			os.mkdir(os.getcwd()+'/LynxData/messaging')
-			for uname in self.tokens.keys():
-				if not os.path.isdir(os.getcwd()+'/LynxData/messaging/' + uname):
-					os.mkdir(os.getcwd()+'/LynxData/messaging/' + uname)
+		for uname in self.tokens.keys():
+			if not os.path.isdir(os.getcwd()+'/LynxData/messaging/' + uname):
+				os.mkdir(os.getcwd()+'/LynxData/messaging/' + uname)
 		try:
 			recvr = req.split(' @ ')[0]
 			date = req.split(' - ')[0].split(recvr)[1]
