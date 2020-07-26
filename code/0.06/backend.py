@@ -103,6 +103,7 @@ class BackendAPI:
 
 	def show_peers(self, c, ci, req, name):
 		clear_reply = self.dump_peers(self.known_clients)
+		print clear_reply
 		c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
 		return c
 
