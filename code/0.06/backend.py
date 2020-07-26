@@ -148,7 +148,7 @@ class BackendAPI:
 			if recvr in self.tokens.keys():
 				print '%s is sending a message for %s at %s - %s:' % (name, recvr, date, ltime)
 				msg_dat = 'From: %s\nSent: %s  %s\nMessage: \n%s' % (name, date, ltime, message)
-				when = date.replace('/','')+'_'+ltime.replace(':', '')
+				when = date.replace('/','').replace('@','').replace(' ','')+'_'+ltime.replace(':', '')
 				name = '%sFOR%sAT%s.msg' % (name,recvr,when)
 				# Write the message to disk
 				open(os.getcwd()+'/LynxData/messaging/%s/%s' % (recvr, name), 'wb').write(msg_dat)
