@@ -46,28 +46,28 @@ class BackendAPI:
 				public_key = self.k.publickey()
 				server_crypto = PKCS1_OAEP.new(public_key)
 			
-					# Accept A Client connection (Blocks Here Until recieivng a client!!)
-					client, client_info = self.serve.accept()
-					# Check whether new client
-					client_ip = client_info[0]
-					# Check whether IP is known (Diff. peers can have same IP tho! bc NAT)
-					if client_info[0] not in self.known:
-						# Every Client gets a unique session_id for encrypting
-						sess_key = get_random_bytes(16)
-						# New Clients will be sending their public key first
-						rmt_pub = client.recv(2050)
-						print '[*] Received %s Public Key:\n%s' % (client_ip, rmt_pub)
-						# New Client so exchange Public Key Crypto
-						encrypted_reply = PKCS1_OAEP.new(RSA.importKey(rmt_pub)).encrypt(sess_key)
-						print '[*] Sending %s a unique session key ' % client_ip
-						client.send(encrypted_reply)
-						enc_name = client.recv(2048)
-						# log this session key for the username they reply with 
-						client_username = utils.DecodeAES(AES.new(sess_key), enc_name)
-						print '[*] %s is registering as: %d' % (client_ip, client_username)
-						self.known.append(client_ip)
-						if client_username not in self.users.keys():
-							self.known[client_username] = client_ip
+				# Accept A Client connection (Blocks Here Until recieivng a client!!)
+				client, client_info = self.serve.accept()
+				# Check whether new client
+				client_ip = client_info[0]
+				# Check whether IP is known (Diff. peers can have same IP tho! bc NAT)
+				if client_info[0] not in self.known:
+					# Every Client gets a unique session_id for encrypting
+					sess_key = get_random_bytes(16)
+					# New Clients will be sending their public key first
+					rmt_pub = client.recv(2050)
+					print '[*] Received %s Public Key:\n%s' % (client_ip, rmt_pub)
+					# New Client so exchange Public Key Crypto
+					encrypted_reply = PKCS1_OAEP.new(RSA.importKey(rmt_pub)).encrypt(sess_key)
+					print '[*] Sending %s a unique session key ' % client_ip
+					client.send(encrypted_reply)
+					enc_name = client.recv(2048)
+					# log this session key for the username they reply with 
+					client_username = utils.DecodeAES(AES.new(sess_key), enc_name)
+					print '[*] %s is registering as: %d' % (client_ip, client_username)
+					self.known.append(client_ip)
+					if client_username not in self.users.keys():
+						self.known[client_username] = client_ip
 					# else it is a known client so try and handle api request
 
 					#
