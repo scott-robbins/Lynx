@@ -25,6 +25,7 @@ def handshake(uname,srvr, pbkey,verbose):
 		# TODO: FINISH
 		# GET SERVERS PUBLIC KEY FOR FURTHER COMMUNICATIONS
 		reply = c.recv(1028)
+		print reply
 		if len(reply.split('-----BEGIN PUBLIC KEY-----')) > 1:
 			server_public_key = reply.split(' **** ')[0]
 			session_key = reply.split(' ***** ')[1]

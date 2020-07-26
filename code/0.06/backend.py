@@ -63,7 +63,7 @@ class BackendAPI:
 						user_public_key = raw_data.split(' **** ')[0]
 						username = raw_data.split(' ****')[1]
 						print '[*] Recieved Public Key from User %s' % username
-						reply = '%s **** %s' % (public_key, base64.b64encode(sess_key))
+						reply = '%s **** %s' % (public_key.exportKey(), base64.b64encode(sess_key))
 						client.send(reply)
 						self.tokens[username] = sess_key 
 					except IndexError:
