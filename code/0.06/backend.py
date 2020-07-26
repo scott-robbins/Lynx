@@ -30,7 +30,7 @@ class BackendAPI:
 		else:
 			k = self.load_server_key()
 
-	def load_server_key():
+	def load_server_key(self):
 		return RSA.importKey(open(os.getcwd()+'/LynxData/server.pem').read())
 
 	def run(self):
@@ -60,6 +60,8 @@ class BackendAPI:
 					print '[*] Sending %s a unique session key ' % client_ip
 					client.send(encrypted_reply)
 					# log this session key for the username they reply with 
+
+
 				# else it is a known client so try and handle api request
 
 				#

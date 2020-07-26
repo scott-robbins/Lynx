@@ -146,6 +146,11 @@ def crawl_dir(file_path, hash, verbose):
             pass
     return directory, hashes
 
+def get_server_addr():
+	addr = utils.cmd('host beta.lynx-network.us', False).pop().split(' address ')[1]
+	return addr
+
+
 def start_listener(port):
 	try:
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -172,7 +177,6 @@ def create_tcp_socket(verbose):
 	s = []
 	try:
 		s = socket.socket(sock.AF_INET, socket.SOCK_STREAM)
-		
 	except socket.error:
 		if verbose:
 			print '!! Unable to create socket'

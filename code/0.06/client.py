@@ -90,6 +90,10 @@ def create_credentials():
 
 
 def load_credentials():
+	if not os.path.isdir(os.getcwd()+'/LynxData/'):
+		print '[!!] No credentials Found. Plese Register First!'
+		exit()
+
 	get_key = 'ls LynxData/*.pem'
 	key_name = utils.cmd(get_key, False).pop()
 	cred_name = key_name.split('.pem')[0]+'.creds'
@@ -100,13 +104,34 @@ def load_credentials():
 	password = raw_creds.split(':')[1]
 	return uname, ip_addr, password
 
+def rsa_decrypt(enc_data):
+	get_key = 'ls LynxData/*.pem'
+	key_name = utils.cmd(get_key, False).pop()
+	cred_name = key_name.split('.pem')[0]+'.creds'
+	private_key = RSA.importKey(open(os.getcwd()+'/%s' % key_name).read())
+	return PKCS1_OAEP.new(private_key).decrypt(enc_data)
+
 
 def main():
 	if '-headless' in sys.argv:
 		welcome()
 		if not os.path.isdir(os.getcwd()+'/LynxData'):
 			register()
-		name, addr, creds = load_credentials()
+			
+
+		# check in with remote server 
+
+	if '-check_in' in sys.argv:
+		name, addr, creds, p_key = load_credentials()
+		pbk = p_key.publicKey()
+		c = utils.create_tcp_socket(False)
+		c.connect((utils.get_server_addr(), 54123))
+        print '[*] Connected to remote server'
+        c.send(pbk)
+        print '[*] Sent Public Key'
+        encrypted_session_key = c.recv(2040)
+        c.close()
+        print rsa_decrypt(encrypted_session_key)
 
 
 if __name__ == '__main__':
