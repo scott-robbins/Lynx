@@ -28,7 +28,7 @@ def handshake(uname,srvr, pbkey,verbose):
 		print reply
 		if len(reply.split('-----BEGIN PUBLIC KEY-----')) > 1:
 			server_public_key = reply.split(' **** ')[0]
-			session_key = reply.split(' ***** ')[1]
+			session_key = reply.split(' **** ')[1]
 			print '[*] Received Public Key and Session Key'
 			success = True
 		c.close()
@@ -47,14 +47,15 @@ def rsa_decrypt(enc_data):
 def check_connection(uname, srvr, verbose):
 	success = False
 	timer = 0.0; start = time.time()
-	if os.path.isfile(os.getcwd()+'/LynxData/session'):
-		session_key = open(os.getcwd()+'/LynxData/session', 'rb').read()
+	if os.path.isfile(os.getcwd()+'/LynxData/Creds/session'):
+		session_key = open(os.getcwd()+'/LynxData/Creds/session', 'rb').read()
 	else:
 		print '[!!] NO Session Key Found'
 		exit()
 	try:
 		s = utils.create_tcp_socket(False)
 		s.connect((srvr, 54123))
+		print session_key
 		enc_dat = utils.EncodeAES(AES.new(base64.b64decode(session_key)),'TEST ???? Hello')
 		api_req = '%s !!!! %s' % (uname, enc_dat)
 		s.send(api_req)

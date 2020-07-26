@@ -90,15 +90,15 @@ def create_credentials():
 	return uname, password	
 
 def load_credentials():
-	if not os.path.isdir(os.getcwd()+'/LynxData/'):
+	if not os.path.isdir(os.getcwd()+'/LynxData/Creds'):
 		print '[!!] No credentials Found. Plese Register First!'
 		exit()
 
-	get_key = 'ls LynxData/*.pem'
+	get_key = 'ls LynxData/Creds/*.pem'
 	key_name = utils.cmd(get_key, False).pop()
-	cred_name = key_name.split('.pem')[0]+'.creds'
+	cred_name = key_name.split('/')[-1].split('.pem')[0]+'.creds'
 	private_key = RSA.importKey(open(os.getcwd()+'/%s' % key_name).read())
-	raw_creds = PKCS1_OAEP.new(private_key).decrypt(open(cred_name,'rb').read())
+	raw_creds = PKCS1_OAEP.new(private_key).decrypt(open(os.getcwd()+'/LynxData/%s' % cred_name,'rb').read())
 	uname = raw_creds.split('@')[0]
 	ip_addr = raw_creds.split('@')[1].split(':')[0]
 	password = raw_creds.split(':')[1]
@@ -118,7 +118,7 @@ def main():
 	if good:
 		print '[*] Encrypted Communication Successful with Remote Server'
 		# Save the Session Key for now 
-		open('LynxData/Creds/session', 'wb').write(rmy_key)
+		open('LynxData/Creds/session', 'wb').write(session)
 		p2p.check_connection(name, rmt_endpt, True)
 
 if __name__ == '__main__':
