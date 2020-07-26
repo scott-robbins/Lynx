@@ -137,14 +137,24 @@ class BackendAPI:
 	def poke_client(self, c, ci, req, name):
 		if not os.path.isdir(os.getcwd()+'/LynxData/messaging'):
 			os.mkdir(os.getcwd()+'/LynxData/messaging')
+			for uname in self.tokens.keys():
+				if not os.path.isdir(os.getcwd()+'/LynxData/messaging/%s' % uname)
 		try:
 			recvr = req.split(' @ ')[0]
 			date = req.split(' - ')[0].split(recvr)[1]
 			ltime = req.split(' - ')[1].split(' :::: ')[0]
 			message = req.split(' :::: ')[1].split(' :::: ')[0]
-			print '%s is sending a message for %s at %s - %s:' % (name, recvr, date, ltime)
-			print '%s' % message
-			c.send(str(len(message)))
+			if recvr in self.tokens.keys():
+				print '%s is sending a message for %s at %s - %s:' % (name, recvr, date, ltime)
+				msg_dat = 'From: %s\nSent: %s  %s\nMessage: \n%s' % (name, date, ltime, message)
+				when = date.replace('/','')+'_'+ltime.replace(':', '')
+				name = '%sFOR%sAT%s.msg' % (name,recvr,when)
+				# Write the message to disk
+				open(os.getcwd()+'/LynxData/messaging/%s/%s' % (recvr, name), 'wb').write(msg_dat)
+				c.send(str(len(message)))
+			else:
+				print '%s tried sending an undeliverable message' % name
+				c.send('0')		
 		except IndexError:
 			print '[!!] Error receivng message'
 			print req
