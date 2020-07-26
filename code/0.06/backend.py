@@ -67,7 +67,10 @@ class BackendAPI:
 					print '[*] %s is registering as: %s' % (client_ip, client_username)
 					self.known.append(client_ip)
 					if client_username not in self.users.keys():
-						self.known[client_username] = client_ip
+						self.users[client_username] = client_ip
+						client.send('OK')
+					else:
+						client.send('Username taken!')
 					# else it is a known client so try and handle api request
 
 					#

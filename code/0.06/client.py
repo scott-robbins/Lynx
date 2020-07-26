@@ -112,6 +112,7 @@ def rsa_decrypt(enc_data):
 	return PKCS1_OAEP.new(private_key).decrypt(enc_data)
 
 def handshake(uname, pbkey,verbose):
+	success = False
 	c = utils.create_tcp_socket(False)
 	c.connect((utils.get_server_addr(), 54123))
 	if verbose:
@@ -123,9 +124,11 @@ def handshake(uname, pbkey,verbose):
 	session_key = rsa_decrypt(encrypted_session_key)
 	if verbose:
 		print '[*] Recieved %d byte session key' % len(session_key)
-	c.send(utils.EncodeAES(AES.new(session_key), 'username='+uname))
+	c.send(utils.EncodeAES(AES.new(session_key), uname))
+	if c.recv('OK'):
+		success = True
 	c.close()
-	return session_key
+	return success, session_key
 
 def main():
 	if '-headless' in sys.argv:
@@ -136,8 +139,9 @@ def main():
 	if '-check_in' in sys.argv:
 		name, addr, creds, p_key = load_credentials()
 		pbk = p_key.publickey()
-		skey = handshake(name, pbk, True)
-
+		good, skey = handshake(name, pbk, True)
+		if good:
+			print '[*] Encrypted Communication Successful with Remote Server'	
 
 if __name__ == '__main__':
 	main()
