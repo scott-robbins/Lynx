@@ -127,7 +127,7 @@ def main():
 		c = utils.create_tcp_socket(False)
 		c.connect((utils.get_server_addr(), 54123))
         print '[*] Connected to remote server'
-        c.send(pbk)
+        c.send(pbk.exportKey())
         print '[*] Sent Public Key'
         encrypted_session_key = c.recv(2040)
         c.close()

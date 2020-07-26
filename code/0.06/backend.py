@@ -56,9 +56,9 @@ class BackendAPI:
 					sess_key = get_random_bytes(16)
 					# New Clients will be sending their public key first
 					rmt_pub = client.recv(2050)
-					print '[*] Received %s Public Key' % client_ip
+					print '[*] Received %s Public Key:\n%s' % (client_ip, rmt_pub)
 					# New Client so exchange Public Key Crypto
-					encrypted_reply = PKCS1_OAEP.new(rmt_pub).encrypt(sess_key)
+					encrypted_reply = PKCS1_OAEP.new(RSA.importKey(rmt_pub)).encrypt(sess_key)
 					print '[*] Sending %s a unique session key ' % client_ip
 					client.send(encrypted_reply)
 					# log this session key for the username they reply with 
