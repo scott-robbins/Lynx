@@ -105,6 +105,7 @@ def load_credentials():
 	return uname, ip_addr, password, private_key
 
 def main():
+	rmt_endpt = utils.get_server_addr()
 	# Sign up Via the Commandline 
 	if not os.path.isdir(os.getcwd()+'/LynxData') or '-register' in sys.argv:
 		welcome()
@@ -113,10 +114,12 @@ def main():
 	# These will be used for basically any operation so do it once at top
 	name, addr, creds, p_key = load_credentials()
 	pub = p_key.publickey()
-	good, skey = p2p.handshake(name, pub, True)
+	good, skey, rmt_key = p2p.handshake(name, rmt_endpt, pub, True)
 	if good:
 		print '[*] Encrypted Communication Successful with Remote Server'
-	
+		# Save the Session Key for now 
+		open('LynxData/Creds/session', 'wb').write(rmy_key)
+
 
 if __name__ == '__main__':
 	main()

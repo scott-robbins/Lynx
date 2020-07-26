@@ -65,10 +65,23 @@ class BackendAPI:
 						print '[*] Recieved Public Key from User %s' % username
 						reply = '%s **** %s' % (public_key, base64.b64encode(sess_key))
 						client.send(reply)
+						self.tokens[username] = sess_key 
 					except IndexError:
 						print '!! Malformed API request'
 						pass
-					
+				elif len(raw_data.split(' !!!! ')) > 1:  # They are encrypted with users session key
+					username = raw_data.split(' !!!! ')[0]
+					enc_req = raw_data.split(' !!!! ')[1]
+					# make sure user is known before trying to decrypt api request
+					if username in self.tokens.keys():
+						dec_req = utils.DecodeAES(AES.new(self.tokens[username]), enc_req)
+						api_fcn = dec_req.split(' ???? ')[0]
+						api_req = dec_req.split(" ???? ")[0]
+						# known fcn run it 
+						if api_fcn in self.actions.keys():
+							client = self.actions[api_fcn](client, client_info, api_req, username)
+
+
 				# Close the connection 
 				client.close()
 		except KeyboardInterrupt:
@@ -84,7 +97,7 @@ class BackendAPI:
 		return c 
 
 	def show_peers(self, c, ci, req, name):
-		clear_reply = self.dump_peers(self.users.keys())
+		clear_reply = self.dump_peers(self.tokens.keys())
 		print clear_reply
 		return c
 

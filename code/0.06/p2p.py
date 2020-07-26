@@ -9,12 +9,13 @@ import p2p
 import sys 
 import os
 
-def handshake(uname, pbkey,verbose):
+def handshake(uname,srvr, pbkey,verbose):
 	success = False
 	session_key = ''
+	server_public_key = ''
 	try:
 		c = utils.create_tcp_socket(False)
-		c.connect((utils.get_server_addr(), 54123))
+		c.connect((srvr, 54123))
 		if verbose:
 			print '[*] Connected to remote server'
 		key_exch = pbkey.exportKey() + ' **** ' + uname
@@ -24,7 +25,7 @@ def handshake(uname, pbkey,verbose):
 		# TODO: FINISH
 		# GET SERVERS PUBLIC KEY FOR FURTHER COMMUNICATIONS
 		reply = c.recv(1028)
-		if len(reply).split('-----BEGIN PUBLIC KEY-----') > 1:
+		if len(reply.split('-----BEGIN PUBLIC KEY-----')) > 1:
 			server_public_key = reply.split(' **** ')[0]
 			session_key = reply.split(' ***** ')[1]
 			print '[*] Received Public Key and Session Key'
@@ -32,7 +33,7 @@ def handshake(uname, pbkey,verbose):
 		c.close()
 	except socket.error:
 		print '!! CONNECTION ERROR: Handshake Failed '
-	return success, session_key
+	return success, session_key, server_public_key
 
 def rsa_decrypt(enc_data):
 	get_key = 'ls LynxData/*.pem'
@@ -41,3 +42,23 @@ def rsa_decrypt(enc_data):
 	private_key = RSA.importKey(open(os.getcwd()+'/%s' % key_name).read())
 	return PKCS1_OAEP.new(private_key).decrypt(enc_data)
 
+
+def check_connection(uname, srvr, verbose):
+	success = False
+	timer = 0.0
+	if os.path.isfile(os.getcwd()+'/LynxData/session'):
+		session_key = open(os.getcwd()+'/LynxData/session', 'rb').read()
+	else:
+		print '[!!] NO Session Key Found'
+		exit()
+
+	try:
+		s = utils.create_tcp_socket(False)
+		s.connect((srvr, 54123))
+		enc_dat = utils.EncodeAES(AES.new(base64.b64decode(session_key)),'TEST ???? Hello')
+		api_req = '%s !!!! %s' % (uname, enc_dat)
+		s.send(api_req)
+	except socket.error:
+		print 'Error Making API Request'
+		pass
+	return success, timer
