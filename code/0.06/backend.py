@@ -70,6 +70,7 @@ class BackendAPI:
 						print '!! Malformed API request'
 						pass
 				elif len(raw_data.split(' !!!! ')) > 1:  # They are encrypted with users session key
+					print raw_data
 					username = raw_data.split(' !!!! ')[0]
 					enc_req = raw_data.split(' !!!! ')[1]
 					# make sure user is known before trying to decrypt api request

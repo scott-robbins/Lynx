@@ -58,6 +58,7 @@ def check_connection(uname, srvr, verbose):
 		api_req = '%s !!!! %s' % (uname, enc_dat)
 		s.send(api_req)
 		reply = utils.DecodeAES(AES.new(base64.b64decode(session_key)), s.recv(1025))
+		print reply
 		if reply == 'Hello, %s' % uname:
 			success = True
 			timer = time.time() - start
