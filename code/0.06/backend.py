@@ -63,7 +63,8 @@ class BackendAPI:
 						user_public_key = raw_data.split(' **** ')[0]
 						username = raw_data.split(' **** ')[1]
 						print '[*] Recieved Public Key from User %s' % username
-						reply = '%s **** %s' % (public_key.exportKey(), base64.b64encode(sess_key))
+						enc_sess_key = PKCS1_OAEP.new(self.k).encrypt(base64.b64encode(sess_key))
+						reply = '%s **** %s' % (public_key.exportKey(), )
 						client.send(reply)
 						self.tokens[username] = sess_key 
 						self.crypto[sess_key] = AES.new(sess_key)
@@ -71,7 +72,6 @@ class BackendAPI:
 						print '!! Malformed API request'
 						pass
 				elif len(raw_data.split(' !!!! ')) > 1:  # They are encrypted with users session key
-					print raw_data
 					username = raw_data.split(' !!!! ')[0]
 					enc_req = raw_data.split(' !!!! ')[1]
 					# make sure user is known before trying to decrypt api request
@@ -101,7 +101,6 @@ class BackendAPI:
 
 	def show_peers(self, c, ci, req, name):
 		clear_reply = self.dump_peers(self.tokens.keys())
-		print clear_reply
 		return c
 
 	def dump_peers(cs):

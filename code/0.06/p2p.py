@@ -27,7 +27,7 @@ def handshake(uname,srvr, pbkey,verbose):
 		reply = c.recv(1028)
 		if len(reply.split('-----BEGIN PUBLIC KEY-----')) > 1:
 			server_public_key = reply.split(' **** ')[0]
-			session_key = reply.split(' **** ')[1]
+			session_key = PKCS1_OAEP.new(RSA.importKey(server_public_key)).decrypt(reply.split(' **** ')[1])
 			print '[*] Received Public Key and Session Key'
 			success = True
 		c.close()
