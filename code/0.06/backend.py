@@ -64,7 +64,7 @@ class BackendAPI:
 						username = raw_data.split(' ****')[1]
 						print '[*] Recieved Public Key from User %s' % username
 						reply = '%s **** %s' % (public_key, base64.b64encode(sess_key))
-						c.send(reply)
+						client.send(reply)
 					except IndexError:
 						print '!! Malformed API request'
 						pass

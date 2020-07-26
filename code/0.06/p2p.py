@@ -17,7 +17,7 @@ def handshake(uname, pbkey,verbose):
 		c.connect((utils.get_server_addr(), 54123))
 		if verbose:
 			print '[*] Connected to remote server'
-		key_exch = pbkey + ' **** ' + uname
+		key_exch = pbkey.exportKey() + ' **** ' + uname
 		c.send(key_exch)
 		if verbose:
 			print '[*] Sent Public Key'
