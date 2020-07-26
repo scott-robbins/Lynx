@@ -111,27 +111,32 @@ def rsa_decrypt(enc_data):
 	private_key = RSA.importKey(open(os.getcwd()+'/%s' % key_name).read())
 	return PKCS1_OAEP.new(private_key).decrypt(enc_data)
 
+def handshake(uname, pbkey,verbose):
+	c = utils.create_tcp_socket(False)
+	c.connect((utils.get_server_addr(), 54123))
+	if verbose:
+		print '[*] Connected to remote server'
+	c.send(pbkey.exportKey())
+	if verbose:
+		print '[*] Sent Public Key'
+	encrypted_session_key = c.recv(2040)
+	session_key = rsa_decrypt(encrypted_session_key)
+	if verbose:
+		print '[*] Recieved %d byte session key' % len(session_key)
+	c.send(utils.EncodeAES(AES.new(session_key), 'username='+uname))
+	c.close()
+	return session_key
 
 def main():
 	if '-headless' in sys.argv:
 		welcome()
 		if not os.path.isdir(os.getcwd()+'/LynxData'):
 			register()
-			
-
-		# check in with remote server 
 
 	if '-check_in' in sys.argv:
 		name, addr, creds, p_key = load_credentials()
 		pbk = p_key.publickey()
-		c = utils.create_tcp_socket(False)
-		c.connect((utils.get_server_addr(), 54123))
-        print '[*] Connected to remote server'
-        c.send(pbk.exportKey())
-        print '[*] Sent Public Key'
-        encrypted_session_key = c.recv(2040)
-        c.close()
-        print rsa_decrypt(encrypted_session_key)
+		skey = handshake(name, pbk)
 
 
 if __name__ == '__main__':
