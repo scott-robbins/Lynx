@@ -69,7 +69,7 @@ class BackendAPI:
 					self.known.append(client_ip)
 					if client_username not in self.users.keys():
 						self.users[client_username] = client_ip
-						self.tokens[sess_key] = client_username
+						self.tokens[client_username] = sess_key
 						client.send('OK')
 					else:
 						client.send('Username taken!')
