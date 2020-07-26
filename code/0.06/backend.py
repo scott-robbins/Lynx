@@ -106,7 +106,7 @@ class BackendAPI:
 		c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
 		return c
 
-	def dump_peers(cs):
+	def dump_peers(self, cs):
 		if os.path.isfile(os.getcwd()+'/LynxData/clients.txt'):
 			known_clients = utils.swap(os.getcwd()+'/LynxData/clients.txt', True)
 		else:
