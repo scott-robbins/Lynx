@@ -42,7 +42,6 @@ def rsa_decrypt(enc_data):
 	private_key = RSA.importKey(open(os.getcwd()+'/%s' % key_name).read())
 	return PKCS1_OAEP.new(private_key).decrypt(enc_data)
 
-
 def check_connection(uname, srvr, verbose):
 	success = False
 	timer = 0.0; start = time.time()
@@ -67,4 +66,23 @@ def check_connection(uname, srvr, verbose):
 	except socket.error:
 		print 'Error Making API Request'
 		pass
-	return success, timer
+	return success, time
+
+def show_peers(uname, srvr, verbose):
+	success = False
+	if os.path.isfile(os.getcwd()+'/LynxData/Creds/session'):
+		session_key = open(os.getcwd()+'/LynxData/Creds/session', 'rb').read()
+	else:
+		print '[!!] NO Session Key Found'
+		exit()
+	try:
+		s = utils.create_tcp_socket(False)
+		s.connect((srvr, 54123))
+		enc_dat = utils.EncodeAES(AES.new(base64.b64decode(session_key)), 'PEERS ???? List')
+		s.send(enc_dat)
+		peer_list = utils.DecodeAES(AES.new(base64.b64decode(session_key)), s.recv(15535)).split('\n')
+		success = True
+	except socket.error:	
+		print 'Error Making API Request'
+		pass
+	return success, peers		

@@ -18,7 +18,8 @@ class BackendAPI:
 	running = False
 
 	def __init__ (self):
-		self.actions = {'TEST': self.check_in}
+		self.actions = {'TEST': self.check_in,
+						'PEERS': self.show_peers}
 		self.serve = utils.start_listener(self.inbound)
 		self.k = self.setup()
 		self.run()
@@ -101,6 +102,7 @@ class BackendAPI:
 
 	def show_peers(self, c, ci, req, name):
 		clear_reply = self.dump_peers(self.tokens.keys())
+		c.send(utils.EncodeAES(self.crypto[self.tokens[name]], clear_reply))
 		return c
 
 	def dump_peers(cs):
