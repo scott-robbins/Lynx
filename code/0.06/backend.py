@@ -50,7 +50,7 @@ class BackendAPI:
 			public_key = self.k.publickey()
 			server_crypto = PKCS1_OAEP.new(public_key)
 			while self.running:
-				sess_key = get_random_bytes(32)
+				sess_key = get_random_bytes(16)
 				# Accept A Client connection (Blocks Here Until recieivng a client!!)
 				client, client_info = self.serve.accept()
 				# Check whether new client
