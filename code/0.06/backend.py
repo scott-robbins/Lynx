@@ -188,11 +188,10 @@ class BackendAPI:
 		else:
 			show = 'ls %s' % (os.getcwd()+'/LynxData/messaging/%s' % name)
 			mname = os.getcwd()+'/LynxData/messaging/%s/%s' % (name, req)
-			if mname in utils.cmd(show, False):
+			if req in utils.cmd(show, False):
 				print '[*] %s is reading %s' % (name, req)
 				c.send(utils.EncodeAES(cipher, open(mname, 'rb').read()))
 			else:
-				print  utils.cmd(show, False)
 				c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
 		return c
 
