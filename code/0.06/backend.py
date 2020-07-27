@@ -22,7 +22,8 @@ class BackendAPI:
 		self.actions = {'TEST':  self.check_in,
 						'PEERS': self.show_peers,
 						'POKES': self.poke_client,
-						'INBOX': self.list_messages}
+						'INBOX': self.list_messages,
+						'READ':  self.read_message}
 		# Setup the server
 		self.serve = utils.start_listener(self.inbound)
 		self.k = self.setup()
@@ -174,6 +175,24 @@ class BackendAPI:
 			show = 'ls %s' % (os.getcwd()+'/LynxData/messaging/%s' % name)
 			names = utils.arr2str(utils.cmd(show, False))
 			c.send(utils.EncodeAES(cipher, names))
+		return c
+
+	def read_message(self, c, ci, req, name):
+		cipher = self.crypto[self.tokens[name]]
+		if not os.path.isdir(os.getcwd()+'/LynxData/messaging'):
+			os.mkdir(os.getcwd()+'/LynxData/messaging')
+			c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
+		if not os.path.isdir(os.getcwd()+'/LynxData/messaging/%s' % name):
+			os.mkdir(os.getcwd()+'/LynxData/messaging/%s' % name)
+			c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
+		else:
+			show = 'ls %s' % (os.getcwd()+'/LynxData/messaging/%s' % name)
+			mname = os.getcwd()+'/LynxData/messaging/%s/%s' % (name, req)
+			if mname in utils.cmd(show, False):
+				print '[*] %s is reading %s' % (name, req)
+				c.send(utils.EncodeAES(cipher, open(mname, 'rb').read()))
+			else:
+				c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
 		return c
 
 

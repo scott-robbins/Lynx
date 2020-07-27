@@ -140,3 +140,28 @@ def show_inbox(uname, srvr, verbose):
 		pass
 
 	return new_messages, messages
+
+def read_message(uname, srvr, message_name, verbose):
+	recvd = False; content = ''
+	session_key = load_sess_key()
+	ciph = AES.new(base64.b64decode(session_key))
+	try:
+		s = utils.create_tcp_socket()
+		s.connect((srvr, 54123))
+		cmesg = 'READ ???? %s' % message_name
+		enc_dat = utils.EncodeAES(ciph, cmesg)
+		api_req = '%s !!!! %s' % (uname, enc_dat)
+		s.send(api_req)
+		print '[*] Requesting to read %s' % message_name
+		content = utils.DecodeAES(ciph, s.recv(65535))
+		if content != '!! unable to read message !!':
+			recvd = True
+			if verbose:
+				print '[*] Retrieved %s:\n%s' % (message_name, content)
+		else:
+			content = ''
+	except socket.error:
+		print 'Error Making API Request'
+		pass
+	s.close()
+	return recvd, contenet

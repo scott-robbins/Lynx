@@ -142,6 +142,11 @@ def main():
 	if '-show_inbox' in sys.argv:
 		p2p.show_inbox(name, rmt_endpt, True)
 
+	if '-read' in sys.argv and len(sys.argv) > 2:
+		msg_name = sys.argv[2]
+		p2p.read_message(name, rmt_endpt, msg_name, True)
+		
+
 if __name__ == '__main__':
 	main()
 
