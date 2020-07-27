@@ -127,8 +127,13 @@ def show_inbox(uname, srvr, verbose):
 		s.send(api_req)
 		print '[*] Requesting to see Inbox'
 		messages = utils.DecodeAES(ciph, s.recv(65535)).split('\n')
-		if len(messages) > 1:
+		messages.pop(-1)
+		if len(messages) >= 1:
 			new_messages = True
+			if verbose:
+				print '[*] You Have %d new messages' % len(messages)
+				for m in messages:
+					print '\to %s' % m
 		s.close()
 	except socket.error:
 		print 'Error Making API Request'
