@@ -146,7 +146,7 @@ def read_message(uname, srvr, message_name, verbose):
 	session_key = load_sess_key()
 	ciph = AES.new(base64.b64decode(session_key))
 	try:
-		s = utils.create_tcp_socket()
+		s = utils.create_tcp_socket(False)
 		s.connect((srvr, 54123))
 		cmesg = 'READ ???? %s' % message_name
 		enc_dat = utils.EncodeAES(ciph, cmesg)
@@ -154,6 +154,7 @@ def read_message(uname, srvr, message_name, verbose):
 		s.send(api_req)
 		print '[*] Requesting to read %s' % message_name
 		content = utils.DecodeAES(ciph, s.recv(65535))
+		print content
 		if content != '!! unable to read message !!':
 			recvd = True
 			if verbose:
@@ -164,4 +165,4 @@ def read_message(uname, srvr, message_name, verbose):
 		print 'Error Making API Request'
 		pass
 	s.close()
-	return recvd, contenet
+	return recvd, content

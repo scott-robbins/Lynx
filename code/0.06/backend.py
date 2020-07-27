@@ -192,6 +192,7 @@ class BackendAPI:
 				print '[*] %s is reading %s' % (name, req)
 				c.send(utils.EncodeAES(cipher, open(mname, 'rb').read()))
 			else:
+				print  utils.cmd(show, False)
 				c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
 		return c
 
