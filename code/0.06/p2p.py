@@ -113,7 +113,7 @@ def message_peer(uname, srvr, recipient, payload, verbose):
 		pass	
 	return completed
 
-def show_inbox(uname, server, verbose):
+def show_inbox(uname, srvr, verbose):
 	new_messages = False
 	messages = []
 	session_key = load_sess_key()

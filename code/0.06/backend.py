@@ -21,7 +21,8 @@ class BackendAPI:
 		# Define API Functions 
 		self.actions = {'TEST':  self.check_in,
 						'PEERS': self.show_peers,
-						'POKES': self.poke_client}
+						'POKES': self.poke_client,
+						'INBOX': self.list_messages}
 		# Setup the server
 		self.serve = utils.start_listener(self.inbound)
 		self.k = self.setup()
