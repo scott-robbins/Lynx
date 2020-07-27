@@ -67,6 +67,7 @@ def check_connection(uname, srvr, verbose):
 			timer = time.time() - start
 			if verbose:
 				print '[*] API Request Replied to in %s seconds' % str(timer)
+		s.close()
 	except socket.error:
 		print 'Error Making API Request'
 		pass
@@ -84,6 +85,7 @@ def show_peers(uname, srvr, verbose):
 		peer_list = utils.DecodeAES(AES.new(base64.b64decode(session_key)), s.recv(15535)).split('\n')
 		print peer_list
 		success = True
+		s.close()
 	except socket.error:	
 		print 'Error Making API Request'
 		pass
@@ -101,6 +103,7 @@ def message_peer(uname, srvr, recipient, payload, verbose):
 		api_req = '%s !!!! %s' % (uname, enc_dat)
 		s.send(api_req)
 		sum = int(s.recv(100))
+		s.close()
 		if sum == len(payload):
 			completed = True
 		else:
@@ -109,3 +112,26 @@ def message_peer(uname, srvr, recipient, payload, verbose):
 		print 'Error Making API Request'
 		pass	
 	return completed
+
+def show_inbox(uname, server, verbose):
+	new_messages = False
+	messages = []
+	session_key = load_sess_key()
+	ciph = AES.new(base64.b64decode(session_key))
+	try:
+		s = utils.create_tcp_socket(False)
+		s.connect((srvr, 54123))
+		cmesg = 'INBOX ???? List'
+		enc_dat = utils.EncodeAES(ciph, cmesg)
+		api_req = '%s !!!! %s' % (uname, enc_dat)
+		s.send(api_req)
+		print '[*] Requesting to see Inbox'
+		messages = utils.DecodeAES(ciph, s.recv(65535)).split('\n')
+		if len(messages) > 1:
+			new_messages = True
+		s.close()
+	except socket.error:
+		print 'Error Making API Request'
+		pass
+
+	return new_messages, messages

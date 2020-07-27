@@ -139,6 +139,9 @@ def main():
 		if p2p.message_peer(name, rmt_endpt, recv, content, True):
 			print '[*] Message Delivered [%ss Elapsed]' % str(time.time()-t0)
 
+	if '-show_inbox' in sys.argv:
+		p2p.show_inbox(name, rmt_endpt, True)
+
 if __name__ == '__main__':
 	main()
 

@@ -161,6 +161,21 @@ class BackendAPI:
 			print req
 		return c
 
+	def list_messages(self, c, ci, req, name):
+		cipher = self.crypto[self.tokens[name]]
+		if not os.path.isdir(os.getcwd()+'/LynxData/messaging'):
+			os.mkdir(os.getcwd()+'/LynxData/messaging')
+			c.send(utils.EncodeAES(cipher, 'You Have 0 New Messages'))
+		if not os.path.isdir(os.getcwd()+'/LynxData/messaging/%s' % name):
+			os.mkdir(os.getcwd()+'/LynxData/messaging/%s' % name)
+			c.send(utils.EncodeAES(cipher, 'You Have 0 New Messages'))
+		else:
+			show = 'ls %s' % (os.getcwd()+'/LynxData/messaging/%s' % name)
+			names = utils.arr2str(utils.cmd(show, False))
+			c.send(utils.EncodeAES(cipher, names))
+		return c
+
+
 def main():
 	BackendAPI()
 
