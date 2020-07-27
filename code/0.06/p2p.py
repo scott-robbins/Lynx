@@ -153,8 +153,7 @@ def read_message(uname, srvr, message_name, verbose):
 		api_req = '%s !!!! %s' % (uname, enc_dat)
 		s.send(api_req)
 		print '[*] Requesting to read %s' % message_name
-		content = utils.DecodeAES(ciph, s.recv(65535))
-		print content
+		content = utils.DecodeAES(ciph, s.recv(65535)).replace(' ;;;; ', '\n')
 		if content != '!! unable to read message !!':
 			recvd = True
 			if verbose:

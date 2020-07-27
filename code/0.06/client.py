@@ -135,17 +135,20 @@ def main():
 			print 'Cannot Find %s' % msg_file
 			exit()
 		content = utils.arr2str(utils.swap(msg_file, False))
+		p2p.check_connection(name, rmt_endpt, True)
 		t0 = time.time()
 		if p2p.message_peer(name, rmt_endpt, recv, content, True):
 			print '[*] Message Delivered [%ss Elapsed]' % str(time.time()-t0)
 
 	if '-show_inbox' in sys.argv:
+		p2p.check_connection(name, rmt_endpt, True)
 		p2p.show_inbox(name, rmt_endpt, True)
 
 	if '-read' in sys.argv and len(sys.argv) > 2:
 		msg_name = sys.argv[2]
+		p2p.check_connection(name, rmt_endpt, True)
 		p2p.read_message(name, rmt_endpt, msg_name, True)
-		
+
 
 if __name__ == '__main__':
 	main()
