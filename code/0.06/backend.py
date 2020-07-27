@@ -156,6 +156,7 @@ class BackendAPI:
 				open(os.getcwd()+'/LynxData/messaging/%s/%s' % (recvr, name), 'wb').write(msg_dat)
 				c.send(str(len(message)))
 			else:
+				print recvr
 				print '%s tried sending an undeliverable message' % name
 				c.send('0')		
 		except IndexError:
