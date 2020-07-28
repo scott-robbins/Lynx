@@ -181,7 +181,8 @@ def delete_message(uname, srvr, message_name, verbose):
 		s.send(api_req)
 		print '[*] Requesting to delete %s' % message_name
 		result = utils.DecodeAES(ciph,s.recv(256))
-		if len(result.split(' bytes ')) > 1:
+		print result
+		if result != '!! unable to read message !!':
 			bytes_deleted = int(result.split('Deleted ')[1].split(' bytes')[0])
 	except socket.error:
 		print 'Error Making API Request'
