@@ -181,7 +181,6 @@ def delete_message(uname, srvr, message_name, verbose):
 		s.send(api_req)
 		print '[*] Requesting to delete %s' % message_name
 		result = utils.DecodeAES(ciph,s.recv(256))
-		print result
 		if result != '!! unable to read message !!':
 			deleted = True
 		else:
