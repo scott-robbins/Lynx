@@ -155,7 +155,7 @@ class BackendAPI:
 				# This will not work alone because you might send more than one message a second!!
 				quick_hash = SHA256.new()
 				quick_hash.update(msg_dat)
-				msg_id = ''.join(base64.b64encode(quick_hash.digest()[0:16]))
+				msg_id = ''.join(base64.b64encode(quick_hash.digest()[0:16])[0:8])
 				name = '%sFOR%sAT%s_%s.msg' % (name,recvr,when, msg_id)
 				# Write the message to disk
 				open(os.getcwd()+'/LynxData/messaging/%s/%s' % (recvr, name), 'wb').write(msg_dat)
