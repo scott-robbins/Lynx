@@ -184,6 +184,8 @@ def delete_message(uname, srvr, message_name, verbose):
 		if result.split(' ')[0]=='Deleted':
 			print result
 			bytes_deleted = int(result.split('Deleted ')[1].split(' bytes')[0])
+		else:
+			print result.upper()
 	except socket.error:
 		print 'Error Making API Request'
 		pass
