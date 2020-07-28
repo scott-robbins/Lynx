@@ -152,7 +152,7 @@ class BackendAPI:
 				print '%s is sending a message for %s at %s - %s:' % (name, recvr, date, ltime)
 				msg_dat = 'From: %s\nSent: %s  %s\nMessage: \n%s' % (name, date, ltime, message)
 				when = date.replace('/','').replace('@','').replace(' ','')+'_'+ltime.replace(':', '')
-				# This will not work alone because you might send more than one message a second!!
+				# Adding this because a client might send more than one message a second!!
 				quick_hash = SHA256.new()
 				quick_hash.update(msg_dat)
 				msg_id = ''.join(base64.b64encode(quick_hash.digest()[0:16])[0:8])
@@ -200,6 +200,25 @@ class BackendAPI:
 				c.send(utils.EncodeAES(cipher, open(mname, 'rb').read()))
 			else:
 				c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
+		return c
+
+	def delete_message(self, c, ci, req, name):
+		cipher = self.crpyto[self.tokens[name]]
+		if not os.path.isdir(os.getcwd()+'/LynxData/messaging/'):
+			os.mkdir(os.getcwd()+'/LynxData/messaging')
+			c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
+			return c
+		if not os.path.isdir(os.getcwd()+'/LynxData/messaging/%s' % name):
+			os.mkdir(os.getcwd()+'/LynxData/messaging/%s' % name)
+			c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
+			return c
+		if os.path.isfile(os.getcwd()+'/LynxData/messaging/%s/%s'%(name, req)):
+			sz = len(open(os.getcwd()+'/LynxData/messaging/%s/%s'%(name, req),'rb').read())
+			os.remove(os.getcwd()+'/LynxData/messaging/%s/%s'%(name, req))
+			c.send(utils.EncodeAES('Deleted %d bytes' % sz))
+		else:
+			os.mkdir(os.getcwd()+'/LynxData/messaging/%s' % name)
+			c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
 		return c
 
 

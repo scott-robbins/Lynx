@@ -165,3 +165,30 @@ def read_message(uname, srvr, message_name, verbose):
 		pass
 	s.close()
 	return recvd, content
+
+def delete_message(uname, srvr, message_name, verbose):
+	deleted = False
+	bytes_deleted = 0
+	session_key = load_sess_key()
+	ciph = AES.new(base64.b64decode(session_key))
+	
+	try:
+		s = utils.create_tcp_socket(False)
+		s.connect((srvr,54123))
+		cmesg = 'DELETE ???? %s' % message_name
+		enc_dat = utils.EncodeAES(ciph, cmesg)
+		api_req = '%s !!!! %s' % (uname, enc_dat)
+		s.send(api_req)
+		print '[*] Requesting to delete %s' % message_name
+		result = s.recv(256)
+		if result != '!! unable to read message !!':
+			deleted = True
+		else:
+			print result
+			bytes_deleted = int(result.split('Deleted ')[1].split(' bytes')[0])
+	except socket.error:
+		print 'Error Making API Request'
+		pass
+	s.close()
+
+	return deleted, bytes_deleted

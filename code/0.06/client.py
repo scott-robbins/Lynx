@@ -149,6 +149,10 @@ def main():
 		p2p.check_connection(name, rmt_endpt, True)
 		p2p.read_message(name, rmt_endpt, msg_name, True)
 
+	if ('-rm' or '-delete') in sys.argv and len(sys.argv) > 2:
+		msg_name = sys.argv[2]
+		p2p.check_connection(name, rmt_endpt, True) 
+		p2p.delete_message(name, rmt_endpt, msg_name, True)
 
 if __name__ == '__main__':
 	main()
