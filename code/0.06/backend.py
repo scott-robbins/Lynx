@@ -216,6 +216,7 @@ class BackendAPI:
 		if os.path.isfile(os.getcwd()+'/LynxData/messaging/%s/%s'%(name, req)):
 			content = open(os.getcwd()+'/LynxData/messaging/%s/%s'%(name, req),'rb').read()
 			sz = len(content)
+			print sz
 			os.remove(os.getcwd()+'/LynxData/messaging/%s/%s'%(name, req))
 			c.send(utils.EncodeAES('Deleted %d bytes' % sz))
 		else:
