@@ -204,7 +204,7 @@ class BackendAPI:
 		return c
 
 	def delete_message(self, c, ci, req, name):
-		cipher = self.crpyto[self.tokens[name]]
+		cipher = self.crypto[self.tokens[name]]
 		if not os.path.isdir(os.getcwd()+'/LynxData/messaging/'):
 			os.mkdir(os.getcwd()+'/LynxData/messaging')
 			c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
