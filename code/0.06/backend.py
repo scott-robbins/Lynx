@@ -1,6 +1,7 @@
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.PublicKey import RSA
+from Crypto.Hash import SHA256
 import base64
 import socket 
 import utils 
@@ -151,7 +152,11 @@ class BackendAPI:
 				print '%s is sending a message for %s at %s - %s:' % (name, recvr, date, ltime)
 				msg_dat = 'From: %s\nSent: %s  %s\nMessage: \n%s' % (name, date, ltime, message)
 				when = date.replace('/','').replace('@','').replace(' ','')+'_'+ltime.replace(':', '')
-				name = '%sFOR%sAT%s.msg' % (name,recvr,when)
+				# This will not work alone because you might send more than one message a second!!
+				quick_hash = SHA256.new()
+				quick_hash.update(msg_dat)
+				msg_id = ''.join(quick_hash.digest()[0:16])
+				name = '%sFOR%sAT%s_%s.msg' % (name,recvr,when, msg_id)
 				# Write the message to disk
 				open(os.getcwd()+'/LynxData/messaging/%s/%s' % (recvr, name), 'wb').write(msg_dat)
 				c.send(str(len(message)))
