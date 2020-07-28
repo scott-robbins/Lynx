@@ -207,11 +207,11 @@ class BackendAPI:
 		cipher = self.crypto[self.tokens[name]]
 		if not os.path.isdir(os.getcwd()+'/LynxData/messaging/'):
 			os.mkdir(os.getcwd()+'/LynxData/messaging')
-			c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
+			c.send(utils.EncodeAES(cipher, '!! unable to delete message !!'))
 			return c
 		if not os.path.isdir(os.getcwd()+'/LynxData/messaging/%s' % name):
 			os.mkdir(os.getcwd()+'/LynxData/messaging/%s' % name)
-			c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
+			c.send(utils.EncodeAES(cipher, '!! unable to delete message !!'))
 			return c
 		if os.path.isfile(os.getcwd()+'/LynxData/messaging/%s/%s'%(name, req)):
 			content = open(os.getcwd()+'/LynxData/messaging/%s/%s'%(name, req),'rb').read()
@@ -220,7 +220,7 @@ class BackendAPI:
 			os.remove(os.getcwd()+'/LynxData/messaging/%s/%s'%(name, req))
 			c.send(utils.EncodeAES(cipher, 'Deleted %d bytes' % sz))
 		else:
-			c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
+			c.send(utils.EncodeAES(cipher, '!! unable to delete message !!'))
 		return c
 
 
