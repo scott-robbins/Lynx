@@ -24,7 +24,8 @@ class BackendAPI:
 						'PEERS': self.show_peers,
 						'POKES': self.poke_client,
 						'INBOX': self.list_messages,
-						'READ':  self.read_message}
+						'READ':  self.read_message,
+						'DELETE': self.delete_message}
 		# Setup the server
 		self.serve = utils.start_listener(self.inbound)
 		self.k = self.setup()
