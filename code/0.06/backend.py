@@ -219,7 +219,6 @@ class BackendAPI:
 			os.remove(os.getcwd()+'/LynxData/messaging/%s/%s'%(name, req))
 			c.send(utils.EncodeAES('Deleted %d bytes' % sz))
 		else:
-			os.mkdir(os.getcwd()+'/LynxData/messaging/%s' % name)
 			c.send(utils.EncodeAES(cipher, '!! unable to read message !!'))
 		return c
 
