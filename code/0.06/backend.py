@@ -26,7 +26,7 @@ class BackendAPI:
 						'POKES': self.poke_client,
 						'INBOX': self.list_messages,
 						'READ':  self.read_message,
-						'DELETE': self.delete_message,
+						'REMOVE': self.delete_message,
 						'SET_PROXY': self.set_proxy_flag}
 		# Setup the server
 		self.serve = utils.start_listener(self.inbound)

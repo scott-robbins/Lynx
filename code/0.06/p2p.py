@@ -176,7 +176,7 @@ def delete_message(uname, srvr, message_name, verbose):
 	try:
 		s = utils.create_tcp_socket(False)
 		s.connect((srvr,54123))
-		cmesg = 'DELETE ???? %s' % message_name
+		cmesg = 'REMOVE ???? %s' % message_name
 		enc_dat = utils.EncodeAES(ciph, cmesg)
 		api_req = '%s !!!! %s' % (uname, enc_dat)
 		s.send(api_req)

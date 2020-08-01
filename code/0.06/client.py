@@ -158,6 +158,11 @@ def main():
 		resource = sys.argv[2]
 		uploaded, uid = p2p.tag_file_for_sharing(resource)
 
+	if '-set_proxy' in sys.argv and len(sys.argv) > 3:
+		rmt_host = sys.argv[2]
+		rmt_port = sys.argv[3]
+		p2p.start_proxy(name, rmt_endpt, rmt_host, rmt_port)
+
 
 if __name__ == '__main__':
 	main()
