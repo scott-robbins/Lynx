@@ -127,7 +127,7 @@ class BackendAPI:
 			if addr not in known_clients and len(addr) > 1:
 				known_clients.append(addr)
 		# Now dump it to txt file
-		cs.pop(-1)
+		#cs.pop(-1)
 		dump = ''
 		for ln in cs:
 			dump += ln + '\n'
