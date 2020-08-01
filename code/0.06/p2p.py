@@ -241,7 +241,7 @@ def start_proxy(uname, srvr, rmt_host, rmt_port):
 		s.send(api_req)
 		print '[*] Requesting to%s' % (cmesg)
 		reply = utils.DecodeAES(ciph, s.recv(2048))
-		if len(reply.split('Proxy Dlag set for for:'))==2:
+		if reply == ('Proxy Flag Set for: %s:%s' % (rmt_host, rmt_port)):
 			proxying = True
 			print '[*] Proxy Flag Set on MiddleManServer for %s:%s' % (rmt_host, rmt_port) 
 		else:
@@ -252,3 +252,11 @@ def start_proxy(uname, srvr, rmt_host, rmt_port):
 	s.close()
 	return proxying
 
+def check_proxy_flag(uname, srver):
+	flagged = False
+	rmt_peer_data = ''
+	# MIGHT WANT ANOTHER PROTOCOL FOR USING THE KEYS FOR PEER-TO-PEER *AUTH* not just 
+	# Encryption ? Like only person with correct private key can decrypt proxy_flag? idk
+	session_key = load_sess_key()
+	ciph = AES.new(base64.b64decode(session_key))
+	return flagged, rmt_peer_data

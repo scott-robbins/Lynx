@@ -163,6 +163,11 @@ def main():
 		rmt_port = sys.argv[3]
 		p2p.start_proxy(name, rmt_endpt, rmt_host, rmt_port)
 
+	elif '-pop_proxy_startups' in sys.argv:
+		print '[*] Checking if any peers are trying to connect...'
+		
+		print '[*] Setting up server to listen for incoming NAT Punch Sequence'
+		
 
 if __name__ == '__main__':
 	main()
