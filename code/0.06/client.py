@@ -125,10 +125,10 @@ def main():
 		p2p.show_peers(name, rmt_endpt, True)
 		exit()
 
-	if '-check' in sys.argv:
+	elif '-check' in sys.argv:
 		p2p.check_connection(name, rmt_endpt, True)
 
-	if '-send' in sys.argv and len(sys.argv) > 3:
+	elif '-send' in sys.argv and len(sys.argv) > 3:
 		recv = sys.argv[2]
 		msg_file = sys.argv[3]
 		if not os.path.isfile(msg_file):
@@ -140,25 +140,25 @@ def main():
 		if p2p.message_peer(name, rmt_endpt, recv, content, True):
 			print '[*] Message Delivered [%ss Elapsed]' % str(time.time()-t0)
 
-	if '-show_inbox' in sys.argv:
+	elif '-show_inbox' in sys.argv:
 		p2p.check_connection(name, rmt_endpt, True)
 		p2p.show_inbox(name, rmt_endpt, True)
 
-	if '-read' in sys.argv and len(sys.argv) > 2:
+	elif '-read' in sys.argv and len(sys.argv) > 2:
 		msg_name = sys.argv[2]
 		p2p.check_connection(name, rmt_endpt, True)
 		p2p.read_message(name, rmt_endpt, msg_name, True)
 
-	if ('-rm' or '-delete' in sys.argv) and len(sys.argv) > 2:
+	elif ('-delete' in sys.argv) and len(sys.argv) > 2:
 		msg_name = sys.argv[2]
 		p2p.check_connection(name, rmt_endpt, True) 
 		p2p.delete_message(name, rmt_endpt, msg_name, True)
 
-	if '-add' in sys.argv and len(sys.argv) > 2:
+	elif '-add' in sys.argv and len(sys.argv) > 2:
 		resource = sys.argv[2]
 		uploaded, uid = p2p.tag_file_for_sharing(resource)
 
-	if '-set_proxy' in sys.argv and len(sys.argv) > 3:
+	elif '-set_proxy' in sys.argv and len(sys.argv) > 3:
 		rmt_host = sys.argv[2]
 		rmt_port = sys.argv[3]
 		p2p.start_proxy(name, rmt_endpt, rmt_host, rmt_port)

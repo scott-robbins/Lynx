@@ -239,13 +239,14 @@ def start_proxy(uname, srvr, rmt_host, rmt_port):
 		# Request to start proxying
 		print cmesg
 		s.send(api_req)
-		print '[*] Requesting to start proxying %s:%s' % (rmt_host, rmt_port)
+		print '[*] Requesting to%s' % (cmesg)
 		reply = utils.DecodeAES(ciph, s.recv(2048))
 		if len(reply.split(':'))==2:
 			proxying = True
 			print '[*] Proxy Flag Set on MiddleManServer for %s:%s' % (rmt_host, rmt_port) 
 		else:
 			print '[!!] Error Setting Proxy Flag'
+			print reply
 	except socket.error:
 		print 'Error Making API Request'
 		pass
