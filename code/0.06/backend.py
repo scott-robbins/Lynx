@@ -240,8 +240,12 @@ class BackendAPI:
 			print '[!!] Malformed API query'
 			return c
 		try:
-			if proxy_endpt in self.tokens.keys() and not self.proxy_mapping[proxy_endpt]:
-				self.proxy_mapping[proxy_endpt] = [ci[0], proxy_endpt, proxy_port]
+			if proxy_endpt in self.tokens.keys():
+				endpt = '%s!%s@%s' % (proxy_endpt,ci[0], name)
+				if proxy_endpt in self.proxy_mapping.keys():
+					self.proxy_mapping[proxy_endpt].append(endpt)
+				else:
+					self.proxy_mapping[proxy_endpt] = [endpt]
 				c.send(utils.EncodeAES(cipher, 'Proxy Flag Set for: %s:%s' % (proxy_endpt, proxy_port)))
 			else:
 				c.send(utils.EncodeAES(cipher, 'Unknown Client %s, cannot set proxy flag' % proxy_endpt))
