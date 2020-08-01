@@ -233,16 +233,17 @@ def start_proxy(uname, srvr, rmt_host, rmt_port):
 	try:
 		s = utils.create_tcp_socket(False)
 		s.connect((srvr, 54123))
-		cmesg = 'SET_PROXY ???? %s :::: %d' % (rmt_host, rmt_port)
+		cmesg = 'SET_PROXY ???? %s :::: %s' % (rmt_host, rmt_port)
 		enc_dat = utils.EncodeAES(ciph, cmesg)
 		api_req = '%s !!!! %s' % (uname, enc_dat)
 		# Request to start proxying
+		print cmesg
 		s.send(api_req)
-		print '[*] Requesting to start proxying %s:%d' % (rmt_host, rmt_port)
+		print '[*] Requesting to start proxying %s:%s' % (rmt_host, rmt_port)
 		reply = utils.DecodeAES(ciph, s.recv(2048))
 		if len(reply.split(':'))==2:
 			proxying = True
-			print '[*] Proxy Flag Set on MiddleManServer for %s:%d' % (rmt_host, rmt_port) 
+			print '[*] Proxy Flag Set on MiddleManServer for %s:%s' % (rmt_host, rmt_port) 
 		else:
 			print '[!!] Error Setting Proxy Flag'
 	except socket.error:
