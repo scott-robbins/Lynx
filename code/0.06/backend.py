@@ -16,6 +16,7 @@ class BackendAPI:
 	tokens = {}
 	crypto = {}
 	known_clients = []
+	proxy_mapping = {}
 	running = False
 
 	def __init__ (self):
@@ -25,7 +26,8 @@ class BackendAPI:
 						'POKES': self.poke_client,
 						'INBOX': self.list_messages,
 						'READ':  self.read_message,
-						'DELETE': self.delete_message}
+						'DELETE': self.delete_message,
+						'SET_PROXY': self.set_proxy_flag}
 		# Setup the server
 		self.serve = utils.start_listener(self.inbound)
 		self.k = self.setup()
@@ -221,6 +223,29 @@ class BackendAPI:
 			c.send(utils.EncodeAES(cipher, 'Deleted %d bytes' % sz))
 		else:
 			c.send(utils.EncodeAES(cipher, '!! unable to delete message !!'))
+		return c
+
+	def add_file_tag(self, c, ci, req, name):
+		
+		return c
+
+	def set_proxy_flag(self, c, ci, req, name):
+		cipher = self.crypto[self.tokens[name]]
+		try:
+			proxy_endpt = req.split(' :::: ')[0]
+			proxy_port = req.split(' :::: ')[1]
+		except IndexError:
+			print '[!!] Malformed API query'
+			return c
+		try:
+			if proxy_endpt in self.known_clients:
+				self.proxy_mapping[client] = [ci[0], proxy_endpt, proxy_port]
+				c.send(utils.EncodeAES('Proxy Flag Set for: %s:%s' % (proxy_endpt, proxy_port)))
+			else:
+				c.send(utils.EncodeAES('Unknown Client %s, cannot set proxy flag' % proxy_endpt))
+		except socket.error:
+			print '[!!] Connection Error'
+			pass
 		return c
 
 

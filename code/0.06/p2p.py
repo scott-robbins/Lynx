@@ -1,6 +1,7 @@
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.PublicKey import RSA
+from Crypto.Hash import SHA256
 import base64
 import socket
 import utils
@@ -190,5 +191,63 @@ def delete_message(uname, srvr, message_name, verbose):
 		print 'Error Making API Request'
 		pass
 	s.close()
-
 	return deleted, bytes_deleted
+
+def tag_file_for_sharing(funame, srvr, file_path, verbose):
+	uploaded = False
+	file_tag = ''
+	file_name = file_path.split('/')[-1]
+	if not os.path.isdir(os.getcwd()+'/LynxData/Shared'):
+		os.mkdir(os.getcwd()+'/LynxData/Shared')
+	hash = utils.cmd('sha256sum %s' % file_path, False).pop().split(' ')[0]
+	size = os.path.getsize(file_path)
+
+	session_key = load_sess_key()
+	ciph = AES.new(base64.b64decode(session_key))
+
+	try:
+		s = utils.create_tcp_socket(False)
+		s.connect((srvr, 54123))
+		cmesg = 'TAGFILE ???? %s :::: %s ;;;; %d' % (file_name, hash, size)
+		enc_data = utils.EncodeAES(ciph, cmesg)
+		api_req = '%s !!!! %s' % (uname, cmesg)
+		s.send(api_req)
+		print '[*] Adding %s <%s> to shared uploads' % (file_name, hash)
+		s.send(enc_dat)
+		reply = s.recv(1028)
+		if utils.DecodeAES(ciph, reply) == hash:
+			uploaded = True
+		else:
+			print '[!!] Server Replied with Incorrect File Hash:\n%s' % reply
+	except socket.error:
+		print 'Error Making API Request'
+		pass
+	s.close()
+	
+	return uploaded, file_tag
+
+def start_proxy(uname, srvr, rmt_host, rmt_port):
+	proxying = False
+	session_key = load_sess_key()
+	ciph = AES.new(base64.b64decode(session_key))
+	try:
+		s = utils.create_tcp_socket(False)
+		s.connect((srvr, 54123))
+		cmesg = 'SET_PROXY ???? %s :::: %d' % (rmt_host, rmt_port)
+		enc_dat = utils.EncodeAES(ciph, cmesg)
+		api_req = '%s !!!! %s' % (uname, enc_dat)
+		# Request to start proxying
+		s.send(api_req)
+		print '[*] Requesting to start proxying %s:%d' % (rmt_host, rmt_port)
+		reply = utils.DecodeAES(ciph, s.recv(2048))
+		if len(reply.split(':'))==2:
+			proxying = True
+			print '[*] Proxy Flag Set on MiddleManServer for %s:%d' % (rmt_host, rmt_port) 
+		else:
+			print '[!!] Error Setting Proxy Flag'
+	except socket.error:
+		print 'Error Making API Request'
+		pass
+	s.close()
+	return proxying
+

@@ -154,6 +154,11 @@ def main():
 		p2p.check_connection(name, rmt_endpt, True) 
 		p2p.delete_message(name, rmt_endpt, msg_name, True)
 
+	if '-add' in sys.argv and len(sys.argv) > 2:
+		resource = sys.argv[2]
+		uploaded, uid = p2p.tag_file_for_sharing(resource)
+
+
 if __name__ == '__main__':
 	main()
 
