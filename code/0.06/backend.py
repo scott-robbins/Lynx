@@ -241,7 +241,7 @@ class BackendAPI:
 			return c
 		try:
 			if proxy_endpt in self.tokens.keys():
-				self.proxy_mapping[client] = [ci[0], proxy_endpt, proxy_port]
+				self.proxy_mapping[proxy_endpt] = [ci[0], proxy_endpt, proxy_port]
 				c.send(utils.EncodeAES(cipher, 'Proxy Flag Set for: %s:%s' % (proxy_endpt, proxy_port)))
 			else:
 				c.send(utils.EncodeAES(cipher, 'Unknown Client %s, cannot set proxy flag' % proxy_endpt))
